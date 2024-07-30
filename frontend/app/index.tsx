@@ -40,6 +40,8 @@ const MainTabs = () => {
                 tabBarInactiveTintColor: 'white',
                 tabBarStyle: { backgroundColor: '#000071' },
             })}
+
+            //ll
         >
             <Tab.Screen name="Home" component={HomePage} />
             <Tab.Screen name="Blog" component={BlogPage} />
@@ -97,3 +99,4 @@ const styles = StyleSheet.create({
 });
 
 export default App;
+
