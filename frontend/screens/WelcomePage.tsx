@@ -5,6 +5,7 @@ const WelcomePage= ({ navigation }: { navigation: any}) => {
     <View style={styles.container}>
             <Text style={styles.title}>AquaVista</Text>
             <Text style={styles.subtitle}>bla bla bla</Text>
+            <Text style={styles.subtitle}>tdkk</Text>
             <TouchableOpacity
                 style={styles.button}
                 onPress={() => navigation.replace('Main')}
