@@ -1,28 +1,38 @@
 import * as React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import Search from '../components/blogComponent/search'; // Adjust the path based on the actual location
+import BlogPost from '@/components/blogComponent/BlogPost';
 
-const HomePage: React.FC = () => {
+// Define the type for the navigation prop
+type BlogPageNavigationProp = StackNavigationProp<{
+  BlogPage: undefined;
+  BlogDetail: undefined;
+}>;
+
+interface BlogPageProps {
+  navigation: BlogPageNavigationProp;
+}
+
+const BlogPage: React.FC<BlogPageProps> = ({ navigation }) => {
+  const handlePress = () => {
+    navigation.navigate('BlogDetail');
+  };
+
   return (
-      <View style={styles.container}>
-          <Text style={styles.title}>Blog Page</Text>
-      </View>
+    <View style={styles.container}>
+      <Search />
+      <BlogPost onPress={handlePress} />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    title: {
-        marginTop: 30,
-        color: 'black',
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        marginBottom: 2,
-    }
+  container: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
 });
 
-export default HomePage;
+export default BlogPage;

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native'; // Ensure StyleSheet is imported from 'react-native'
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -10,6 +10,7 @@ import HomePage from '@/screens/HomePage';
 import EventPage from '@/screens/EventPage';
 import SoundPage from '@/screens/SoundPage';
 import BlogPage from '@/screens/BlogPage';
+import BlogDetail from '@/screens/BlogDetailPage';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -40,14 +41,21 @@ const MainTabs = () => {
                 tabBarInactiveTintColor: 'white',
                 tabBarStyle: { backgroundColor: '#000071' },
             })}
-
-            //ll
         >
             <Tab.Screen name="Home" component={HomePage} />
-            <Tab.Screen name="Blog" component={BlogPage} />
+            <Tab.Screen name="Blog" component={BlogStack} options={{ headerShown: false }} />
             <Tab.Screen name="Events" component={EventPage} />
             <Tab.Screen name="Sounds" component={SoundPage} />
         </Tab.Navigator>
+    );
+};
+
+const BlogStack = () => {
+    return (
+        <Stack.Navigator initialRouteName="BlogPage">
+            <Stack.Screen name="BlogPage" component={BlogPage} />
+            <Stack.Screen name="BlogDetail" component={BlogDetail} />
+        </Stack.Navigator>
     );
 };
 
@@ -99,4 +107,3 @@ const styles = StyleSheet.create({
 });
 
 export default App;
-
