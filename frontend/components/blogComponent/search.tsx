@@ -40,7 +40,8 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     borderWidth: 1,
     paddingLeft: 8,
-    borderRadius: 8,
+
+   
   },
   sortBox: {
     height: 40,
