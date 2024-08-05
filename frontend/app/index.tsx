@@ -2,50 +2,112 @@ import * as React from 'react';
 import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Provider as PaperProvider } from 'react-native-paper';
 import WelcomePage from '@/screens/WelcomePage';
 import HomePage from '@/screens/HomePage';
 import EventPage from '@/screens/EventPage';
 import SoundPage from '@/screens/SoundPage';
 import BlogPage from '@/screens/BlogPage';
+import BlogDetail from '@/screens/BlogDetailPage';
 
 const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
+const Tab = createMaterialBottomTabNavigator();
 
 const MainTabs = () => {
     return (
         <Tab.Navigator
             initialRouteName="Home"
+            activeColor="#000000"
+            inactiveColor="#ffffff"
+            barStyle={{ backgroundColor: '#000071' }}
+            shifting={true}
             screenOptions={({ route }) => ({
-                tabBarIcon: ({ color, size }) => {
+                tabBarIcon: ({ color }) => {
                     let iconName: string;
+                    let IconComponent: typeof Ionicons;
 
                     if (route.name === 'Home') {
                         iconName = 'home';
+                        IconComponent = MaterialCommunityIcons;
                     } else if (route.name === 'Events') {
                         iconName = 'calendar';
+                        IconComponent = MaterialCommunityIcons;
                     } else if (route.name === 'Blog') {
-                        iconName = 'book';
+                        iconName = 'forum-outline';
+                        IconComponent = MaterialCommunityIcons;
                     } else if (route.name === 'Sounds') {
-                        iconName = 'musical-notes';
+                        iconName = 'music';
+                        IconComponent = MaterialCommunityIcons;
                     } else {
                         iconName = 'information-circle'; // default icon
+                        IconComponent = Ionicons;
                     }
 
-                    return <Ionicons name={iconName} color={color} size={size} />;
+                    return <IconComponent name={iconName} color={color} size={26} />;
                 },
-                tabBarActiveTintColor: 'tomato',
-                tabBarInactiveTintColor: 'white',
-                tabBarStyle: { backgroundColor: '#000071' },
             })}
         >
-            <Tab.Screen name="Home" component={HomePage} />
-            <Tab.Screen name="Blog" component={BlogPage} />
-            <Tab.Screen name="Events" component={EventPage} />
-            <Tab.Screen name="Sounds" component={SoundPage} />
+            <Tab.Screen
+                name="Home"
+                component={HomePage}
+                options={{
+                    tabBarLabel: 'Home',
+                    tabBarIcon: ({ color }) => (
+                        <MaterialCommunityIcons name="home" color={color} size={26} />
+                    ),
+                }}
+            />
+            <Tab.Screen
+                name="Blog"
+                component={BlogStack}
+                options={{
+                    tabBarLabel: 'Blog',
+                    tabBarIcon: ({ color }) => (
+                        <MaterialCommunityIcons name="forum-outline" color={color} size={26} />
+                    ),
+                }}
+            />
+            <Tab.Screen
+                name="Events"
+                component={EventPage}
+                options={{
+                    tabBarLabel: 'Events',
+                    tabBarIcon: ({ color }) => (
+                        <MaterialCommunityIcons name="calendar-multiselect" color={color} size={26} />
+                    ),
+                }}
+            />
+            <Tab.Screen
+                name="Sounds"
+                component={SoundPage}
+                options={{
+                    tabBarLabel: 'Sounds',
+                    tabBarIcon: ({ color }) => (
+                        <MaterialCommunityIcons name="music" color={color} size={26} />
+                    ),
+                }}
+            />
         </Tab.Navigator>
+    );
+};
+
+const BlogStack = () => {
+    return (
+        <Stack.Navigator initialRouteName="BlogPage">
+            <Stack.Screen
+                name="BlogPage"
+                component={BlogPage}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="BlogDetail"
+                component={BlogDetail}
+                options={{ headerShown: false }}
+            />
+        </Stack.Navigator>
     );
 };
 
@@ -53,8 +115,16 @@ const App = () => {
     return (
         <PaperProvider>
                 <Stack.Navigator initialRouteName="Welcome">
-                    <Stack.Screen name="Welcome" component={WelcomePage} options={{ headerShown: false }} />
-                    <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
+                    <Stack.Screen
+                        name="Welcome"
+                        component={WelcomePage}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="Main"
+                        component={MainTabs}
+                        options={{ headerShown: false }}
+                    />
                 </Stack.Navigator>
         </PaperProvider>
     );
@@ -65,22 +135,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    title: {
-        marginTop: 30,
-        color: 'black',
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        marginBottom: 2,
-    },
-    subtitle: {
-        marginTop: 30,
-        color: 'black',
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        marginBottom: 6,
     },
     button: {
         marginTop: 60,
