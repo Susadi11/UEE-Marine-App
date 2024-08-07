@@ -1,10 +1,18 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+ 
 
 // Define the type for the props
 interface BlogPostProps {
   onPress: () => void; // Define the type for onPress as a function that returns void
+ 
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
+interface BlogPostProps {
+  onPress: () => void; // Ensure onPress is defined here
+ 
 }
 
 const BlogPost: React.FC<BlogPostProps> = ({ onPress }) => {
@@ -17,9 +25,15 @@ const BlogPost: React.FC<BlogPostProps> = ({ onPress }) => {
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={styles.title}>About Macbook</Text>
+ 
           <View style={styles.icon}>
             <Icon name="arrow-up-right" size={24} color="black" />
           </View>
+ 
+          <TouchableOpacity style={styles.icon} onPress={onPress}>
+            <Icon name="arrow-up-right" size={24} color="black" />
+          </TouchableOpacity>
+ 
         </View>
         <Text style={styles.description}>
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi, debitis?
@@ -29,17 +43,39 @@ const BlogPost: React.FC<BlogPostProps> = ({ onPress }) => {
           <Text style={styles.tag}>#Apple</Text>
           <Text style={styles.tag}>#Laptop</Text>
         </View>
+ 
         <TouchableOpacity style={styles.button} onPress={onPress}>
           <Text style={styles.buttonText}>Read</Text>
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
+ 
+        <View style={styles.footer}>
+          <TouchableOpacity style={styles.readMore} onPress={onPress}>
+            <Text style={styles.readMoreText}>Read More</Text>
+            <Icon name="arrow-right" size={16} color="black" />
+          </TouchableOpacity>
+          <View style={styles.iconContainer}>
+            <AntDesign name="like2" size={20} color="black" style={styles.iconSpacing} />
+            <AntDesign name="dislike2" size={20} color="black" style={[styles.iconSpacing, styles.dislikeIcon]} />
+            <MaterialCommunityIcons name="share-outline" size={20} color="black" style={styles.iconSpacing} />
+          </View>
+        </View>
+      </View>
+    </TouchableOpacity>
+
+    
+ 
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+ 
     width: 300,
+ 
+    width: 350,
+ 
     borderRadius: 8,
     borderColor: '#d1d5db',
     borderWidth: 1,
@@ -49,6 +85,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 1,
+ 
+    marginTop: 10,
+ 
   },
   image: {
     height: 200,
@@ -67,6 +106,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#111827',
+ 
+    flex: 1,
+ 
   },
   icon: {
     marginLeft: 8,
@@ -92,6 +134,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#111827',
   },
+ 
   button: {
     marginTop: 16,
     width: '100%',
@@ -109,6 +152,33 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     color: '#fff',
+=======
+  footer: {
+    marginTop: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  readMore: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  readMoreText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: 'black',
+    marginRight: 4,
+  },
+  iconContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconSpacing: {
+    marginHorizontal: 8,
+  },
+  dislikeIcon: {
+    marginLeft: 16,
+ 
   },
 });
 
