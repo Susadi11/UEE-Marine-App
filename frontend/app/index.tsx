@@ -12,6 +12,7 @@ import EventPage from '@/screens/EventPage';
 import SoundPage from '@/screens/SoundPage';
 import BlogPage from '@/screens/BlogPage';
 import BlogDetail from '@/screens/BlogDetailPage';
+import SeaWaveTrack from '@/screens/SeaWaweTrack';
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -125,6 +126,11 @@ const App = () => {
                         component={MainTabs}
                         options={{ headerShown: false }}
                     />
+                    <Stack.Screen
+                        name="SeaWaveTrack"
+                        component={SeaWaveTrack}
+                        options={{ title: 'Sea Wave Track' }}
+          />
                 </Stack.Navigator>
         </PaperProvider>
     );
