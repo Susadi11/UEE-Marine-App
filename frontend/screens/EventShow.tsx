@@ -1,12 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 
-import { NavigationProp } from '@react-navigation/native';
-interface EventPageProps {
-  navigation: NavigationProp<any>;
-}
-
-const EventPage: React.FC<EventPageProps> = ({ navigation }) => {
+const EventShow = () => {
   return (
     <ScrollView style={styles.container}>
       {/* Hero section */}
@@ -14,15 +9,12 @@ const EventPage: React.FC<EventPageProps> = ({ navigation }) => {
         <View style={styles.heroContent}>
           <Text style={styles.heroTitle}>Explore Our Marine Events</Text>
           <Text style={styles.heroSubtitle}>
-            Dive into exciting activities, conservation efforts, and community gatherings that celebrate the wonders of the ocean.
+          Dive into exciting activities, conservation efforts, and community gatherings that celebrate the wonders of the ocean
           </Text>
           <TouchableOpacity style={styles.heroButton}>
             <Text style={styles.heroButtonText}>Explore</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.heroButton2}
-            onPress={() => navigation.navigate('EventAdd')}  // Ensure 'EventAdd' matches the stack navigator name
-          >
+          <TouchableOpacity style={styles.heroButton2}>
             <Text style={styles.heroButtonText2}>Add Events</Text>
           </TouchableOpacity>
         </View>
@@ -45,9 +37,10 @@ const EventPage: React.FC<EventPageProps> = ({ navigation }) => {
             <View style={styles.productInfo}>
               <Text style={styles.productTitle}>World's Beach Cleanup Day</Text>
               <Text style={styles.productDescription}>
-                World Beach Cleanup Day is celebrated annually on September 16. It is part of a global effort to clean up coastlines, promote 
-                marine conservation, and raise awareness about the impact of ocean pollution.
+              World Beach Cleanup Day is celebrated annually on September 16. It is part of a global effort to clean up coastlines, promote 
+              marine conservation, and raise awareness about the impact of ocean pollution.
               </Text>
+               
             </View>
           </View>
 
@@ -60,12 +53,17 @@ const EventPage: React.FC<EventPageProps> = ({ navigation }) => {
             <View style={styles.productInfo}>
               <Text style={styles.productTitle}>World's Ocean Day</Text>
               <Text style={styles.productDescription}>
-                World Oceans Day is celebrated annually on June 8. It’s a global event dedicated to celebrating the ocean, raising awareness about its importance, and promoting actions to protect and sustain it.
+              World Oceans Day is celebrated annually on June 8. It’s a global event dedicated to celebrating the ocean, raising awareness 
+              about its importance, and promoting actions to protect and sustain it.
               </Text>
+               
+              </View>
             </View>
           </View>
+
+          {/* Add more products as needed */}
         </View>
-      </View>
+    
     </ScrollView>
   );
 };
@@ -76,90 +74,116 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   heroSection: {
-    position: 'relative',
-    height: 300,
+    backgroundColor: '#1E40AF',
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+    flexDirection: 'column', // Changed to column for mobile layout
+    alignItems: 'center',
   },
   heroContent: {
-    position: 'absolute',
-    top: 50,
-    left: 20,
-    zIndex: 1,
-    maxWidth: '60%',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   heroTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
     color: '#fff',
+    fontSize: 32,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 16,
   },
   heroSubtitle: {
-    fontSize: 16,
     color: '#fff',
-    marginVertical: 10,
+    fontSize: 18,
+    textAlign: 'center',
+    marginBottom: 24,
   },
   heroButton: {
-    backgroundColor: '#007BFF',
+    backgroundColor: '#fff',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 5,
-    marginVertical: 10,
-  },
-  heroButton2: {
-    backgroundColor: '#FFD700',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginTop:5,
+    borderRadius: 50,
+    marginBottom: 10,
   },
   heroButtonText: {
-    color: '#fff',
-    fontSize: 16,
+    color: '#1E40AF',
+    fontWeight: 'bold',
+  },
+  heroButton2: {
+    backgroundColor: '#fff',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 50,
   },
   heroButtonText2: {
-    color: '#000',
-    fontSize: 16,
+    color: '#1E40AF',
+    fontWeight: 'bold',
   },
   heroImage: {
     width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
+    height: 200,
+    borderRadius: 10,
+    marginTop: 20,
   },
   featuredSection: {
-    padding: 20,
+    paddingVertical: 40,
+    paddingHorizontal: 20,
   },
   sectionTitle: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: '#374151',
     marginBottom: 20,
-    marginTop:60,
+    textAlign: 'center',
   },
   productGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: 'column', // Adjusted for mobile, no grid layout
   },
   productCard: {
-    width: '48%',
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#fff',
     borderRadius: 10,
     overflow: 'hidden',
     marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
   },
   productImage: {
     width: '100%',
-    height: 150,
+    height: 200,
     resizeMode: 'cover',
   },
   productInfo: {
-    padding: 10,
+    padding: 16,
   },
   productTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 20,
+    color: '#374151',
+    marginBottom: 8,
   },
   productDescription: {
     fontSize: 14,
-    color: '#666',
+    color: '#6B7280',
+    marginBottom: 16,
+  },
+  productFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  
+  addButton: {
+    backgroundColor: '#1E40AF',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 50,
+  },
+  addButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 
-export default EventPage;
+export default EventShow;

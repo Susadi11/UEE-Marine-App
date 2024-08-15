@@ -13,6 +13,8 @@ import SoundPage from '@/screens/SoundPage';
 import BlogPage from '@/screens/BlogPage';
 import BlogDetail from '@/screens/BlogDetailPage';
 import SeaWaveTrack from '@/screens/SeaWaweTrack';
+import EventShow from '@/screens/EventShow';
+import EventAdd from '@/screens/EventAdd';
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -73,7 +75,7 @@ const MainTabs = () => {
             />
             <Tab.Screen
                 name="Events"
-                component={EventPage}
+                component={EventStack}
                 options={{
                     tabBarLabel: 'Events',
                     tabBarIcon: ({ color }) => (
@@ -136,6 +138,23 @@ const App = () => {
     );
 };
 
+const EventStack = () => {
+    return (
+        <Stack.Navigator initialRouteName="EventPage">
+            <Stack.Screen
+                name="EventPage"
+                component={EventPage}
+                options={{ headerShown: false }}  
+            />
+            <Stack.Screen
+                name="EventAdd"
+                component={EventAdd}
+                options={{ headerShown: false }}  
+            />
+        </Stack.Navigator>
+    );
+};
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -157,3 +176,4 @@ const styles = StyleSheet.create({
 });
 
 export default App;
+ 
