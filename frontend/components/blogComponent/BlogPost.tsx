@@ -1,73 +1,112 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
+import React, { useState } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface BlogPostProps {
   onPress: () => void;
 }
 
 const BlogPost: React.FC<BlogPostProps> = ({ onPress }) => {
+  const [liked, setLiked] = useState(false);
+  const animatedScale = new Animated.Value(1);
+
+  const handleLike = () => {
+    setLiked(!liked);
+    Animated.sequence([
+      Animated.timing(animatedScale, {
+        toValue: 1.2,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(animatedScale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress}>
+    <View style={styles.container}>
       <Image
         source={{ uri: 'https://images.unsplash.com/photo-1522199755839-a2bacb67c546?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTF8fGJsb2d8ZW58MHx8MHx8&auto=format&fit=crop&w=800&q=60' }}
         style={styles.image}
       />
+      <LinearGradient
+        colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.7)']}
+        style={styles.gradient}
+      >
+       
+      </LinearGradient>
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={styles.title}>About Macbook</Text>
-          <TouchableOpacity style={styles.icon} onPress={onPress}>
-            <Icon name="arrow-up-right" size={24} color="black" />
-          </TouchableOpacity>
         </View>
-        <Text style={styles.description}>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi, debitis?
+        <Text style={styles.description} numberOfLines={2}>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi, debitis? Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptates, quod.
         </Text>
+        <TouchableOpacity onPress={onPress}>
+          <Text style={styles.readMore}>Read More</Text>
+        </TouchableOpacity>
         <View style={styles.tags}>
           <Text style={styles.tag}>#Macbook</Text>
           <Text style={styles.tag}>#Apple</Text>
           <Text style={styles.tag}>#Laptop</Text>
         </View>
-        <TouchableOpacity style={styles.button} onPress={onPress}>
-          <Text style={styles.buttonText}>Read</Text>
-        </TouchableOpacity>
         <View style={styles.footer}>
-          <TouchableOpacity style={styles.readMore} onPress={onPress}>
-            <Text style={styles.readMoreText}>Read More</Text>
-            <Icon name="arrow-right" size={16} color="black" />
-          </TouchableOpacity>
+          <View style={styles.authorInfo}>
+            <Image
+              source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }}
+              style={styles.authorImage}
+            />
+            <View>
+              <Text style={styles.authorName}>John Doe</Text>
+              <Text style={styles.date}>May 20, 2023</Text>
+            </View>
+          </View>
           <View style={styles.iconContainer}>
-            <AntDesign name="like2" size={20} color="black" style={styles.iconSpacing} />
+            <TouchableOpacity onPress={handleLike}>
+              <Animated.View style={{ transform: [{ scale: animatedScale }] }}>
+                <AntDesign name="like2" size={20} color="black" style={styles.iconSpacing} />
+              </Animated.View>
+            </TouchableOpacity>
             <AntDesign name="dislike2" size={20} color="black" style={[styles.iconSpacing, styles.dislikeIcon]} />
             <MaterialCommunityIcons name="share-outline" size={20} color="black" style={styles.iconSpacing} />
           </View>
         </View>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     width: 350,
-    borderRadius: 8,
-    borderColor: '#d1d5db',
-    borderWidth: 1,
+    borderRadius: 16,
     backgroundColor: 'white',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 2,
-    elevation: 1,
-    marginTop: 10,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+    marginVertical: 16,
+    overflow: 'hidden',
   },
   image: {
     height: 200,
     width: '100%',
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
+  },
+  gradient: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 80,
+    justifyContent: 'flex-end',
+    paddingBottom: 16,
+    paddingHorizontal: 16,
   },
   content: {
     padding: 16,
@@ -75,20 +114,23 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 8,
   },
   title: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#111827',
     flex: 1,
   },
-  icon: {
-    marginLeft: 8,
-  },
   description: {
-    marginTop: 12,
-    fontSize: 14,
+    fontSize: 16,
     color: '#4b5563',
+    lineHeight: 24,
+  },
+  readMore: {
+    color: '#3b82f6',
+    fontWeight: 'bold',
+    marginVertical: 8,
   },
   tags: {
     marginTop: 16,
@@ -99,30 +141,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     marginRight: 8,
     paddingHorizontal: 12,
-    paddingVertical: 4,
+    paddingVertical: 6,
     borderRadius: 16,
     backgroundColor: '#f3f4f6',
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: 'bold',
     color: '#111827',
-  },
-  button: {
-    marginTop: 16,
-    width: '100%',
-    borderRadius: 4,
-    backgroundColor: '#000',
-    paddingVertical: 8,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  buttonText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#fff',
   },
   footer: {
     marginTop: 16,
@@ -130,15 +154,24 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  readMore: {
+  authorInfo: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  readMoreText: {
-    fontSize: 14,
+  authorImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 12,
+  },
+  authorName: {
+    fontSize: 16,
     fontWeight: 'bold',
-    color: 'black',
-    marginRight: 4,
+    color: '#111827',
+  },
+  date: {
+    fontSize: 14,
+    color: '#6b7280',
   },
   iconContainer: {
     flexDirection: 'row',

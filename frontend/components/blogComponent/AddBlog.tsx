@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { getFirestore, collection, addDoc } from 'firebase/firestore'; // Firestore imports
+import { app } from '../../firebaseConfig'; // Import initialized Firebase app
 
 const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [title, setTitle] = useState('');
@@ -8,6 +10,8 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [para1, setPara1] = useState('');
   const [para2, setPara2] = useState('');
   const [para3, setPara3] = useState('');
+
+  const firestore = getFirestore(app); // Initialize Firestore
 
   const handleSave = async () => {
     if (!title || !category || !sciName || !para1 || !para2 || !para3) {
@@ -25,22 +29,13 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     };
 
     try {
-        const response = await fetch('http://192.168.1.87:5555/blog', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(newBlog),
-          });
-
-      if (response.ok) {
-        Alert.alert('Blog saved successfully');
-        onClose();
-      } else {
-        const errorData = await response.json();
-        Alert.alert('Error', errorData.message);
-      }
+      // Attempt to add a new blog to Firestore
+      const docRef = await addDoc(collection(firestore, 'blogs'), newBlog);
+      console.log('Document written with ID: ', docRef.id);
+      Alert.alert('Blog saved successfully');
+      onClose();
     } catch (error) {
+      console.error('Error adding document: ', error);
       if (error instanceof Error) {
         Alert.alert('Error', error.message);
       } else {
