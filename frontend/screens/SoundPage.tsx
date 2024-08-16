@@ -9,7 +9,7 @@ const Sound: React.FC = () => {
 
   const categories = [
     { title: 'Sea Wave', imageUrl: 'https://cache.desktopnexus.com/thumbseg/2397/2397774-bigthumbnail.jpg', navigateTo: 'SeaWaveTrack' },
-    { title: 'Dolphin Calls', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzAtANFORNBOtyQ-0-p_J-AHDLDHt0_upQLA&s' },
+    { title: 'Dolphin Calls', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzAtANFORNBOtyQ-0-p_J-AHDLDHt0_upQLA&s',navigateTo:'SeaWaveTrack' },
     { title: 'Underwater', imageUrl: 'https://www.creativefabrica.com/wp-content/uploads/2023/09/21/Ocean-Underwater-Wallpaper-Graphics-79762400-1.jpg' },
     { title: 'Sea Waves + Piano Music', imageUrl: 'https://t3.ftcdn.net/jpg/06/34/38/26/360_F_634382619_pvMY6CtgERYA8401Zhf6HiwtWduWXLgp.jpg' },
     { title: 'Sea Animal Sounds', imageUrl: 'https://i.pinimg.com/736x/ff/af/03/ffaf03f6c7bfad3c90f02d5207847793.jpg' },
@@ -20,6 +20,7 @@ const Sound: React.FC = () => {
 
   return (
     <View style={styles.container}>
+      
       <Text style={styles.title}>Recommended for you</Text>
       <ScrollView horizontal={true} contentContainerStyle={styles.cardsContainer} showsHorizontalScrollIndicator={false}>
         <Card title="Relaxing music with Ocean Waves" description="Sleep music, Stress Relief" imageUrl='https://i.pinimg.com/736x/76/27/b1/7627b146303d3bd73c057e04cba9a3a7.jpg'/>
