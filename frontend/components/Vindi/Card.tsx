@@ -1,20 +1,38 @@
 import * as React from 'react';
-import { View, Text, ImageBackground, StyleSheet } from 'react-native';
+import { View, Text, ImageBackground, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-const Card: React.FC<{ title: string, description: string, imageUrl: string }> = ({ title, description, imageUrl }) => {
+interface CardProps {
+  title: string;
+  description: string;
+  imageUrl: string;
+  navigateTo?: string; // This is now explicitly defined as an optional prop
+}
+
+const Card: React.FC<CardProps> = ({ title, description, imageUrl, navigateTo }) => {
+  const navigation = useNavigation();
+
+  const handlePress = () => {
+    if (navigateTo) {
+      navigation.navigate(navigateTo as never); // TypeScript expects a string here
+    }
+  };
+
   return (
-    <View style={styles.card}>
-      <ImageBackground 
-        style={styles.cardImage} 
-        source={{ uri: imageUrl }} 
-        imageStyle={{ borderRadius: 10 }}
-      >
-        <View style={styles.textContainer}>
-          <Text style={styles.cardTitle}>{title}</Text>
-          <Text style={styles.cardDescription}>{description}</Text>
-        </View>
-      </ImageBackground>
-    </View>
+    <TouchableOpacity onPress={handlePress}>
+      <View style={styles.card}>
+        <ImageBackground 
+          style={styles.cardImage} 
+          source={{ uri: imageUrl }} 
+          imageStyle={{ borderRadius: 10 }}
+        >
+          <View style={styles.textContainer}>
+            <Text style={styles.cardTitle}>{title}</Text>
+            <Text style={styles.cardDescription}>{description}</Text>
+          </View>
+        </ImageBackground>
+      </View>
+    </TouchableOpacity>
   );
 };
 
@@ -30,8 +48,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
-    marginTop:10,
-    
+    marginTop: 10,
   },
   cardImage: {
     width: '100%',
@@ -55,3 +72,4 @@ const styles = StyleSheet.create({
 });
 
 export default Card;
+
