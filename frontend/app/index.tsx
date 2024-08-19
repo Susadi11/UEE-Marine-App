@@ -15,6 +15,9 @@ import BlogDetail from '@/screens/BlogDetailPage';
 import SeaWaveTrack from '@/screens/SeaWaweTrack';
 import EventShow from '@/screens/EventShow';
 import EventAdd from '@/screens/EventAdd';
+import MusicPlayer from '@/screens/MusicPlayer';
+
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -72,7 +75,7 @@ const MainTabs = () => {
       />
       <Tab.Screen
         name="Sounds"
-        component={SoundPage}
+        component={SoundStack}
         options={{
           tabBarLabel: 'Sounds',
         }}
@@ -98,6 +101,25 @@ const BlogStack = () => {
   );
 };
 
+
+const SoundStack = () => {
+  return (
+    <Stack.Navigator initialRouteName="SoundPage">
+      <Stack.Screen
+        name="SoundPage"
+        component={SoundPage}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="MusicPlayer"
+        component={MusicPlayer}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+
 const EventStack = () => {
   return (
     <Stack.Navigator initialRouteName="EventPage">
@@ -114,6 +136,7 @@ const EventStack = () => {
     </Stack.Navigator>
   );
 };
+
 
 const App = () => {
   return (
@@ -134,6 +157,9 @@ const App = () => {
             component={SeaWaveTrack}
             options={{ title: 'Sea Wave Track' }}
           />
+          
+         
+         
         </Stack.Navigator>
     </PaperProvider>
   );
