@@ -3,14 +3,37 @@ import { View, TextInput, StyleSheet, TouchableOpacity, Text, Modal } from 'reac
 import { Picker } from '@react-native-picker/picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AddBlog from '../../components/blogComponent/AddBlog'; // Adjust the path based on the actual location
+import { NavigationContainer, useNavigation } from '@react-navigation/native'; 
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+type RootStackParamList = {
+  Welcome: undefined;
+  Main: undefined;
+  SeaWaveTrack: undefined;
+  MyBlogPage: undefined;
+  // add more routes as needed
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
+type MyBlogPageNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'MyBlogPage'
+>;
 
 const Search: React.FC = () => {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [sortType, setSortType] = React.useState('');
   const [isModalVisible, setModalVisible] = React.useState(false);
+  const navigation = useNavigation<MyBlogPageNavigationProp>(); // Use the navigation hook with type
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
+  };
+
+  const navigateToMyBlogPage = () => {
+    navigation.navigate('MyBlogPage'); // Navigate to MyBlogPage
   };
 
   return (
@@ -38,7 +61,7 @@ const Search: React.FC = () => {
           <Text style={styles.buttonText}>Trending</Text>
         </View>
         <View style={styles.buttonWrapper}>
-          <TouchableOpacity style={styles.circleButton}>
+          <TouchableOpacity style={styles.circleButton} onPress={navigateToMyBlogPage}>
             <Icon name="rss-feed" size={24} color="#000" />
           </TouchableOpacity>
           <Text style={styles.buttonText}>My Blogs</Text>

@@ -184,7 +184,7 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
 const styles = StyleSheet.create({
   scrollView: {
-    backgroundColor: '#f0f8ff',
+   
   },
   container: {
     padding: 20,

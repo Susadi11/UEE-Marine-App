@@ -16,8 +16,7 @@ import SeaWaveTrack from '@/screens/SeaWaweTrack';
 import EventShow from '@/screens/EventShow';
 import EventAdd from '@/screens/EventAdd';
 import MusicPlayer from '@/screens/MusicPlayer';
-
-
+import MyBlogPage from '@/screens/Blogs/MyBlogPage';
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -28,8 +27,8 @@ const MainTabs = () => {
       initialRouteName="Home"
       activeColor="#b07a33"
       inactiveColor="#ffffff"
-      shifting={true}
-      barStyle={styles.floatingBarStyle}
+
+      barStyle={{ backgroundColor: '#1d6ab5' }}
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color }) => {
           let iconName;
@@ -49,6 +48,12 @@ const MainTabs = () => {
           }
 
           return <IconComponent name={iconName} color={color} size={26} />;
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+        },
+        tabBarStyle: {
+          backgroundColor: '#1d6ab5',
         },
       })}
     >
@@ -101,7 +106,6 @@ const BlogStack = () => {
   );
 };
 
-
 const SoundStack = () => {
   return (
     <Stack.Navigator initialRouteName="SoundPage">
@@ -119,7 +123,6 @@ const SoundStack = () => {
   );
 };
 
-
 const EventStack = () => {
   return (
     <Stack.Navigator initialRouteName="EventPage">
@@ -136,7 +139,6 @@ const EventStack = () => {
     </Stack.Navigator>
   );
 };
-
 
 const App = () => {
   return (
@@ -157,36 +159,17 @@ const App = () => {
             component={SeaWaveTrack}
             options={{ title: 'Sea Wave Track' }}
           />
-          
-         
-         
+          <Stack.Screen
+            name="MyBlogPage"
+            component={MyBlogPage}
+            options={{ title: 'My Blog Page' }}
+          />
         </Stack.Navigator>
     </PaperProvider>
   );
 };
 
 const styles = StyleSheet.create({
-  floatingBarStyle: {
-    position: 'absolute',
-    left: 20,
-    right: 20,
-    bottom: 20,
-    backgroundColor: '#1d6ab5',
-    borderRadius: 50,
-    height: 70,
-    overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 5 },
-        shadowOpacity: 0.3,
-        shadowRadius: 5,
-      },
-      android: {
-        elevation: 10,
-      },
-    }),
-  },
   container: {
     flex: 1,
     justifyContent: 'center',
