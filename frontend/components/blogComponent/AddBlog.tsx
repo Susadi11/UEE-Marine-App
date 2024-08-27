@@ -6,11 +6,14 @@ import * as ImagePicker from 'expo-image-picker';
 
 const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('');
+  const [introduction, setIntroduction] = useState('');
   const [sciName, setSciName] = useState('');
-  const [para1, setPara1] = useState('');
-  const [para2, setPara2] = useState('');
-  const [para3, setPara3] = useState('');
+  const [physicalCharacteristics, setPhysicalCharacteristics] = useState('');
+  const [habitatDistribution, setHabitatDistribution] = useState('');
+  const [dietFeedingHabits, setDietFeedingHabits] = useState('');
+  const [behavior, setBehavior] = useState('');
+  const [importanceEcosystem, setImportanceEcosystem] = useState('');
+  const [humanInteractionImpact, setHumanInteractionImpact] = useState('');
   const [coverPhoto, setCoverPhoto] = useState<any>(null);
   const [images, setImages] = useState<any[]>([]);
   const [hashtags, setHashtags] = useState('');
@@ -27,18 +30,25 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   }, []);
 
   const handleSave = async () => {
-    if (!title || !category || !sciName || !para1 || !para2 || !para3 || !coverPhoto || images.length === 0 || !hashtags) {
+    if (
+      !title || !introduction || !sciName || !physicalCharacteristics || !habitatDistribution ||
+      !dietFeedingHabits || !behavior || !importanceEcosystem || !humanInteractionImpact || 
+      !coverPhoto || images.length === 0 || !hashtags
+    ) {
       Alert.alert('Please fill all fields');
       return;
     }
 
     const newBlog = {
       blog_title: title,
-      blog_category: category,
+      blog_category: introduction,
       blog_sciname: sciName,
-      blog_para1: para1,
-      blog_para2: para2,
-      blog_para3: para3,
+      blog_physicalCharacteristics: physicalCharacteristics,
+      blog_habitatDistribution: habitatDistribution,
+      blog_dietFeedingHabits: dietFeedingHabits,
+      blog_behavior: behavior,
+      blog_importanceEcosystem: importanceEcosystem,
+      blog_humanInteractionImpact: humanInteractionImpact,
       blog_coverPhoto: coverPhoto?.uri,
       blog_images: images.map(image => image.uri),
       blog_hashtags: hashtags.split(',').map(tag => tag.trim()),
@@ -110,9 +120,9 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       />
       <TextInput
         style={styles.input}
-        placeholder="Category"
-        value={category}
-        onChangeText={setCategory}
+        placeholder="Introduction"
+        value={introduction}
+        onChangeText={setIntroduction}
         placeholderTextColor="#a0a0a0"
       />
       <TextInput
@@ -124,27 +134,54 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       />
       <TextInput
         style={[styles.input, styles.textArea]}
-        placeholder="Paragraph 1"
-        value={para1}
-        onChangeText={setPara1}
+        placeholder="Physical Characteristics"
+        value={physicalCharacteristics}
+        onChangeText={setPhysicalCharacteristics}
         multiline={true}
         numberOfLines={4}
         placeholderTextColor="#a0a0a0"
       />
       <TextInput
         style={[styles.input, styles.textArea]}
-        placeholder="Paragraph 2"
-        value={para2}
-        onChangeText={setPara2}
+        placeholder="Habitat & Distribution"
+        value={habitatDistribution}
+        onChangeText={setHabitatDistribution}
         multiline={true}
         numberOfLines={4}
         placeholderTextColor="#a0a0a0"
       />
       <TextInput
         style={[styles.input, styles.textArea]}
-        placeholder="Paragraph 3"
-        value={para3}
-        onChangeText={setPara3}
+        placeholder="Diet & Feeding Habits"
+        value={dietFeedingHabits}
+        onChangeText={setDietFeedingHabits}
+        multiline={true}
+        numberOfLines={4}
+        placeholderTextColor="#a0a0a0"
+      />
+      <TextInput
+        style={[styles.input, styles.textArea]}
+        placeholder="Behavior"
+        value={behavior}
+        onChangeText={setBehavior}
+        multiline={true}
+        numberOfLines={4}
+        placeholderTextColor="#a0a0a0"
+      />
+      <TextInput
+        style={[styles.input, styles.textArea]}
+        placeholder="Importance in the Ecosystem"
+        value={importanceEcosystem}
+        onChangeText={setImportanceEcosystem}
+        multiline={true}
+        numberOfLines={4}
+        placeholderTextColor="#a0a0a0"
+      />
+      <TextInput
+        style={[styles.input, styles.textArea]}
+        placeholder="Human Interaction & Impact"
+        value={humanInteractionImpact}
+        onChangeText={setHumanInteractionImpact}
         multiline={true}
         numberOfLines={4}
         placeholderTextColor="#a0a0a0"
@@ -209,82 +246,67 @@ const styles = StyleSheet.create({
   input: {
     borderColor: '#000071',
     borderWidth: 1,
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
-    backgroundColor: 'white',
-    color: '#000071',
+    borderRadius: 8,
+    padding: 10,
     fontSize: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    marginBottom: 10,
+    color: '#000071',
+    backgroundColor: '#f9f9f9',
   },
   textArea: {
-    height: 100,
+    minHeight: 100,
     textAlignVertical: 'top',
-  },
-  image: {
-    width: '100%',
-    height: 200,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  imageGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  gridImage: {
-    width: '32%',
-    height: 100,
-    borderRadius: 5,
-    marginBottom: 10,
   },
   addButton: {
     backgroundColor: '#000071',
-    borderRadius: 25,
-    padding: 15,
-    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginTop: 10,
     marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 5,
+    alignItems: 'center',
   },
   addButtonText: {
+    color: '#fff',
     fontSize: 16,
-    color: 'white',
     fontWeight: 'bold',
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 20,
   },
   button: {
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 25,
-    backgroundColor: '#000071',
     flex: 1,
+    paddingVertical: 15,
+    alignItems: 'center',
+    borderRadius: 8,
     marginHorizontal: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 5,
+    backgroundColor: '#ddd',
   },
   saveButton: {
-    backgroundColor: '#0080ff',
+    backgroundColor: '#000071',
   },
   buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
+    color: '#000071',
     fontSize: 16,
+    fontWeight: 'bold',
+  },
+  image: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  imageGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  gridImage: {
+    width: 90,
+    height: 90,
+    borderRadius: 8,
+    marginRight: 10,
+    marginBottom: 10,
   },
 });
 

@@ -5,10 +5,17 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { LinearGradient } from 'expo-linear-gradient';
 
 interface BlogPostProps {
+  coverPhoto: string;
+  title: string;
+  introduction: string;
+  hashTags: string[];
+  authorName: string;
+  authorImage: string;
+  date: string;
   onPress: () => void;
 }
 
-const BlogPost: React.FC<BlogPostProps> = ({ onPress }) => {
+const BlogPost: React.FC<BlogPostProps> = ({ coverPhoto, title, introduction, hashTags, authorName, authorImage, date, onPress }) => {
   const [liked, setLiked] = useState(false);
   const animatedScale = new Animated.Value(1);
 
@@ -31,39 +38,37 @@ const BlogPost: React.FC<BlogPostProps> = ({ onPress }) => {
   return (
     <View style={styles.container}>
       <Image
-        source={{ uri: 'https://images.unsplash.com/photo-1522199755839-a2bacb67c546?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTF8fGJsb2d8ZW58MHx8MHx8&auto=format&fit=crop&w=800&q=60' }}
+        source={{ uri: coverPhoto }}
         style={styles.image}
       />
       <LinearGradient
         colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.7)']}
         style={styles.gradient}
-      >
-       
-      </LinearGradient>
+      />
       <View style={styles.content}>
         <View style={styles.header}>
-          <Text style={styles.title}>About Macbook</Text>
+          <Text style={styles.title}>{title}</Text>
         </View>
         <Text style={styles.description} numberOfLines={2}>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi, debitis? Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptates, quod.
+          {introduction}
         </Text>
         <TouchableOpacity onPress={onPress}>
           <Text style={styles.readMore}>Read More</Text>
         </TouchableOpacity>
         <View style={styles.tags}>
-          <Text style={styles.tag}>#Macbook</Text>
-          <Text style={styles.tag}>#Apple</Text>
-          <Text style={styles.tag}>#Laptop</Text>
+          {hashTags.map((tag, index) => (
+            <Text key={index} style={styles.tag}>#{tag}</Text>
+          ))}
         </View>
         <View style={styles.footer}>
           <View style={styles.authorInfo}>
             <Image
-              source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }}
+              source={{ uri: authorImage }}
               style={styles.authorImage}
             />
             <View>
-              <Text style={styles.authorName}>John Doe</Text>
-              <Text style={styles.date}>May 20, 2023</Text>
+              <Text style={styles.authorName}>{authorName}</Text>
+              <Text style={styles.date}>{date}</Text>
             </View>
           </View>
           <View style={styles.iconContainer}>
