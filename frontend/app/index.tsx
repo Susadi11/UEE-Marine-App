@@ -17,6 +17,7 @@ import EventShow from '@/screens/EventShow';
 import EventAdd from '@/screens/EventAdd';
 import MusicPlayer from '@/screens/MusicPlayer';
 import MyBlogPage from '@/screens/Blogs/MyBlogPage';
+import TrendingPage from '@/screens/Blogs/TrendingPage';
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -158,11 +159,6 @@ const App = () => {
             name="SeaWaveTrack"
             component={SeaWaveTrack}
             options={{ title: 'Sea Wave Track' }}
-          />
-          <Stack.Screen
-            name="MyBlogPage"
-            component={MyBlogPage}
-            options={{ title: 'My Blog Page' }}
           />
         </Stack.Navigator>
     </PaperProvider>

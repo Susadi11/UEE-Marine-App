@@ -1,97 +1,34 @@
-import * as React from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity, Text, Modal } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import React from 'react';
+import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import AddBlog from '../../components/blogComponent/AddBlog'; // Adjust the path based on the actual location
-import { NavigationContainer, useNavigation } from '@react-navigation/native'; 
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import TabBar from './TabBar';
 
-type RootStackParamList = {
-  Welcome: undefined;
-  Main: undefined;
-  SeaWaveTrack: undefined;
-  MyBlogPage: undefined;
-  // add more routes as needed
+type SearchProps = {
+  activeTab: string;
+  onTabPress: (tabName: string) => void;
+  onAddPress: () => void;
 };
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
-
-type MyBlogPageNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'MyBlogPage'
->;
-
-const Search: React.FC = () => {
+const Search: React.FC<SearchProps> = ({ activeTab, onTabPress, onAddPress }) => {
   const [searchQuery, setSearchQuery] = React.useState('');
-  const [sortType, setSortType] = React.useState('');
-  const [isModalVisible, setModalVisible] = React.useState(false);
-  const navigation = useNavigation<MyBlogPageNavigationProp>(); // Use the navigation hook with type
-
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
-  };
-
-  const navigateToMyBlogPage = () => {
-    navigation.navigate('MyBlogPage'); // Navigate to MyBlogPage
-  };
 
   return (
     <View style={styles.container}>
-      <View style={styles.searchContainer}>
-        <Icon name="search" size={20} color="#999" style={styles.searchIcon} />
-        <TextInput
-          style={styles.searchBox}
-          placeholder="Search"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
+      <View style={styles.searchRow}>
+        <View style={styles.searchBoxContainer}>
+          <Icon name="search" size={20} color="#999" style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchBox}
+            placeholder="Search"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
+        <TouchableOpacity onPress={onAddPress}>
+          <Icon name="add" size={25} color="#000" style={styles.addIcon} />
+        </TouchableOpacity>
       </View>
-      <View style={styles.buttonContainer}>
-        <View style={styles.buttonWrapper}>
-          <TouchableOpacity style={styles.circleButton} onPress={toggleModal}>
-            <Icon name="add" size={24} color="#000" />
-          </TouchableOpacity>
-          <Text style={styles.buttonText}>Add</Text>
-        </View>
-        <View style={styles.buttonWrapper}>
-          <TouchableOpacity style={styles.circleButton}>
-            <Icon name="trending-up" size={24} color="#000" />
-          </TouchableOpacity>
-          <Text style={styles.buttonText}>Trending</Text>
-        </View>
-        <View style={styles.buttonWrapper}>
-          <TouchableOpacity style={styles.circleButton} onPress={navigateToMyBlogPage}>
-            <Icon name="rss-feed" size={24} color="#000" />
-          </TouchableOpacity>
-          <Text style={styles.buttonText}>My Blogs</Text>
-        </View>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={sortType}
-            style={styles.sortBox}
-            onValueChange={(itemValue) => setSortType(itemValue)}
-          >
-            <Picker.Item label="Sort" value="" />
-            <Picker.Item label="A" value="A" />
-            <Picker.Item label="B" value="B" />
-            <Picker.Item label="C" value="C" />
-          </Picker>
-        </View>
-      </View>
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isModalVisible}
-        onRequestClose={toggleModal}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <AddBlog onClose={toggleModal} />
-          </View>
-        </View>
-      </Modal>
+      <TabBar activeTab={activeTab} onTabPress={onTabPress} />
     </View>
   );
 };
@@ -100,21 +37,20 @@ const styles = StyleSheet.create({
   container: {
     margin: 10,
   },
-  searchContainer: {
-    marginTop: 30,
+  searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 10,
+  },
+  searchBoxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
     borderColor: '#ddd',
     borderWidth: 1,
     borderRadius: 20,
     paddingHorizontal: 15,
-    marginBottom: 20,
     backgroundColor: '#fff',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
   },
   searchIcon: {
     marginRight: 10,
@@ -123,58 +59,8 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 40,
   },
-  buttonContainer: {
-    marginTop: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    paddingHorizontal: 5,
-  },
-  buttonWrapper: {
-    alignItems: 'center',
-    width: '18%', // Reduced to make space for the wider picker
-  },
-  circleButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-  },
-  buttonText: {
-    marginTop: 5,
-    fontSize: 12,
-    textAlign: 'center',
-  },
-  pickerContainer: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 5,
-    overflow: 'hidden',
-    width: '42%', // Increased width for the picker
-  },
-  sortBox: {
-    height: 40,
-    width: '100%',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  modalContent: {
-    width: '100%',
-    padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    backgroundColor: '#fff',
+  addIcon: {
+    marginLeft: 10,
   },
 });
 
