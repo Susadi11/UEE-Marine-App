@@ -1,8 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ScrollView, Image, Animated } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+  Image,
+  Animated,
+  Platform,
+} from 'react-native';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { app } from '../../firebaseConfig';
 import * as ImagePicker from 'expo-image-picker';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [title, setTitle] = useState('');
@@ -20,6 +32,7 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [fadeAnim] = useState(new Animated.Value(0));
 
   const firestore = getFirestore(app);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -107,7 +120,10 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   return (
     <Animated.ScrollView 
-      contentContainerStyle={styles.container}
+      contentContainerStyle={[
+        styles.container,
+        { paddingBottom: insets.bottom + 100 } // Add extra padding at the bottom
+      ]}
       style={[styles.scrollView, { opacity: fadeAnim }]}
     >
       <Text style={styles.title}>Add a New Blog Post</Text>
@@ -116,21 +132,21 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         placeholder="Title"
         value={title}
         onChangeText={setTitle}
-        placeholderTextColor="#a0a0a0"
+        placeholderTextColor="#a0aec0"
       />
       <TextInput
         style={styles.input}
         placeholder="Introduction"
         value={introduction}
         onChangeText={setIntroduction}
-        placeholderTextColor="#a0a0a0"
+        placeholderTextColor="#a0aec0"
       />
       <TextInput
         style={styles.input}
         placeholder="Scientific Name"
         value={sciName}
         onChangeText={setSciName}
-        placeholderTextColor="#a0a0a0"
+        placeholderTextColor="#a0aec0"
       />
       <TextInput
         style={[styles.input, styles.textArea]}
@@ -139,7 +155,7 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         onChangeText={setPhysicalCharacteristics}
         multiline={true}
         numberOfLines={4}
-        placeholderTextColor="#a0a0a0"
+        placeholderTextColor="#a0aec0"
       />
       <TextInput
         style={[styles.input, styles.textArea]}
@@ -148,7 +164,7 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         onChangeText={setHabitatDistribution}
         multiline={true}
         numberOfLines={4}
-        placeholderTextColor="#a0a0a0"
+        placeholderTextColor="#a0aec0"
       />
       <TextInput
         style={[styles.input, styles.textArea]}
@@ -157,7 +173,7 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         onChangeText={setDietFeedingHabits}
         multiline={true}
         numberOfLines={4}
-        placeholderTextColor="#a0a0a0"
+        placeholderTextColor="#a0aec0"
       />
       <TextInput
         style={[styles.input, styles.textArea]}
@@ -166,7 +182,7 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         onChangeText={setBehavior}
         multiline={true}
         numberOfLines={4}
-        placeholderTextColor="#a0a0a0"
+        placeholderTextColor="#a0aec0"
       />
       <TextInput
         style={[styles.input, styles.textArea]}
@@ -175,7 +191,7 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         onChangeText={setImportanceEcosystem}
         multiline={true}
         numberOfLines={4}
-        placeholderTextColor="#a0a0a0"
+        placeholderTextColor="#a0aec0"
       />
       <TextInput
         style={[styles.input, styles.textArea]}
@@ -184,7 +200,7 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         onChangeText={setHumanInteractionImpact}
         multiline={true}
         numberOfLines={4}
-        placeholderTextColor="#a0a0a0"
+        placeholderTextColor="#a0aec0"
       />
       <Text style={styles.subtitle}>Cover Photo</Text>
       {coverPhoto && <Image source={{ uri: coverPhoto.uri }} style={styles.image} />}
@@ -205,14 +221,14 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         placeholder="Hashtags (comma separated)"
         value={hashtags}
         onChangeText={setHashtags}
-        placeholderTextColor="#a0a0a0"
+        placeholderTextColor="#a0aec0"
       />
-      <View style={styles.buttonContainer}>
+      <View style={[styles.buttonContainer, { marginBottom: 20 }]}>
         <TouchableOpacity style={styles.button} onPress={onClose}>
           <Text style={styles.buttonText}>Cancel</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleSave}>
-          <Text style={styles.buttonText}>Save</Text>
+          <Text style={[styles.buttonText, styles.saveButtonText]}>Save</Text>
         </TouchableOpacity>
       </View>
     </Animated.ScrollView>
@@ -221,7 +237,8 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
 const styles = StyleSheet.create({
   scrollView: {
-   
+    backgroundColor: '#f7fafc', // bg-gray-100
+    flex: 1, // Make sure the ScrollView takes up the full screen
   },
   container: {
     padding: 20,
@@ -230,50 +247,48 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#000071',
+    color: '#2d3748', // text-gray-800
     textAlign: 'center',
-    textShadowColor: 'rgba(0, 0, 113, 0.3)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
   },
   subtitle: {
     fontSize: 18,
     fontWeight: 'bold',
     marginTop: 20,
     marginBottom: 10,
-    color: '#000071',
+    color: '#2d3748', // text-gray-800
   },
   input: {
-    borderColor: '#000071',
+    borderColor: '#e2e8f0', // border-gray-300
     borderWidth: 1,
     borderRadius: 8,
-    padding: 10,
+    padding: 12,
     fontSize: 16,
-    marginBottom: 10,
-    color: '#000071',
-    backgroundColor: '#f9f9f9',
+    marginBottom: 12,
+    color: '#2d3748', // text-gray-800
+    backgroundColor: '#ffffff', // bg-white
   },
   textArea: {
     minHeight: 100,
     textAlignVertical: 'top',
   },
   addButton: {
-    backgroundColor: '#000071',
-    paddingVertical: 10,
+    backgroundColor: '#4299e1', // bg-blue-500
+    paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 8,
-    marginTop: 10,
+    marginTop: 12,
     marginBottom: 20,
     alignItems: 'center',
   },
   addButtonText: {
-    color: '#fff',
+    color: '#ffffff', // text-white
     fontSize: 16,
     fontWeight: 'bold',
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 20,
   },
   button: {
     flex: 1,
@@ -281,21 +296,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 8,
     marginHorizontal: 5,
-    backgroundColor: '#ddd',
+    backgroundColor: '#edf2f7', // bg-gray-200
   },
   saveButton: {
-    backgroundColor: '#000071',
+    backgroundColor: '#4299e1', // bg-blue-500
   },
   buttonText: {
-    color: '#000071',
+    color: '#2d3748', // text-gray-800
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  saveButtonText: {
+    color: '#ffffff', // text-white
   },
   image: {
     width: '100%',
     height: 200,
     borderRadius: 8,
-    marginBottom: 10,
+    marginBottom: 12,
   },
   imageGrid: {
     flexDirection: 'row',

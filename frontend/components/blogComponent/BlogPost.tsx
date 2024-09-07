@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { LinearGradient } from 'expo-linear-gradient';
 
 interface BlogPostProps {
   coverPhoto: string;
@@ -40,10 +39,6 @@ const BlogPost: React.FC<BlogPostProps> = ({ coverPhoto, title, introduction, ha
       <Image
         source={{ uri: coverPhoto }}
         style={styles.image}
-      />
-      <LinearGradient
-        colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.7)']}
-        style={styles.gradient}
       />
       <View style={styles.content}>
         <View style={styles.header}>
@@ -103,18 +98,9 @@ const styles = StyleSheet.create({
     height: 200,
     width: '100%',
   },
-  gradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: 80,
-    justifyContent: 'flex-end',
-    paddingBottom: 16,
-    paddingHorizontal: 16,
-  },
   content: {
     padding: 16,
+    backgroundColor: 'white', // Ensure the background remains white
   },
   header: {
     flexDirection: 'row',
