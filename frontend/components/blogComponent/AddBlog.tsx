@@ -22,13 +22,10 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [sciName, setSciName] = useState('');
   const [physicalCharacteristics, setPhysicalCharacteristics] = useState('');
   const [habitatDistribution, setHabitatDistribution] = useState('');
-  const [dietFeedingHabits, setDietFeedingHabits] = useState('');
   const [behavior, setBehavior] = useState('');
   const [importanceEcosystem, setImportanceEcosystem] = useState('');
-  const [humanInteractionImpact, setHumanInteractionImpact] = useState('');
   const [coverPhoto, setCoverPhoto] = useState<any>(null);
   const [images, setImages] = useState<any[]>([]);
-  const [hashtags, setHashtags] = useState('');
   const [fadeAnim] = useState(new Animated.Value(0));
 
   const firestore = getFirestore(app);
@@ -44,8 +41,7 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const handleSave = async () => {
     if (
       !title || !introduction || !sciName || !physicalCharacteristics || !habitatDistribution ||
-      !dietFeedingHabits || !behavior || !importanceEcosystem || !humanInteractionImpact || 
-      !coverPhoto || images.length === 0 || !hashtags
+     !behavior || !importanceEcosystem || !coverPhoto || images.length === 0 
     ) {
       Alert.alert('Please fill all fields');
       return;
@@ -57,13 +53,10 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       blog_sciname: sciName,
       blog_physicalCharacteristics: physicalCharacteristics,
       blog_habitatDistribution: habitatDistribution,
-      blog_dietFeedingHabits: dietFeedingHabits,
       blog_behavior: behavior,
       blog_importanceEcosystem: importanceEcosystem,
-      blog_humanInteractionImpact: humanInteractionImpact,
       blog_coverPhoto: coverPhoto?.uri,
       blog_images: images.map(image => image.uri),
-      blog_hashtags: hashtags.split(',').map(tag => tag.trim()),
     };
 
     try {
@@ -169,15 +162,6 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       />
       <TextInput
         style={[styles.input, styles.textArea]}
-        placeholder="Diet & Feeding Habits"
-        value={dietFeedingHabits}
-        onChangeText={setDietFeedingHabits}
-        multiline={true}
-        numberOfLines={4}
-        placeholderTextColor="#a0aec0"
-      />
-      <TextInput
-        style={[styles.input, styles.textArea]}
         placeholder="Behavior"
         value={behavior}
         onChangeText={setBehavior}
@@ -190,15 +174,6 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         placeholder="Importance in the Ecosystem"
         value={importanceEcosystem}
         onChangeText={setImportanceEcosystem}
-        multiline={true}
-        numberOfLines={4}
-        placeholderTextColor="#a0aec0"
-      />
-      <TextInput
-        style={[styles.input, styles.textArea]}
-        placeholder="Human Interaction & Impact"
-        value={humanInteractionImpact}
-        onChangeText={setHumanInteractionImpact}
         multiline={true}
         numberOfLines={4}
         placeholderTextColor="#a0aec0"
@@ -231,7 +206,7 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
 const styles = StyleSheet.create({
   scrollView: {
-    backgroundColor: '#f7fafc', // bg-gray-100
+    backgroundColor: '#ffffff', // bg-gray-100
     flex: 1, // Make sure the ScrollView takes up the full screen
   },
   container: {
@@ -249,7 +224,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
   },
   input: {
-    borderColor: '#e2e8f0', // border-gray-300
+    borderColor: '#4a5568', // border-gray-300
     borderWidth: 1,
     borderRadius: 8,
     padding: 10,
@@ -285,7 +260,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   addButton: {
-    backgroundColor: '#4a5568', // bg-gray-600
+    backgroundColor: '#6C9EE5', // bg-gray-600
     padding: 10,
     borderRadius: 8,
     marginBottom: 15,
@@ -307,7 +282,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   saveButton: {
-    backgroundColor: '#2d3748', // bg-gray-800
+    backgroundColor: '#6C9EE5', // bg-gray-800
     marginLeft: 10,
   },
   buttonText: {

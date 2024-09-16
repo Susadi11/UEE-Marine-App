@@ -1,3 +1,4 @@
+// App.tsx
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -11,13 +12,12 @@ import MusicPlayer from '@/screens/MusicPlayer';
 import EventPage from '@/screens/EventPage';
 import EventAdd from '@/screens/EventAdd';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Ionicons from 'react-native-vector-icons/Ionicons'; // Import Ionicons
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import SeaWaveTrack from '@/screens/SeaWaweTrack';
 import { useEffect } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
-// Define stack navigators for each feature
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -30,7 +30,7 @@ const BlogStack = () => (
     />
     <Stack.Screen
       name="BlogDetail"
-      component={BlogDetail}
+      component={BlogDetail as React.ComponentType<any>}
       options={{ headerShown: false }}
     />
   </Stack.Navigator>
@@ -89,7 +89,7 @@ const MainTabs = () => (
           Home: 'home',
           Blog: 'forum-outline',
           Events: 'calendar-outline',
-          Sounds: 'music-circle-outline', // Updated icon
+          Sounds: 'music-circle-outline',
         };
 
         const iconName = iconMap[route.name] || 'question-mark';
@@ -142,7 +142,7 @@ const App = () => (
       <Stack.Screen
         name="SeaWaveTrack"
         component={SeaWaveTrack}
-        options={{ headerShown: false }} // Changed this line to remove the header
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
 );

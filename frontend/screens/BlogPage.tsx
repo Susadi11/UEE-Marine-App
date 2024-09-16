@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Alert, ScrollView, TouchableOpacity } from 'react-native';
-import { getFirestore, collection, onSnapshot } from 'firebase/firestore';
+import { getFirestore, collection, onSnapshot, doc, getDoc } from 'firebase/firestore';
 import { app } from '../firebaseConfig';
 import BlogPost from '@/components/blogComponent/BlogPost';
 import Search from '@/components/blogComponent/search';
@@ -12,7 +12,6 @@ import MyBlogPage from '@/screens/Blogs/MyBlogPage';
 type BlogPageProps = {
   navigation: any; // Replace 'any' with the appropriate type if using TypeScript
 };
-
 const BlogPage: React.FC<BlogPageProps> = ({ navigation }) => {
   const [blogs, setBlogs] = useState<any[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -53,10 +52,23 @@ const BlogPage: React.FC<BlogPageProps> = ({ navigation }) => {
     setShowAddBlog(false);
   };
 
-  const handleReadMore = (blogId: string) => {
-    navigation.navigate('BlogDetail', { blogId });
+  const handleReadMore = async (blogId: string) => {
+    try {
+      const docRef = doc(firestore, 'blogs', blogId);
+      const docSnap = await getDoc(docRef);
+      
+      if (docSnap.exists()) {
+        const blogData = docSnap.data();
+        navigation.navigate('BlogDetail', { blogData });
+      } else {
+        console.log("No such document!");
+        Alert.alert("Error", "Blog post not found");
+      }
+    } catch (error) {
+      console.error("Error fetching blog details:", error);
+      Alert.alert("Error", "Failed to load blog details");
+    }
   };
-
   const getActiveTab = () => {
     switch (activeIndex) {
       case 0:
