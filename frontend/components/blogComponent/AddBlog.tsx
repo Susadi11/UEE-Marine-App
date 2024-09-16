@@ -14,7 +14,6 @@ import {
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { app } from '../../firebaseConfig';
 import * as ImagePicker from 'expo-image-picker';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [title, setTitle] = useState('');
@@ -32,7 +31,6 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [fadeAnim] = useState(new Animated.Value(0));
 
   const firestore = getFirestore(app);
-  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -120,10 +118,7 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   return (
     <Animated.ScrollView 
-      contentContainerStyle={[
-        styles.container,
-        { paddingBottom: insets.bottom + 100 } // Add extra padding at the bottom
-      ]}
+      contentContainerStyle={styles.container}
       style={[styles.scrollView, { opacity: fadeAnim }]}
     >
       <Text style={styles.title}>Add a New Blog Post</Text>

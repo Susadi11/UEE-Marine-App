@@ -84,7 +84,7 @@ const BlogPost: React.FC<BlogPostProps> = ({ coverPhoto, title, introduction, ha
 const styles = StyleSheet.create({
   container: {
     width: 350,
-    borderRadius: 16,
+    borderRadius: 30,
     backgroundColor: 'white',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },

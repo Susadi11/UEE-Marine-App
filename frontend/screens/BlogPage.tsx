@@ -8,7 +8,6 @@ import Swiper from 'react-native-swiper';
 import AddBlog from '@/components/blogComponent/AddBlog';
 import TrendingPage from '@/screens/Blogs/TrendingPage';
 import MyBlogPage from '@/screens/Blogs/MyBlogPage';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type BlogPageProps = {
   navigation: any; // Replace 'any' with the appropriate type if using TypeScript
@@ -19,7 +18,6 @@ const BlogPage: React.FC<BlogPageProps> = ({ navigation }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [showAddBlog, setShowAddBlog] = useState(false);
   const firestore = getFirestore(app);
-  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     const blogCollection = collection(firestore, 'blogs');
@@ -73,7 +71,7 @@ const BlogPage: React.FC<BlogPageProps> = ({ navigation }) => {
   };
 
   return (
-    <View style={[styles.container, { paddingBottom: insets.bottom }]}>
+    <View style={styles.container}>
       {!showAddBlog && (
         <Search
           activeTab={getActiveTab()}
@@ -93,7 +91,7 @@ const BlogPage: React.FC<BlogPageProps> = ({ navigation }) => {
         >
           <ScrollView 
             style={styles.page}
-            contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
+            contentContainerStyle={styles.scrollContentContainer}
           >
             <View style={styles.blogList}>
               {blogs && blogs.length > 0 ? (
@@ -117,13 +115,13 @@ const BlogPage: React.FC<BlogPageProps> = ({ navigation }) => {
           </ScrollView>
           <ScrollView 
             style={styles.page}
-            contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
+            contentContainerStyle={styles.scrollContentContainer}
           >
             <TrendingPage />
           </ScrollView>
           <ScrollView 
             style={styles.page}
-            contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
+            contentContainerStyle={styles.scrollContentContainer}
           >
             <MyBlogPage />
           </ScrollView>
@@ -140,6 +138,9 @@ const styles = StyleSheet.create({
   },
   page: {
     flex: 1,
+  },
+  scrollContentContainer: {
+    paddingBottom: 100, // Adjust padding as needed
   },
   blogList: {
     padding: 16,
