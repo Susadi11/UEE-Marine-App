@@ -14,6 +14,7 @@ import {
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { app } from '../../firebaseConfig';
 import * as ImagePicker from 'expo-image-picker';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [title, setTitle] = useState('');
@@ -121,7 +122,12 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       contentContainerStyle={styles.container}
       style={[styles.scrollView, { opacity: fadeAnim }]}
     >
-      <Text style={styles.title}>Add a New Blog Post</Text>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={onClose}>
+          <MaterialCommunityIcons name="arrow-left" size={24} color="#2d3748" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Add New Blog</Text>
+      </View>
       <TextInput
         style={styles.input}
         placeholder="Title"
@@ -211,13 +217,6 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       <TouchableOpacity style={styles.addButton} onPress={handleAddImage}>
         <Text style={styles.addButtonText}>+ Add Image</Text>
       </TouchableOpacity>
-      <TextInput
-        style={styles.input}
-        placeholder="Hashtags (comma separated)"
-        value={hashtags}
-        onChangeText={setHashtags}
-        placeholderTextColor="#a0aec0"
-      />
       <View style={[styles.buttonContainer, { marginBottom: 20 }]}>
         <TouchableOpacity style={styles.button} onPress={onClose}>
           <Text style={styles.buttonText}>Cancel</Text>
@@ -238,88 +237,86 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
     color: '#2d3748', // text-gray-800
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginTop: 20,
-    marginBottom: 10,
-    color: '#2d3748', // text-gray-800
+    marginLeft: 20,
   },
   input: {
     borderColor: '#e2e8f0', // border-gray-300
     borderWidth: 1,
     borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    marginBottom: 12,
+    padding: 10,
+    marginBottom: 15,
+    backgroundColor: '#fff',
     color: '#2d3748', // text-gray-800
-    backgroundColor: '#ffffff', // bg-white
   },
   textArea: {
-    minHeight: 100,
-    textAlignVertical: 'top',
+    height: Platform.OS === 'ios' ? 100 : undefined, // adjust height for iOS
+  },
+  subtitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#2d3748', // text-gray-800
+  },
+  image: {
+    width: '100%',
+    height: 200,
+    resizeMode: 'cover',
+    marginBottom: 10,
+  },
+  imageGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 15,
+  },
+  gridImage: {
+    width: 100,
+    height: 100,
+    marginRight: 10,
+    marginBottom: 10,
+    borderRadius: 8,
   },
   addButton: {
-    backgroundColor: '#4299e1', // bg-blue-500
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+    backgroundColor: '#4a5568', // bg-gray-600
+    padding: 10,
     borderRadius: 8,
-    marginTop: 12,
-    marginBottom: 20,
-    alignItems: 'center',
+    marginBottom: 15,
   },
   addButtonText: {
-    color: '#ffffff', // text-white
-    fontSize: 16,
+    color: '#fff', // text-white
+    textAlign: 'center',
     fontWeight: 'bold',
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 20,
   },
   button: {
-    flex: 1,
-    paddingVertical: 15,
-    alignItems: 'center',
+    backgroundColor: '#e2e8f0', // bg-gray-300
+    padding: 10,
     borderRadius: 8,
-    marginHorizontal: 5,
-    backgroundColor: '#edf2f7', // bg-gray-200
+    flex: 1,
+    marginRight: 10,
   },
   saveButton: {
-    backgroundColor: '#4299e1', // bg-blue-500
+    backgroundColor: '#2d3748', // bg-gray-800
+    marginLeft: 10,
   },
   buttonText: {
     color: '#2d3748', // text-gray-800
-    fontSize: 16,
+    textAlign: 'center',
     fontWeight: 'bold',
   },
   saveButtonText: {
-    color: '#ffffff', // text-white
-  },
-  image: {
-    width: '100%',
-    height: 200,
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-  imageGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  gridImage: {
-    width: 90,
-    height: 90,
-    borderRadius: 8,
-    marginRight: 10,
-    marginBottom: 10,
+    color: '#fff', // text-white
   },
 });
 
