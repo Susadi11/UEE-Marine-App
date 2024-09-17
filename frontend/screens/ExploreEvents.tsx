@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, Alert, TextInput, ImageBackground, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'; // For icons
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { app } from '../firebaseConfig';
 
 const ExploreEvents = ({ navigation }: any) => {
-    const [events, setEvents] = useState<{ id: string; name: string; date: string; location: string; imageUrl: string; description: string; }[]>([]);
+    const [events, setEvents] = useState<{ id: string; title: string; date: string; time: string;  location: { latitude: number; longitude: number; }; imageUrl: string; description: string; }[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const firestore = getFirestore(app);
 
@@ -13,7 +13,7 @@ const ExploreEvents = ({ navigation }: any) => {
         const fetchEvents = async () => {
             try {
                 const querySnapshot = await getDocs(collection(firestore, 'events'));
-                const eventList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as { id: string; name: string;description: string; date: string; location: string; imageUrl: string;  }[];
+                const eventList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as { id: string; title: string;description: string; date: string; time: string; location: { latitude: number; longitude: number; }; imageUrl: string; }[];
                 setEvents(eventList);
             } catch (error) {
                 console.error('Error fetching events: ', error);
@@ -26,19 +26,43 @@ const ExploreEvents = ({ navigation }: any) => {
 
     const handleAttendEvent = (event: any) => {
         // Navigate to AttendEvent screen with event data as params
-        navigation.navigate('AttendEvent', { event });
+        navigation.navigate('EventDetails', { event });
     };
 
- 
+    const handleDeleteEvent = async (eventId: string) => {
+        Alert.alert(
+            'Delete Event',
+            'Are you sure you want to delete this event?',
+            [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                    text: 'Delete',
+                    onPress: async () => {
+                        try {
+                            await deleteDoc(doc(firestore, 'events', eventId));
+                            setEvents(events.filter(event => event.id !== eventId)); // Remove the deleted event from state
+                            Alert.alert('Success', 'Event deleted successfully');
+                        } catch (error) {
+                            Alert.alert('Error', 'Failed to delete the event');
+                        }
+                    },
+                    style: 'destructive',
+                },
+            ]
+        );
+    };
 
     const filteredEvents = events.filter(event =>
-        event.name?.toLowerCase().includes(searchQuery.toLowerCase())
+        event.title?.toLowerCase().includes(searchQuery.toLowerCase())
+        
     );
+
+    
     
     return (
         <ScrollView style={styles.container}>
             <ImageBackground
-                source={{ uri: 'https://example.com/event-background.jpg' }} // Replace with a relevant image URL
+                source={{ uri: 'https://t4.ftcdn.net/jpg/05/79/90/33/360_F_579903359_dPN7YwyB8l5lUUCrP3nj0kvPcFe90Lbg.jpg' }} // Replace with a relevant image URL
             >
                 <View style={styles.overlay}>
                     <Text style={styles.title}>Upcoming Events</Text>
@@ -61,13 +85,17 @@ const ExploreEvents = ({ navigation }: any) => {
                         {event.imageUrl && <Image source={{ uri: event.imageUrl }} style={styles.eventImage} />}
                     </TouchableOpacity>
                     <View style={styles.detailsContainer}>
-                        <Text style={styles.eventName}>{event.name}</Text>
+                        <Text style={styles.eventName}>{event.title}</Text>
                         <Text style={styles.eventDate}>Date: {event.date}</Text>
-                        <Text style={styles.eventLocation}>Location: {event.location}</Text>
-                        <Text style={styles.eventDescription}>{event.description}</Text>
+                       
                         <TouchableOpacity style={styles.attendButton} onPress={() => handleAttendEvent(event)}>
-                            <Icon name="calendar" size={20} color="#fff" />
-                            <Text style={styles.attendButtonText}>Attend Event</Text>
+                            <Icon name="eye" size={20} color="#fff" />
+                            <Text style={styles.attendButtonText}>View Post</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteEvent(event.id)}>
+                            <Icon name="trash" size={20} color="#fff" />
+                            <Text style={styles.deleteButtonText}>Delete Post</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -136,10 +164,11 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 4,
         marginHorizontal: 16,
+        marginTop: 10,
     },
     imageContainer: {
         position: 'relative',
-        height: 200,
+        height: 300,
         borderBottomWidth: 1,
         borderColor: '#e5e7eb',
     },
@@ -147,19 +176,27 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         resizeMode: 'cover',
+        borderRadius: 25,
     },
     detailsContainer: {
         padding: 15,
     },
     eventName: {
-        fontSize: 19.5,
+        fontSize: 30,
         fontWeight: 'bold',
         color: '#1f2937',
     },
     eventDate: {
         fontSize: 16,
+        color: '#250071',
+        marginVertical: 5,
+        fontWeight:'semibold'
+    },
+    eventTime: {
+        fontSize: 16,
         color: '#333',
         marginVertical: 5,
+       
     },
     eventLocation: {
         fontSize: 16,
@@ -168,19 +205,36 @@ const styles = StyleSheet.create({
     },
     eventDescription: {
         fontSize: 14,
-        color: '#333',
+        color: '#224671',
         marginVertical: 10,
     },
     attendButton: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: '#007BFF',
         paddingVertical: 10,
         paddingHorizontal: 15,
         borderRadius: 5,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
+        marginTop: 15,
     },
     attendButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginLeft: 10,
+    },
+    deleteButton: {
+        backgroundColor: '#e66666',
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        borderRadius: 5,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 10,
+    },
+    deleteButtonText: {
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
@@ -189,4 +243,3 @@ const styles = StyleSheet.create({
 });
 
 export default ExploreEvents;
- 
