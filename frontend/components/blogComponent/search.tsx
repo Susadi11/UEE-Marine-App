@@ -25,7 +25,7 @@ const Search: React.FC<SearchProps> = ({ activeTab, onTabPress, onAddPress }) =>
           />
         </View>
         <TouchableOpacity onPress={onAddPress}>
-          <Icon name="add" size={25} color="#000" style={styles.addIcon} />
+          <Icon name="add-circle-outline" size={25} color="#000" style={styles.addIcon} />
         </TouchableOpacity>
       </View>
       <TabBar activeTab={activeTab} onTabPress={onTabPress} />

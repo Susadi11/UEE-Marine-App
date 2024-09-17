@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Alert, ScrollView, TouchableOpacity } from 'react-native';
-import { getFirestore, collection, onSnapshot } from 'firebase/firestore';
+import { getFirestore, collection, onSnapshot, doc, getDoc } from 'firebase/firestore';
 import { app } from '../firebaseConfig';
 import BlogPost from '@/components/blogComponent/BlogPost';
 import Search from '@/components/blogComponent/search';
@@ -8,18 +8,15 @@ import Swiper from 'react-native-swiper';
 import AddBlog from '@/components/blogComponent/AddBlog';
 import TrendingPage from '@/screens/Blogs/TrendingPage';
 import MyBlogPage from '@/screens/Blogs/MyBlogPage';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type BlogPageProps = {
   navigation: any; // Replace 'any' with the appropriate type if using TypeScript
 };
-
 const BlogPage: React.FC<BlogPageProps> = ({ navigation }) => {
   const [blogs, setBlogs] = useState<any[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [showAddBlog, setShowAddBlog] = useState(false);
   const firestore = getFirestore(app);
-  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     const blogCollection = collection(firestore, 'blogs');
@@ -55,10 +52,23 @@ const BlogPage: React.FC<BlogPageProps> = ({ navigation }) => {
     setShowAddBlog(false);
   };
 
-  const handleReadMore = (blogId: string) => {
-    navigation.navigate('BlogDetail', { blogId });
+  const handleReadMore = async (blogId: string) => {
+    try {
+      const docRef = doc(firestore, 'blogs', blogId);
+      const docSnap = await getDoc(docRef);
+      
+      if (docSnap.exists()) {
+        const blogData = docSnap.data();
+        navigation.navigate('BlogDetail', { blogData });
+      } else {
+        console.log("No such document!");
+        Alert.alert("Error", "Blog post not found");
+      }
+    } catch (error) {
+      console.error("Error fetching blog details:", error);
+      Alert.alert("Error", "Failed to load blog details");
+    }
   };
-
   const getActiveTab = () => {
     switch (activeIndex) {
       case 0:
@@ -73,7 +83,7 @@ const BlogPage: React.FC<BlogPageProps> = ({ navigation }) => {
   };
 
   return (
-    <View style={[styles.container, { paddingBottom: insets.bottom }]}>
+    <View style={styles.container}>
       {!showAddBlog && (
         <Search
           activeTab={getActiveTab()}
@@ -93,7 +103,7 @@ const BlogPage: React.FC<BlogPageProps> = ({ navigation }) => {
         >
           <ScrollView 
             style={styles.page}
-            contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
+            contentContainerStyle={styles.scrollContentContainer}
           >
             <View style={styles.blogList}>
               {blogs && blogs.length > 0 ? (
@@ -117,13 +127,13 @@ const BlogPage: React.FC<BlogPageProps> = ({ navigation }) => {
           </ScrollView>
           <ScrollView 
             style={styles.page}
-            contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
+            contentContainerStyle={styles.scrollContentContainer}
           >
             <TrendingPage />
           </ScrollView>
           <ScrollView 
             style={styles.page}
-            contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
+            contentContainerStyle={styles.scrollContentContainer}
           >
             <MyBlogPage />
           </ScrollView>
@@ -140,6 +150,9 @@ const styles = StyleSheet.create({
   },
   page: {
     flex: 1,
+  },
+  scrollContentContainer: {
+    paddingBottom: 100, // Adjust padding as needed
   },
   blogList: {
     padding: 16,

@@ -12,9 +12,10 @@ import {
   Platform,
 } from 'react-native';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { app } from '../../firebaseConfig';
 import * as ImagePicker from 'expo-image-picker';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [title, setTitle] = useState('');
@@ -22,17 +23,14 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [sciName, setSciName] = useState('');
   const [physicalCharacteristics, setPhysicalCharacteristics] = useState('');
   const [habitatDistribution, setHabitatDistribution] = useState('');
-  const [dietFeedingHabits, setDietFeedingHabits] = useState('');
   const [behavior, setBehavior] = useState('');
   const [importanceEcosystem, setImportanceEcosystem] = useState('');
-  const [humanInteractionImpact, setHumanInteractionImpact] = useState('');
   const [coverPhoto, setCoverPhoto] = useState<any>(null);
   const [images, setImages] = useState<any[]>([]);
-  const [hashtags, setHashtags] = useState('');
   const [fadeAnim] = useState(new Animated.Value(0));
 
   const firestore = getFirestore(app);
-  const insets = useSafeAreaInsets();
+  const storage = getStorage(app);
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -42,32 +40,44 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     }).start();
   }, []);
 
+  const uploadImage = async (uri: string): Promise<string> => {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    const filename = uri.substring(uri.lastIndexOf('/') + 1);
+    const storageRef = ref(storage, `blog_images/${filename}`);
+    
+    await uploadBytes(storageRef, blob);
+    return await getDownloadURL(storageRef);
+  };
+
   const handleSave = async () => {
     if (
       !title || !introduction || !sciName || !physicalCharacteristics || !habitatDistribution ||
-      !dietFeedingHabits || !behavior || !importanceEcosystem || !humanInteractionImpact || 
-      !coverPhoto || images.length === 0 || !hashtags
+      !behavior || !importanceEcosystem || !coverPhoto || images.length === 0 
     ) {
       Alert.alert('Please fill all fields');
       return;
     }
 
-    const newBlog = {
-      blog_title: title,
-      blog_category: introduction,
-      blog_sciname: sciName,
-      blog_physicalCharacteristics: physicalCharacteristics,
-      blog_habitatDistribution: habitatDistribution,
-      blog_dietFeedingHabits: dietFeedingHabits,
-      blog_behavior: behavior,
-      blog_importanceEcosystem: importanceEcosystem,
-      blog_humanInteractionImpact: humanInteractionImpact,
-      blog_coverPhoto: coverPhoto?.uri,
-      blog_images: images.map(image => image.uri),
-      blog_hashtags: hashtags.split(',').map(tag => tag.trim()),
-    };
-
     try {
+      // Upload cover photo
+      const coverPhotoUrl = await uploadImage(coverPhoto.uri);
+
+      // Upload other images
+      const imageUrls = await Promise.all(images.map(image => uploadImage(image.uri)));
+
+      const newBlog = {
+        blog_title: title,
+        blog_category: introduction,
+        blog_sciname: sciName,
+        blog_physicalCharacteristics: physicalCharacteristics,
+        blog_habitatDistribution: habitatDistribution,
+        blog_behavior: behavior,
+        blog_importanceEcosystem: importanceEcosystem,
+        blog_coverPhoto: coverPhotoUrl,
+        blog_images: imageUrls,
+      };
+
       const docRef = await addDoc(collection(firestore, 'blogs'), newBlog);
       console.log('Document written with ID: ', docRef.id);
       Alert.alert('Blog saved successfully');
@@ -120,13 +130,15 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   return (
     <Animated.ScrollView 
-      contentContainerStyle={[
-        styles.container,
-        { paddingBottom: insets.bottom + 100 } // Add extra padding at the bottom
-      ]}
+      contentContainerStyle={styles.container}
       style={[styles.scrollView, { opacity: fadeAnim }]}
     >
-      <Text style={styles.title}>Add a New Blog Post</Text>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={onClose}>
+          <MaterialCommunityIcons name="arrow-left" size={24} color="#2d3748" />
+        </TouchableOpacity>
+        <Text style={styles.title}>Add New Blog</Text>
+      </View>
       <TextInput
         style={styles.input}
         placeholder="Title"
@@ -168,15 +180,6 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       />
       <TextInput
         style={[styles.input, styles.textArea]}
-        placeholder="Diet & Feeding Habits"
-        value={dietFeedingHabits}
-        onChangeText={setDietFeedingHabits}
-        multiline={true}
-        numberOfLines={4}
-        placeholderTextColor="#a0aec0"
-      />
-      <TextInput
-        style={[styles.input, styles.textArea]}
         placeholder="Behavior"
         value={behavior}
         onChangeText={setBehavior}
@@ -189,15 +192,6 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         placeholder="Importance in the Ecosystem"
         value={importanceEcosystem}
         onChangeText={setImportanceEcosystem}
-        multiline={true}
-        numberOfLines={4}
-        placeholderTextColor="#a0aec0"
-      />
-      <TextInput
-        style={[styles.input, styles.textArea]}
-        placeholder="Human Interaction & Impact"
-        value={humanInteractionImpact}
-        onChangeText={setHumanInteractionImpact}
         multiline={true}
         numberOfLines={4}
         placeholderTextColor="#a0aec0"
@@ -216,13 +210,6 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       <TouchableOpacity style={styles.addButton} onPress={handleAddImage}>
         <Text style={styles.addButtonText}>+ Add Image</Text>
       </TouchableOpacity>
-      <TextInput
-        style={styles.input}
-        placeholder="Hashtags (comma separated)"
-        value={hashtags}
-        onChangeText={setHashtags}
-        placeholderTextColor="#a0aec0"
-      />
       <View style={[styles.buttonContainer, { marginBottom: 20 }]}>
         <TouchableOpacity style={styles.button} onPress={onClose}>
           <Text style={styles.buttonText}>Cancel</Text>
@@ -237,94 +224,92 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
 const styles = StyleSheet.create({
   scrollView: {
-    backgroundColor: '#f7fafc', // bg-gray-100
+    backgroundColor: '#ffffff', // bg-gray-100
     flex: 1, // Make sure the ScrollView takes up the full screen
   },
   container: {
     padding: 20,
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
     color: '#2d3748', // text-gray-800
-    textAlign: 'center',
+    marginLeft: 20,
+  },
+  input: {
+    borderColor: '#4a5568', // border-gray-300
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 15,
+    backgroundColor: '#fff',
+    color: '#2d3748', // text-gray-800
+  },
+  textArea: {
+    height: Platform.OS === 'ios' ? 100 : undefined, // adjust height for iOS
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
-    marginTop: 20,
     marginBottom: 10,
     color: '#2d3748', // text-gray-800
   },
-  input: {
-    borderColor: '#e2e8f0', // border-gray-300
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    marginBottom: 12,
-    color: '#2d3748', // text-gray-800
-    backgroundColor: '#ffffff', // bg-white
+  image: {
+    width: '100%',
+    height: 200,
+    resizeMode: 'cover',
+    marginBottom: 10,
   },
-  textArea: {
-    minHeight: 100,
-    textAlignVertical: 'top',
+  imageGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 15,
+  },
+  gridImage: {
+    width: 100,
+    height: 100,
+    marginRight: 10,
+    marginBottom: 10,
+    borderRadius: 8,
   },
   addButton: {
-    backgroundColor: '#4299e1', // bg-blue-500
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+    backgroundColor: '#6C9EE5', // bg-gray-600
+    padding: 10,
     borderRadius: 8,
-    marginTop: 12,
-    marginBottom: 20,
-    alignItems: 'center',
+    marginBottom: 15,
   },
   addButtonText: {
-    color: '#ffffff', // text-white
-    fontSize: 16,
+    color: '#fff', // text-white
+    textAlign: 'center',
     fontWeight: 'bold',
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 20,
   },
   button: {
-    flex: 1,
-    paddingVertical: 15,
-    alignItems: 'center',
+    backgroundColor: '#e2e8f0', // bg-gray-300
+    padding: 10,
     borderRadius: 8,
-    marginHorizontal: 5,
-    backgroundColor: '#edf2f7', // bg-gray-200
+    flex: 1,
+    marginRight: 10,
   },
   saveButton: {
-    backgroundColor: '#4299e1', // bg-blue-500
+    backgroundColor: '#6C9EE5', // bg-gray-800
+    marginLeft: 10,
   },
   buttonText: {
     color: '#2d3748', // text-gray-800
-    fontSize: 16,
+    textAlign: 'center',
     fontWeight: 'bold',
   },
   saveButtonText: {
-    color: '#ffffff', // text-white
-  },
-  image: {
-    width: '100%',
-    height: 200,
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-  imageGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  gridImage: {
-    width: 90,
-    height: 90,
-    borderRadius: 8,
-    marginRight: 10,
-    marginBottom: 10,
+    color: '#fff', // text-white
   },
 });
 

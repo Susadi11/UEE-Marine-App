@@ -1,4 +1,3 @@
-// TabBar.tsx
 import { View, StyleSheet } from 'react-native';
 import React from 'react';
 import { BlurView } from 'expo-blur';
@@ -14,8 +13,8 @@ const TabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation })
       <BlurView intensity={60} tint="light" style={styles.tabbar}>
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key] as { options: BottomTabNavigationOptions };
-          const label = typeof options.tabBarLabel === 'string' 
-            ? options.tabBarLabel 
+          const label = typeof options.tabBarLabel === 'string'
+            ? options.tabBarLabel
             : route.name; // Ensure label is a string
 
           // Skip rendering for certain routes
@@ -54,12 +53,12 @@ const TabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation })
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
-    bottom: 20,
-    left: 15,
-    right: 15,
-    borderRadius: 45,
-    overflow: 'hidden',
+    position: 'absolute',  // Ensure the navbar stays fixed
+    bottom: 0,             // Position it at the bottom of the screen
+    left: 0,               // Span full width
+    right: 0,              // Span full width
+    borderRadius: 0,       // Remove any radius to match standard navbars
+    zIndex: 1,             // Ensure it sits above the rest of the content
   },
   tabbar: {
     flexDirection: 'row',
@@ -67,7 +66,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 15,
     backgroundColor: 'transparent',
-    borderRadius: 45,
     shadowColor: 'black',
     shadowOffset: { width: 0, height: 10 },
     shadowRadius: 10,

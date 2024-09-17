@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Animated } from 'react-native';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface BlogPostProps {
   coverPhoto: string;
@@ -34,6 +33,11 @@ const BlogPost: React.FC<BlogPostProps> = ({ coverPhoto, title, introduction, ha
     ]).start();
   };
 
+  const handleShare = () => {
+    // Add the functionality to share here
+    console.log('Share button pressed');
+  };
+
   return (
     <View style={styles.container}>
       <Image
@@ -47,33 +51,24 @@ const BlogPost: React.FC<BlogPostProps> = ({ coverPhoto, title, introduction, ha
         <Text style={styles.description} numberOfLines={2}>
           {introduction}
         </Text>
-        <TouchableOpacity onPress={onPress}>
-          <Text style={styles.readMore}>Read More</Text>
-        </TouchableOpacity>
-        <View style={styles.tags}>
-          {hashTags.map((tag, index) => (
-            <Text key={index} style={styles.tag}>#{tag}</Text>
-          ))}
-        </View>
         <View style={styles.footer}>
-          <View style={styles.authorInfo}>
-            <Image
-              source={{ uri: authorImage }}
-              style={styles.authorImage}
-            />
-            <View>
-              <Text style={styles.authorName}>{authorName}</Text>
-              <Text style={styles.date}>{date}</Text>
-            </View>
-          </View>
+          <TouchableOpacity onPress={onPress}>
+            <Text style={styles.readMore}>Read More</Text>
+          </TouchableOpacity>
           <View style={styles.iconContainer}>
             <TouchableOpacity onPress={handleLike}>
               <Animated.View style={{ transform: [{ scale: animatedScale }] }}>
-                <AntDesign name="like2" size={20} color="black" style={styles.iconSpacing} />
+                <Ionicons
+                  name={liked ? 'heart' : 'heart-outline'}
+                  size={30}
+                  color={liked ? 'red' : 'black'}
+                  style={styles.iconSpacing}
+                />
               </Animated.View>
             </TouchableOpacity>
-            <AntDesign name="dislike2" size={20} color="black" style={[styles.iconSpacing, styles.dislikeIcon]} />
-            <MaterialCommunityIcons name="share-outline" size={20} color="black" style={styles.iconSpacing} />
+            <TouchableOpacity onPress={handleShare}>
+              <Ionicons name="paper-plane-outline" size={30} color="black" style={styles.iconSpacing} />
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -84,7 +79,7 @@ const BlogPost: React.FC<BlogPostProps> = ({ coverPhoto, title, introduction, ha
 const styles = StyleSheet.create({
   container: {
     width: 350,
-    borderRadius: 16,
+    borderRadius: 30,
     backgroundColor: 'white',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -100,7 +95,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
-    backgroundColor: 'white', // Ensure the background remains white
+    backgroundColor: 'white',
   },
   header: {
     flexDirection: 'row',
@@ -145,34 +140,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  authorInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  authorImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 12,
-  },
-  authorName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#111827',
-  },
-  date: {
-    fontSize: 14,
-    color: '#6b7280',
-  },
   iconContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   iconSpacing: {
     marginHorizontal: 8,
-  },
-  dislikeIcon: {
-    marginLeft: 16,
   },
 });
 
