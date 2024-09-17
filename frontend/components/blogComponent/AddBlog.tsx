@@ -12,6 +12,7 @@ import {
   Platform,
 } from 'react-native';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { app } from '../../firebaseConfig';
 import * as ImagePicker from 'expo-image-picker';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -29,6 +30,7 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [fadeAnim] = useState(new Animated.Value(0));
 
   const firestore = getFirestore(app);
+  const storage = getStorage(app);
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -38,28 +40,44 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     }).start();
   }, []);
 
+  const uploadImage = async (uri: string): Promise<string> => {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    const filename = uri.substring(uri.lastIndexOf('/') + 1);
+    const storageRef = ref(storage, `blog_images/${filename}`);
+    
+    await uploadBytes(storageRef, blob);
+    return await getDownloadURL(storageRef);
+  };
+
   const handleSave = async () => {
     if (
       !title || !introduction || !sciName || !physicalCharacteristics || !habitatDistribution ||
-     !behavior || !importanceEcosystem || !coverPhoto || images.length === 0 
+      !behavior || !importanceEcosystem || !coverPhoto || images.length === 0 
     ) {
       Alert.alert('Please fill all fields');
       return;
     }
 
-    const newBlog = {
-      blog_title: title,
-      blog_category: introduction,
-      blog_sciname: sciName,
-      blog_physicalCharacteristics: physicalCharacteristics,
-      blog_habitatDistribution: habitatDistribution,
-      blog_behavior: behavior,
-      blog_importanceEcosystem: importanceEcosystem,
-      blog_coverPhoto: coverPhoto?.uri,
-      blog_images: images.map(image => image.uri),
-    };
-
     try {
+      // Upload cover photo
+      const coverPhotoUrl = await uploadImage(coverPhoto.uri);
+
+      // Upload other images
+      const imageUrls = await Promise.all(images.map(image => uploadImage(image.uri)));
+
+      const newBlog = {
+        blog_title: title,
+        blog_category: introduction,
+        blog_sciname: sciName,
+        blog_physicalCharacteristics: physicalCharacteristics,
+        blog_habitatDistribution: habitatDistribution,
+        blog_behavior: behavior,
+        blog_importanceEcosystem: importanceEcosystem,
+        blog_coverPhoto: coverPhotoUrl,
+        blog_images: imageUrls,
+      };
+
       const docRef = await addDoc(collection(firestore, 'blogs'), newBlog);
       console.log('Document written with ID: ', docRef.id);
       Alert.alert('Blog saved successfully');
