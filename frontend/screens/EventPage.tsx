@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-
 import { useNavigation } from '@react-navigation/native';
 
+ 
 const EventPage = () => {
   const navigation = useNavigation();
   return (
@@ -18,7 +18,8 @@ const EventPage = () => {
                 style={styles. heroButton}
                 onPress={() => navigation.navigate('ExploreEvents')}
             >
-                <Text style={styles.heroButton}>Explore</Text>
+                <Text style={styles.heroButtonText}>Explore</Text>
+ 
           </TouchableOpacity>
           <TouchableOpacity
                 style={styles.fab}
@@ -99,28 +100,22 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   heroButton: {
-    backgroundColor: '#007BFF',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginVertical: 10,
-  },
-  heroButton2: {
     backgroundColor: '#FFD700',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 5,
-    marginTop:5,
+    borderRadius: 16,
+    marginVertical: 10,
+ 
     
   },
+   
   heroButtonText: {
-    color: '#fff',
-    fontSize: 16,
+    color: '#666',
+    fontSize: 20,
+    fontWeight: 'bold',
+    
   },
-  heroButtonText2: {
-    color: '#000',
-    fontSize: 16,
-  },
+ 
   heroImage: {
     width: '100%',
     height: '100%',
@@ -168,7 +163,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#33bbff',
+    backgroundColor: '#007BFF',
     justifyContent: 'center',
     alignItems: 'center',
     bottom: 230,
@@ -177,7 +172,7 @@ const styles = StyleSheet.create({
 },
 fabText: {
     color: '#fff',
-    fontSize: 30,
+    fontSize: 40,
     fontWeight: 'bold',
 },
 });
