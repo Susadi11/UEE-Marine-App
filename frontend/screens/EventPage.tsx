@@ -1,12 +1,9 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-import { NavigationProp } from '@react-navigation/native';
-interface EventPageProps {
-  navigation: NavigationProp<any>;
-}
-
-const EventPage: React.FC<EventPageProps> = ({ navigation }) => {
+const EventPage = () => {
+  const navigation = useNavigation();
   return (
     <ScrollView style={styles.container}>
       {/* Hero section */}
@@ -16,15 +13,19 @@ const EventPage: React.FC<EventPageProps> = ({ navigation }) => {
           <Text style={styles.heroSubtitle}>
             Dive into exciting activities, conservation efforts, and community gatherings that celebrate the wonders of the ocean.
           </Text>
-          <TouchableOpacity style={styles.heroButton}>
-            <Text style={styles.heroButtonText}>Explore</Text>
+          <TouchableOpacity
+                style={styles. heroButton}
+                onPress={() => navigation.navigate('ExploreEvents')}
+            >
+                <Text style={styles.heroButtonText}>Explore</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.heroButton2}
-            onPress={() => navigation.navigate('EventAdd')}  // Ensure 'EventAdd' matches the stack navigator name
-          >
-            <Text style={styles.heroButtonText2}>Add Events</Text>
+                style={styles.fab}
+                onPress={() => navigation.navigate('EventAdd')}
+            >
+                <Text style={styles.fabText}>+</Text>
           </TouchableOpacity>
+
         </View>
         <Image
           source={{ uri: 'https://plus.unsplash.com/premium_photo-1666286163385-abe05f0326c4?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fG9jZWFufGVufDB8fDB8fHww' }}
@@ -97,27 +98,21 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   heroButton: {
-    backgroundColor: '#007BFF',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginVertical: 10,
-  },
-  heroButton2: {
     backgroundColor: '#FFD700',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 5,
-    marginTop:5,
+    borderRadius: 16,
+    marginVertical: 10,
+    
   },
+   
   heroButtonText: {
-    color: '#fff',
-    fontSize: 16,
+    color: '#666',
+    fontSize: 20,
+    fontWeight: 'bold',
+    
   },
-  heroButtonText2: {
-    color: '#000',
-    fontSize: 16,
-  },
+ 
   heroImage: {
     width: '100%',
     height: '100%',
@@ -160,6 +155,23 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
   },
+  fab: {
+    position: 'absolute',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#007BFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    bottom: 230,
+    right:-150,
+    elevation: 8,
+},
+fabText: {
+    color: '#fff',
+    fontSize: 40,
+    fontWeight: 'bold',
+},
 });
 
 export default EventPage;

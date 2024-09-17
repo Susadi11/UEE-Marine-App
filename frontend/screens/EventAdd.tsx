@@ -1,239 +1,185 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { View, Text, ScrollView, StyleSheet, Alert, TouchableOpacity, Image } from 'react-native';
+import { Input } from 'react-native-elements';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import MapView, { Marker } from 'react-native-maps';
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { db, storage } from '../firebaseConfig'; 
+import * as ImagePicker from 'expo-image-picker';
+import { useNavigation } from '@react-navigation/native'; 
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-const EventAdd: React.FC = () => {
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
-  const [location, setLocation] = useState('');
-  const [datePickerVisible, setDatePickerVisible] = useState(false);
-  const [timePickerVisible, setTimePickerVisible] = useState(false);
+const EventPublish: React.FC = () => {
+    const navigation = useNavigation();
+    
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const [eventDate, setEventDate] = useState(new Date());
+    const [eventTime, setEventTime] = useState(new Date());
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [showTimePicker, setShowTimePicker] = useState(false);
+    const [location, setLocation] = useState({ latitude: 6.9271, longitude: 79.8612 });
+    const [imageUri, setImageUri] = useState<string | null>(null);
 
-  const showDatePicker = () => setDatePickerVisible(true);
-  const hideDatePicker = () => setDatePickerVisible(false);
+    const handleDateChange = (event: any, selectedDate?: Date) => {
+        setShowDatePicker(false);
+        setEventDate(selectedDate || eventDate);
+    };
 
-  const showTimePicker = () => setTimePickerVisible(true);
-  const hideTimePicker = () => setTimePickerVisible(false);
+    const handleTimeChange = (event: any, selectedTime?: Date) => {
+        setShowTimePicker(false);
+        setEventTime(selectedTime || eventTime);
+    };
 
-  const handleDateConfirm = (selectedDate: Date) => {
-    const formattedDate = selectedDate.toISOString().split('T')[0];
-    setDate(formattedDate);
-    hideDatePicker();
-  };
+    const handleImagePick = async () => {
+        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-  const handleTimeConfirm = (selectedTime: Date) => {
-    const hours = selectedTime.getHours().toString().padStart(2, '0');
-    const minutes = selectedTime.getMinutes().toString().padStart(2, '0');
-    setTime(`${hours}:${minutes}`);
-    hideTimePicker();
-  };
+        if (!permissionResult.granted) {
+            Alert.alert('Permission required', 'You need to allow permission to access the gallery.');
+            return;
+        }
 
-  return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.section}>
-        <Text style={styles.title}>Add Event</Text>
-        <Text style={styles.description}>This information will be displayed publicly, so be careful what you share.</Text>
-        
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Title</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your event title"
-          />
-        </View>
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 0.5,
+        });
 
-        <View style={styles.inputGroupFull}>
-          <Text style={styles.label}>Description</Text>
-          <TextInput
-            style={styles.textArea}
-            multiline={true}
-            numberOfLines={3}
-            placeholder="Write a few sentences about the event."
-          />
-        </View>
+        if (!result.canceled) {
+            setImageUri(result.assets[0].uri);
+        } else {
+            console.log('Image picking was canceled');
+        }
+    };
 
-        <View style={styles.inputGroupFull}>
-          <Text style={styles.label}>Date</Text>
-          <TouchableOpacity onPress={showDatePicker}>
-            <TextInput
-              style={styles.input}
-              placeholder="Select Date"
-              value={date}
-              editable={false}
-            />
-          </TouchableOpacity>
-          <DateTimePickerModal
-            isVisible={datePickerVisible}
-            mode="date"
-            onConfirm={handleDateConfirm}
-            onCancel={hideDatePicker}
-          />
-        </View>
+    const uploadImage = async () => {
+        if (imageUri) {
+            try {
+                const response = await fetch(imageUri);
+                if (!response.ok) throw new Error('Failed to fetch image');
+                const blob = await response.blob();
+                const storageRef = ref(storage, `events/${Date.now()}`);
+                await uploadBytes(storageRef, blob);
+                return await getDownloadURL(storageRef);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                Alert.alert('Error', 'Failed to upload image');
+            }
+        }
+        return null;
+    };
 
-        <View style={styles.inputGroupFull}>
-          <Text style={styles.label}>Time</Text>
-          <TouchableOpacity onPress={showTimePicker}>
-            <TextInput
-              style={styles.input}
-              placeholder="Select Time"
-              value={time}
-              editable={false}
-            />
-          </TouchableOpacity>
-          <DateTimePickerModal
-            isVisible={timePickerVisible}
-            mode="time"
-            onConfirm={handleTimeConfirm}
-            onCancel={hideTimePicker}
-          />
-        </View>
+    const handleSubmit = async () => {
+        if (!title || !description) {
+            Alert.alert('Error', 'Please fill in all required fields');
+            return;
+        }
 
-        <View style={styles.inputGroupFull}>
-          <Text style={styles.label}>Location</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter event location"
-            value={location}
-            onChangeText={setLocation}
-          />
-        </View>
+        try {
+            const imageUrl = await uploadImage();
+            const eventData = {
+                title,
+                description,
+                date: eventDate.toISOString(),
+                time: eventTime.toLocaleTimeString(),
+                location,
+                imageUrl
+            };
+            await addDoc(collection(db, 'events'), eventData);
+            Alert.alert('Success', 'Event published successfully');
+            navigation.goBack();
+        } catch (error) {
+            console.error('Error adding document: ', error);
+            Alert.alert('Error', 'An error occurred while publishing the event');
+        }
+    };
 
-        <View style={styles.inputGroupFull}>
-          <Text style={styles.label}>Cover photo (optional)</Text>
-          <View style={styles.coverPhotoContainer}>
-            <Text style={styles.coverPhotoText}>Upload a file or drag and drop</Text>
-            <TouchableOpacity style={styles.uploadButton}>
-              <Text style={styles.uploadButtonText}>Upload</Text>
+    return (
+        <ScrollView contentContainerStyle={styles.container}>
+            <Text style={styles.heading}>Publish Event</Text>
+            <Input placeholder="Enter event title" value={title} onChangeText={setTitle} />
+            <Input placeholder="Enter event description" value={description} onChangeText={setDescription} multiline numberOfLines={4} />
+
+            <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+                <Input placeholder="Tap to select date" value={eventDate.toDateString()} editable={false} />
             </TouchableOpacity>
-          </View>
-        </View>
-      </View>
+            {showDatePicker && (
+                <DateTimePicker value={eventDate} mode="date" display="default" onChange={handleDateChange} />
+            )}
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={[styles.button, styles.cancelButton]}>
-          <Text style={styles.buttonText}>Cancel</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.saveButton]}>
-          <Text style={styles.buttonText}>Save</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
-  );
+            <TouchableOpacity onPress={() => setShowTimePicker(true)}>
+                <Input placeholder="Tap to select time" value={eventTime.toLocaleTimeString()} editable={false} />
+            </TouchableOpacity>
+            {showTimePicker && (
+                <DateTimePicker value={eventTime} mode="time" display="default" onChange={handleTimeChange} />
+            )}
+
+            <MapView
+                style={styles.map}
+                initialRegion={{
+                    latitude: location.latitude,
+                    longitude: location.longitude,
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421,
+                }}
+                onPress={(e) => setLocation(e.nativeEvent.coordinate)}
+            >
+                <Marker coordinate={location} />
+            </MapView>
+
+            <TouchableOpacity onPress={handleImagePick} style={styles.imagePicker}>
+                {imageUri ? <Image source={{ uri: imageUri }} style={styles.image} /> : <Text>Select Cover Photo</Text>}
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+                <Text style={styles.submitButtonText}>Publish Event</Text>
+            </TouchableOpacity>
+        </ScrollView>
+    );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 20,
-    paddingTop: 30,
-    maxWidth: 800,
-    alignSelf: 'center',
-  },
-  section: {
-    marginBottom: 24,
-  },
-  
-  description: {
-    fontSize: 14,
-    color: '#FF0000',
-    marginTop: 8,
-    lineHeight: 20,
-  },
-  inputGroup: {
-    marginTop: 20,
-  },
-  inputGroupFull: {
-    marginTop: 20,
-    width: '100%',
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 10,
-  },
-  input: {
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 10,
-    padding: 15,
-    color: '#1F2937',
-    backgroundColor: '#F9FAFB',
-  },
-  textArea: {
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 10,
-    padding: 15,
-    textAlignVertical: 'top',
-    color: '#1F2937',
-    backgroundColor: '#F9FAFB',
-  },
-  coverPhotoContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderStyle: 'dashed',
-    borderRadius: 10,
-    padding: 30,
-    marginTop: 12,
-    backgroundColor: '#F9FAFB',
-  },
-  coverPhotoText: {
-    fontSize: 16,
-    color: '#9CA3AF',
-    textAlign: 'center',
-  },
-  uploadButton: {
-    marginTop: 10,
-    backgroundColor: '#3B82F6',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-  },
-  uploadButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginTop: 30,
-  },
-  button: {
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  cancelButton: {
-    backgroundColor: '#10B981',
-    marginRight: 10,
-    marginBottom:20,
-  },
-  saveButton: {
-    backgroundColor: '#10B981',
-    marginBottom:20,
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  title:
-  {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  
-   
+    container: {
+        padding: 16,
+        backgroundColor: '#f3f4f6',
+    },
+    heading: {
+        fontSize: 28,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginVertical: 16,
+        color: '#007BFF',
+    },
+    map: {
+        width: '100%',
+        height: 300,
+        marginVertical: 12,
+    },
+    imagePicker: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 200,
+        borderColor: '#ccc',
+        borderWidth: 1,
+        marginVertical: 12,
+    },
+    image: {
+        width: '100%',
+        height: '100%',
+    },
+    submitButton: {
+        backgroundColor: '#007BFF',
+        paddingVertical: 14,
+        borderRadius: 10,
+        marginTop: 16,
+    },
+    submitButtonText: {
+        color: '#ffffff',
+        fontSize: 18,
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
 });
 
- 
-export default EventAdd;
+export default EventPublish;
