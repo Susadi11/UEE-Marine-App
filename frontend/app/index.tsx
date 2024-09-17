@@ -11,7 +11,8 @@ import SoundPage from '@/screens/SoundPage';
 import MusicPlayer from '@/screens/MusicPlayer';
 import EventPage from '@/screens/EventPage';
 import EventAdd from '@/screens/EventAdd';
-import EventShow from '@/screens/EventShow';
+import EventDetails from '@/screens/EventDetails';
+import SetReminder from '@/screens/SetReminder';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import SeaWaveTrack from '@/screens/SeaWaweTrack';
@@ -69,6 +70,16 @@ const EventStack = () => (
      <Stack.Screen                    
       name="ExploreEvents"
       component={ExploreEvents}
+      options={{ headerShown: false }}
+    />
+     <Stack.Screen                    
+      name="EventDetails"
+      component={EventDetails}
+      options={{ headerShown: false }}
+    />
+     <Stack.Screen                    
+      name="SetReminder"
+      component={SetReminder}
       options={{ headerShown: false }}
     />
   </Stack.Navigator>
