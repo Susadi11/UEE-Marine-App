@@ -1,29 +1,65 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, ScrollView, StyleSheet, Animated, Easing } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons'; // Import MaterialCommunityIcons
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../../firebaseConfig'; // Ensure correct Firebase configuration
+import { db } from '../../firebaseConfig';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+type RootStackParamList = {
+  Home: undefined;
+  ExploreEvents: undefined;
+  // Add other screens here as needed
+};
+
+type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
+
+type Event = {
+  id: string;
+  title: string;
+  imageUrl?: string;
+  // Add other event properties as needed
+};
 
 const Home: React.FC = () => {
-    const [events, setEvents] = useState<any[]>([]);
+    const [events, setEvents] = useState<Event[]>([]);
+    const [scaleValue] = useState(new Animated.Value(1)); // For scaling animation
+    const navigation = useNavigation<HomeScreenNavigationProp>();
 
     useEffect(() => {
         const fetchEvents = async () => {
             const eventsCollection = collection(db, 'events');
             const eventsSnapshot = await getDocs(eventsCollection);
-            const eventsList = eventsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const eventsList = eventsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Event));
             setEvents(eventsList);
         };
 
         fetchEvents();
     }, []);
 
+    const handlePressIn = () => {
+        Animated.spring(scaleValue, {
+            toValue: 0.95,
+            useNativeDriver: true,
+        }).start();
+    };
+
+    const handlePressOut = () => {
+        Animated.spring(scaleValue, {
+            toValue: 1,
+            friction: 5,
+            tension: 200,
+            useNativeDriver: true,
+        }).start();
+    };
+
     return (
         <ScrollView style={styles.container}>
             {/* Welcome Message */}
             <View style={styles.header}>
                 <Text style={styles.welcomeText}>Welcome to AquaVista!</Text>
-                <Ionicons name="settings-outline" size={28} color="black" />
+                <Ionicons name="settings-outline" size={28} color="#333" />
             </View>
 
             {/* Search Bar */}
@@ -40,34 +76,58 @@ const Home: React.FC = () => {
             <Text style={styles.sectionTitle}>Explore events</Text>
             <ScrollView horizontal={true} style={styles.eventsContainer} showsHorizontalScrollIndicator={false}>
                 {events.slice(-4).map((event) => (
-                    <TouchableOpacity key={event.id} style={styles.eventCard}>
-                        <Image
-                            source={{ uri: event.imageUrl || 'https://via.placeholder.com/150' }}
-                            style={styles.eventImage}
-                        />
-                        <Text style={styles.eventText}>{event.title}</Text>
-                    </TouchableOpacity>
+                    <Animated.View
+                        key={event.id}
+                        style={[styles.eventCard, { transform: [{ scale: scaleValue }] }]}
+                    >
+                        <TouchableOpacity
+                            activeOpacity={0.8}
+                            onPressIn={handlePressIn}
+                            onPressOut={handlePressOut}
+                        >
+                            <Image
+                                source={{ uri: event.imageUrl || 'https://via.placeholder.com/150' }}
+                                style={styles.eventImage}
+                            />
+                            <Text style={styles.eventText}>{event.title}</Text>
+                        </TouchableOpacity>
+                    </Animated.View>
                 ))}
 
                 {/* Explore More Card */}
-                <TouchableOpacity style={[styles.eventCard, styles.exploreMoreCard]}>
-                    <Ionicons name="arrow-forward-circle-outline" size={40} color="#007BFF" />
+                <TouchableOpacity
+                    style={[styles.eventCard, styles.exploreMoreCard]}
+                    onPress={() => navigation.navigate('ExploreEvents')}
+                    activeOpacity={0.8}
+                >
+                    <Ionicons name="arrow-forward-circle-outline" size={40} color="#6C9EE5" />
                     <Text style={styles.exploreMoreText}>Explore More</Text>
                 </TouchableOpacity>
             </ScrollView>
 
             {/* Discover Ocean Sounds */}
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity
+                style={styles.actionButton}
+                activeOpacity={0.8}
+                onPressIn={handlePressIn}
+                onPressOut={handlePressOut}
+            >
                 <View style={styles.buttonContent}>
-                    <Ionicons name="musical-notes-outline" size={24} color="#333" />
+                    <Ionicons name="musical-note-outline" size={24} color="#6C9EE5" />
                     <Text style={styles.buttonText}>Discover ocean sounds</Text>
                 </View>
             </TouchableOpacity>
 
             {/* Check Out Trending Blogs */}
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity
+                style={styles.actionButton}
+                activeOpacity={0.8}
+                onPressIn={handlePressIn}
+                onPressOut={handlePressOut}
+            >
                 <View style={styles.buttonContent}>
-                    <Ionicons name="flame-outline" size={24} color="#333" />
+                    {/* Replace flame icon with MaterialCommunityIcons fire icon */}
+                    <MaterialCommunityIcons name="fire" size={30} color="#FD7600" />
                     <Text style={styles.buttonText}>Check Out the Latest Trending Blogs</Text>
                 </View>
             </TouchableOpacity>
@@ -78,68 +138,80 @@ const Home: React.FC = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
-        backgroundColor: '#fff',
+        backgroundColor: '#f7f9fc',
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 20,
+        paddingHorizontal: 20,
+        paddingVertical: 15,
     },
     welcomeText: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: 'black',
+        color: '#333',
+        opacity: 0.9,
     },
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#f2f2f2',
+        backgroundColor: '#ffffff',
         borderRadius: 25,
-        paddingHorizontal: 10,
-        paddingVertical: 8,
-        marginBottom: 20,
-        marginTop: 20,
-    },
-    searchInput: {
-        flex: 1,
-        marginLeft: 10,
-        color: 'black',
-    },
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
-    },
-    eventsContainer: {
-        flexDirection: 'row',
-        marginBottom: 20,
-        marginTop: 20,
-    },
-    eventCard: {
-        marginRight: 15,
-        width: 200,
-        borderRadius: 30,
-        overflow: 'hidden',
-        backgroundColor: '#fff',
-        elevation: 3,
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        marginHorizontal: 20,
+        marginVertical: 15,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
+        elevation: 3,
+    },
+    searchInput: {
+        flex: 1,
+        marginLeft: 10,
+        color: '#333',
+        fontSize: 16,
+    },
+    sectionTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 15,
+        marginLeft: 20,
+        color: '#333',
+        marginTop: 20,
+        opacity: 0.9,
+    },
+    eventsContainer: {
+        paddingLeft: 20,
+        marginBottom: 25,
+        marginTop: 20,
+    },
+    eventCard: {
+        width: 200,
+        borderRadius: 30,
+        overflow: 'hidden',
+        backgroundColor: '#ffffff',
+        marginRight: 15,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 30,
+        elevation: 3,
     },
     eventImage: {
         width: '100%',
-        height: 150, // Adjusted image height to match the increased card height
+        height: 150,
         resizeMode: 'cover',
     },
     eventText: {
         textAlign: 'center',
-        padding: 10,
+        padding: 12,
         backgroundColor: '#d1e7ff',
-        color: 'black',
+        color: '#333',
         fontWeight: 'bold',
+        fontSize: 14,
     },
     exploreMoreCard: {
         justifyContent: 'center',
@@ -147,15 +219,23 @@ const styles = StyleSheet.create({
         backgroundColor: '#f0f4ff',
     },
     exploreMoreText: {
-        color: '#007BFF',
+        color: '#6C9EE5',
         fontWeight: 'bold',
         marginTop: 10,
+        fontSize: 14,
     },
     actionButton: {
-        padding: 15,
-        borderRadius: 10,
-        backgroundColor: '#f2f2f2',
+        backgroundColor: '#ffffff',
+        borderRadius: 30,
+        paddingVertical: 15,
+        paddingHorizontal: 20,
+        marginHorizontal: 20,
         marginBottom: 15,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
         marginTop: 20,
     },
     buttonContent: {
@@ -163,11 +243,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     buttonText: {
-        marginLeft: 10,
+        marginLeft: 15,
         color: '#333',
         fontSize: 16,
+        fontWeight: '500',
     },
 });
-
 
 export default Home;
