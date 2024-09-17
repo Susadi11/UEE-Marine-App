@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
+ 
 const EventPage = () => {
   const navigation = useNavigation();
   return (
@@ -18,6 +19,7 @@ const EventPage = () => {
                 onPress={() => navigation.navigate('ExploreEvents')}
             >
                 <Text style={styles.heroButtonText}>Explore</Text>
+ 
           </TouchableOpacity>
           <TouchableOpacity
                 style={styles.fab}
@@ -103,6 +105,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 16,
     marginVertical: 10,
+ 
     
   },
    

@@ -16,9 +16,11 @@ import ExploreEvents from '@/screens/ExploreEvents';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import SeaWaveTrack from '@/screens/SeaWaweTrack';
+import ExploreEvents from '@/screens/ExploreEvents';
 import { useEffect } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -58,16 +60,16 @@ const EventStack = () => (
     <Stack.Screen
       name="EventPage"
       component={EventPage}
-      options={{ headerShown: false }}
+      options={{ headerShown: false }}       
     />
-    <Stack.Screen
+    <Stack.Screen                    
       name="EventAdd"
       component={EventAdd}
       options={{ headerShown: false }}
     />
-      <Stack.Screen
+     <Stack.Screen                    
       name="ExploreEvents"
-      component={ExploreEvents }
+      component={ExploreEvents}
       options={{ headerShown: false }}
     />
   </Stack.Navigator>
@@ -135,6 +137,7 @@ const MainTabs = () => (
 );
 
 const App = () => (
+  
     <Stack.Navigator initialRouteName="Welcome">
       <Stack.Screen
         name="Welcome"
