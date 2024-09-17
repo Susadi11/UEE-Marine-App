@@ -12,7 +12,6 @@ import MusicPlayer from '@/screens/MusicPlayer';
 import EventPage from '@/screens/EventPage';
 import EventAdd from '@/screens/EventAdd';
 import EventShow from '@/screens/EventShow';
-import ExploreEvents from '@/screens/ExploreEvents';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import SeaWaveTrack from '@/screens/SeaWaweTrack';
