@@ -12,6 +12,7 @@ import EventPage from '@/screens/EventPage';
 import EventAdd from '@/screens/EventAdd';
 import TabBar from '@/components/NavBar/TabBar';
 import SeaWaveTrack from '@/screens/SeaWaweTrack';
+import ExploreEvents from '@/screens/ExploreEvents';
 
 // Define stack navigators for each feature
 const Stack = createNativeStackNavigator();
@@ -52,11 +53,16 @@ const EventStack = () => (
     <Stack.Screen
       name="EventPage"
       component={EventPage}
-      options={{ headerShown: false }}
+      options={{ headerShown: false }}       
     />
-    <Stack.Screen
+    <Stack.Screen                    
       name="EventAdd"
       component={EventAdd}
+      options={{ headerShown: false }}
+    />
+     <Stack.Screen                    
+      name="ExploreEvents"
+      component={ExploreEvents}
       options={{ headerShown: false }}
     />
   </Stack.Navigator>
@@ -92,6 +98,7 @@ const MainTabs = () => (
 );
 
 const App = () => (
+  
     <Stack.Navigator initialRouteName="Welcome">
       <Stack.Screen
         name="Welcome"
