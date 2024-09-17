@@ -15,7 +15,7 @@ const EventShow = () => {
             <Text style={styles.heroButtonText}>Explore</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.heroButton2}>
-            <Text style={styles.heroButtonText2}>Add Events</Text>
+          <Text style={styles.heroButtonText2}>Events</Text>
           </TouchableOpacity>
         </View>
         <Image
