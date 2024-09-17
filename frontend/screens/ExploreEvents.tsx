@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/FontAwesome'; // For icons
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { app } from '../firebaseConfig';
 
-const EventPage = ({ navigation }: any) => {
+const ExploreEvents = ({ navigation }: any) => {
     const [events, setEvents] = useState<{ id: string; name: string; date: string; location: string; imageUrl: string; description: string; }[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const firestore = getFirestore(app);
@@ -188,4 +188,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default EventPage;
+export default ExploreEvents;
