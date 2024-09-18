@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,12 +10,16 @@ import {
   Image,
   Animated,
   Platform,
+  Dimensions,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { app } from '../../firebaseConfig';
 import * as ImagePicker from 'expo-image-picker';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+const { width } = Dimensions.get('window');
 
 const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [title, setTitle] = useState('');
@@ -28,16 +32,26 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [coverPhoto, setCoverPhoto] = useState<any>(null);
   const [images, setImages] = useState<any[]>([]);
   const [fadeAnim] = useState(new Animated.Value(0));
+  const [slideAnim] = useState(new Animated.Value(width));
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const firestore = getFirestore(app);
   const storage = getStorage(app);
 
   useEffect(() => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 1000,
-      useNativeDriver: true,
-    }).start();
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        tension: 10,
+        friction: 8,
+        useNativeDriver: true,
+      }),
+    ]).start();
   }, []);
 
   const uploadImage = async (uri: string): Promise<string> => {
@@ -60,10 +74,7 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     }
 
     try {
-      // Upload cover photo
       const coverPhotoUrl = await uploadImage(coverPhoto.uri);
-
-      // Upload other images
       const imageUrls = await Promise.all(images.map(image => uploadImage(image.uri)));
 
       const newBlog = {
@@ -128,107 +139,103 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     }
   };
 
+  const renderInputField = (
+    placeholder: string,
+    value: string,
+    onChangeText: (text: string) => void,
+    multiline = false
+  ) => (
+    <Animated.View style={[styles.inputContainer, { transform: [{ translateX: slideAnim }] }]}>
+      <TextInput
+        style={[styles.input, multiline && styles.textArea]}
+        placeholder={placeholder}
+        value={value}
+        onChangeText={onChangeText}
+        placeholderTextColor="#a0aec0"
+        multiline={multiline}
+      />
+    </Animated.View>
+  );
+
   return (
-    <Animated.ScrollView 
-      contentContainerStyle={styles.container}
-      style={[styles.scrollView, { opacity: fadeAnim }]}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
     >
-      <View style={styles.header}>
-        <TouchableOpacity onPress={onClose}>
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#2d3748" />
-        </TouchableOpacity>
-        <Text style={styles.title}>Add New Blog</Text>
-      </View>
-      <TextInput
-        style={styles.input}
-        placeholder="Title"
-        value={title}
-        onChangeText={setTitle}
-        placeholderTextColor="#a0aec0"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Introduction"
-        value={introduction}
-        onChangeText={setIntroduction}
-        placeholderTextColor="#a0aec0"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Scientific Name"
-        value={sciName}
-        onChangeText={setSciName}
-        placeholderTextColor="#a0aec0"
-      />
-      <TextInput
-        style={[styles.input, styles.textArea]}
-        placeholder="Physical Characteristics"
-        value={physicalCharacteristics}
-        onChangeText={setPhysicalCharacteristics}
-        multiline={true}
-        numberOfLines={4}
-        placeholderTextColor="#a0aec0"
-      />
-      <TextInput
-        style={[styles.input, styles.textArea]}
-        placeholder="Habitat & Distribution"
-        value={habitatDistribution}
-        onChangeText={setHabitatDistribution}
-        multiline={true}
-        numberOfLines={4}
-        placeholderTextColor="#a0aec0"
-      />
-      <TextInput
-        style={[styles.input, styles.textArea]}
-        placeholder="Behavior"
-        value={behavior}
-        onChangeText={setBehavior}
-        multiline={true}
-        numberOfLines={4}
-        placeholderTextColor="#a0aec0"
-      />
-      <TextInput
-        style={[styles.input, styles.textArea]}
-        placeholder="Importance in the Ecosystem"
-        value={importanceEcosystem}
-        onChangeText={setImportanceEcosystem}
-        multiline={true}
-        numberOfLines={4}
-        placeholderTextColor="#a0aec0"
-      />
-      <Text style={styles.subtitle}>Cover Photo</Text>
-      {coverPhoto && <Image source={{ uri: coverPhoto.uri }} style={styles.image} />}
-      <TouchableOpacity style={styles.addButton} onPress={() => pickImage(setCoverPhoto)}>
-        <Text style={styles.addButtonText}>Select Cover Photo</Text>
-      </TouchableOpacity>
-      <Text style={styles.subtitle}>Add Images (up to 9)</Text>
-      <View style={styles.imageGrid}>
-        {images.map((image, index) => (
-          <Image key={index} source={{ uri: image.uri }} style={styles.gridImage} />
-        ))}
-      </View>
-      <TouchableOpacity style={styles.addButton} onPress={handleAddImage}>
-        <Text style={styles.addButtonText}>+ Add Image</Text>
-      </TouchableOpacity>
-      <View style={[styles.buttonContainer, { marginBottom: 20 }]}>
-        <TouchableOpacity style={styles.button} onPress={onClose}>
-          <Text style={styles.buttonText}>Cancel</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleSave}>
-          <Text style={[styles.buttonText, styles.saveButtonText]}>Save</Text>
-        </TouchableOpacity>
-      </View>
-    </Animated.ScrollView>
+      <Animated.ScrollView
+        ref={scrollViewRef}
+        contentContainerStyle={styles.scrollViewContent}
+        style={[styles.scrollView, { opacity: fadeAnim }]}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.header}>
+          <TouchableOpacity onPress={onClose}>
+            <MaterialCommunityIcons name="arrow-left" size={28} color="#6C9EE5" />
+          </TouchableOpacity>
+          <Text style={styles.title}>Create New Blog</Text>
+        </View>
+
+        {renderInputField("Title", title, setTitle)}
+        {renderInputField("Introduction", introduction, setIntroduction)}
+        {renderInputField("Scientific Name", sciName, setSciName)}
+        {renderInputField("Physical Characteristics", physicalCharacteristics, setPhysicalCharacteristics, true)}
+        {renderInputField("Habitat & Distribution", habitatDistribution, setHabitatDistribution, true)}
+        {renderInputField("Behavior", behavior, setBehavior, true)}
+        {renderInputField("Importance in the Ecosystem", importanceEcosystem, setImportanceEcosystem, true)}
+
+        <Animated.View style={[styles.section, { transform: [{ translateX: slideAnim }] }]}>
+          <Text style={styles.subtitle}>Cover Photo</Text>
+          {coverPhoto && (
+            <Animated.Image
+              source={{ uri: coverPhoto.uri }}
+              style={[styles.image, { opacity: fadeAnim }]}
+            />
+          )}
+          <TouchableOpacity style={styles.addButton} onPress={() => pickImage(setCoverPhoto)}>
+            <Text style={styles.addButtonText}>Select Cover Photo</Text>
+          </TouchableOpacity>
+        </Animated.View>
+
+        <Animated.View style={[styles.section, { transform: [{ translateX: slideAnim }] }]}>
+          <Text style={styles.subtitle}>Add Images (up to 9)</Text>
+          <View style={styles.imageGrid}>
+            {images.map((image, index) => (
+              <Animated.Image
+                key={index}
+                source={{ uri: image.uri }}
+                style={[styles.gridImage, { opacity: fadeAnim }]}
+              />
+            ))}
+          </View>
+          <TouchableOpacity style={styles.addButton} onPress={handleAddImage}>
+            <Text style={styles.addButtonText}>+ Add Image</Text>
+          </TouchableOpacity>
+        </Animated.View>
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={onClose}>
+            <Text style={styles.buttonText}>Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleSave}>
+            <Text style={[styles.buttonText, styles.saveButtonText]}>Save</Text>
+          </TouchableOpacity>
+        </View>
+      </Animated.ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: '#ffffff', // bg-gray-100
-    flex: 1, // Make sure the ScrollView takes up the full screen
-  },
   container: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollViewContent: {
     padding: 20,
+    paddingBottom: 40,
   },
   header: {
     flexDirection: 'row',
@@ -236,34 +243,42 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#2d3748', // text-gray-800
+    color: '#6C9EE5',
     marginLeft: 20,
   },
-  input: {
-    borderColor: '#4a5568', // border-gray-300
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 10,
+  inputContainer: {
     marginBottom: 15,
-    backgroundColor: '#fff',
-    color: '#2d3748', // text-gray-800
+  },
+  input: {
+    backgroundColor: '#f7fafc',
+    borderRadius: 12,
+    padding: 15,
+    fontSize: 16,
+    color: '#2d3748',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
   },
   textArea: {
-    height: Platform.OS === 'ios' ? 100 : undefined, // adjust height for iOS
+    height: 120,
+    textAlignVertical: 'top',
+  },
+  section: {
+    marginBottom: 20,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#2d3748', // text-gray-800
+    color: '#000000',
   },
   image: {
     width: '100%',
     height: 200,
     resizeMode: 'cover',
     marginBottom: 10,
+    borderRadius: 12,
   },
   imageGrid: {
     flexDirection: 'row',
@@ -271,45 +286,46 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   gridImage: {
-    width: 100,
-    height: 100,
+    width: (width - 60) / 3,
+    height: (width - 60) / 3,
     marginRight: 10,
     marginBottom: 10,
     borderRadius: 8,
   },
   addButton: {
-    backgroundColor: '#6C9EE5', // bg-gray-600
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 15,
+    backgroundColor: '#6C9EE5',
+    padding: 15,
+    borderRadius: 12,
+    alignItems: 'center',
   },
   addButtonText: {
-    color: '#fff', // text-white
-    textAlign: 'center',
+    color: '#ffffff',
     fontWeight: 'bold',
+    fontSize: 16,
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 20,
   },
   button: {
-    backgroundColor: '#e2e8f0', // bg-gray-300
-    padding: 10,
-    borderRadius: 8,
     flex: 1,
-    marginRight: 10,
+    backgroundColor: '#e2e8f0',
+    padding: 15,
+    borderRadius: 12,
+    marginHorizontal: 5,
   },
   saveButton: {
-    backgroundColor: '#6C9EE5', // bg-gray-800
-    marginLeft: 10,
+    backgroundColor: '#6C9EE5',
   },
   buttonText: {
-    color: '#2d3748', // text-gray-800
+    color: '#6C9EE5',
     textAlign: 'center',
     fontWeight: 'bold',
+    fontSize: 16,
   },
   saveButtonText: {
-    color: '#fff', // text-white
+    color: '#ffffff',
   },
 });
 

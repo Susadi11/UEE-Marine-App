@@ -126,7 +126,6 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   blogList: {
-    padding: 16,
   },
   blogContainer: {
     position: 'relative',
@@ -134,8 +133,8 @@ const styles = StyleSheet.create({
   },
   menuIcon: {
     position: 'absolute',
-    top: 10,
-    right: 10,
+    top: 30,
+    right: 30,
     zIndex: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
     borderRadius: 15,

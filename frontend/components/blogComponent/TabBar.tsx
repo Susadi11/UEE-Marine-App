@@ -1,49 +1,69 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { View, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+
+type TabName = 'AllBlogs' | 'TrendingPage' | 'MyBlogPage';
 
 type TabBarProps = {
-  activeTab: string;
-  onTabPress: (tabName: string) => void;
+  activeTab: TabName;
+  onTabPress: (tabName: TabName) => void;
+};
+
+type AnimatedValues = {
+  [K in TabName]: Animated.Value;
 };
 
 const TabBar: React.FC<TabBarProps> = ({ activeTab, onTabPress }) => {
+  const [animatedValues] = React.useState<AnimatedValues>({
+    AllBlogs: new Animated.Value(activeTab === 'AllBlogs' ? 1 : 0),
+    TrendingPage: new Animated.Value(activeTab === 'TrendingPage' ? 1 : 0),
+    MyBlogPage: new Animated.Value(activeTab === 'MyBlogPage' ? 1 : 0),
+  });
+
+  React.useEffect(() => {
+    Object.keys(animatedValues).forEach((key) => {
+      Animated.spring(animatedValues[key as TabName], {
+        toValue: activeTab === key ? 1 : 0,
+        useNativeDriver: false,
+      }).start();
+    });
+  }, [activeTab, animatedValues]);
+
+  const renderTab = (name: TabName, iconName: keyof typeof Ionicons.glyphMap) => {
+    const isActive = activeTab === name;
+    const animatedStyle = {
+      transform: [
+        {
+          scale: animatedValues[name].interpolate({
+            inputRange: [0, 1],
+            outputRange: [1, 1.2],
+          }),
+        },
+      ],
+    };
+
+    return (
+      <TouchableOpacity
+        style={styles.tabButton}
+        onPress={() => onTabPress(name)}
+      >
+        <Animated.View style={animatedStyle}>
+          <Ionicons
+            name={iconName}
+            size={24}
+            color={isActive ? '#6C9EE5' : '#999'}
+          />
+        </Animated.View>
+        {isActive && <View style={styles.activeBar} />}
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <View style={styles.tabBar}>
-      <TouchableOpacity 
-        style={styles.tabButton} 
-        onPress={() => onTabPress('AllBlogs')}
-      >
-        <Icon 
-          name="list" 
-          size={30} 
-          color={activeTab === 'AllBlogs' ? '#2196F3' : '#757575'} 
-        />
-        {activeTab === 'AllBlogs' && <View style={styles.activeIndicator} />}
-      </TouchableOpacity>
-      <TouchableOpacity 
-        style={styles.tabButton} 
-        onPress={() => onTabPress('TrendingPage')}
-      >
-        <Icon 
-          name="trending-up" 
-          size={30} 
-          color={activeTab === 'TrendingPage' ? '#2196F3' : '#757575'} 
-        />
-        {activeTab === 'TrendingPage' && <View style={styles.activeIndicator} />}
-      </TouchableOpacity>
-      <TouchableOpacity 
-        style={styles.tabButton} 
-        onPress={() => onTabPress('MyBlogPage')}
-      >
-        <MaterialCommunityIcons
-          name="account-outline"
-          size={30}
-          color={activeTab === 'MyBlogPage' ? '#2196F3' : '#757575'}
-        />
-        {activeTab === 'MyBlogPage' && <View style={styles.activeIndicator} />}
-      </TouchableOpacity>
+      {renderTab('AllBlogs', 'list')}
+      {renderTab('TrendingPage', 'trending-up')}
+      {renderTab('MyBlogPage', 'person-outline')}
     </View>
   );
 };
@@ -53,9 +73,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    height: 60,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+    height: 45,
+    backgroundColor: 'white',
+    borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
   tabButton: {
     alignItems: 'center',
@@ -63,12 +88,12 @@ const styles = StyleSheet.create({
     flex: 1,
     height: '100%',
   },
-  activeIndicator: {
+  activeBar: {
     position: 'absolute',
     bottom: 0,
-    width: '100%',
-    height: 3,
-    backgroundColor: '#2196F3',
+    width: '70%',
+    height: 4, // Height of the active bar
+    backgroundColor: '#6C9EE5',
   },
 });
 

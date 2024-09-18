@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100, // Adjust padding as needed
   },
   blogList: {
-    padding: 16,
+   
   },
   noBlogsText: {
     fontSize: 16,

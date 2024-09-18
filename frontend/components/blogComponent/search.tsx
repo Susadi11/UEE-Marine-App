@@ -1,31 +1,62 @@
-import React from 'react';
-import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import React, { useState } from 'react';
+import {
+  View,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Animated,
+  Easing,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import TabBar from './TabBar';
 
+// Use TabName type from TabBar to ensure type consistency
+type TabName = 'AllBlogs' | 'TrendingPage' | 'MyBlogPage';
+
 type SearchProps = {
-  activeTab: string;
-  onTabPress: (tabName: string) => void;
+  activeTab: TabName;
+  onTabPress: (tabName: TabName) => void;
   onAddPress: () => void;
 };
 
 const Search: React.FC<SearchProps> = ({ activeTab, onTabPress, onAddPress }) => {
-  const [searchQuery, setSearchQuery] = React.useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const animatedWidth = React.useRef(new Animated.Value(0)).current;
+
+  React.useEffect(() => {
+    Animated.timing(animatedWidth, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: false,
+      easing: Easing.out(Easing.cubic),
+    }).start();
+  }, []);
 
   return (
     <View style={styles.container}>
       <View style={styles.searchRow}>
-        <View style={styles.searchBoxContainer}>
-          <Icon name="search" size={20} color="#999" style={styles.searchIcon} />
+        <Animated.View
+          style={[
+            styles.searchBoxContainer,
+            {
+              width: animatedWidth.interpolate({
+                inputRange: [0, 1],
+                outputRange: ['0%', '85%'],
+              }),
+            },
+          ]}
+        >
+          <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
           <TextInput
             style={styles.searchBox}
             placeholder="Search"
             value={searchQuery}
             onChangeText={setSearchQuery}
+            placeholderTextColor="#999"
           />
-        </View>
-        <TouchableOpacity onPress={onAddPress}>
-          <Icon name="add-circle-outline" size={25} color="#000" style={styles.addIcon} />
+        </Animated.View>
+        <TouchableOpacity onPress={onAddPress} style={styles.addButton}>
+          <Ionicons name="add-circle-outline" size={35} color="black" />
         </TouchableOpacity>
       </View>
       <TabBar activeTab={activeTab} onTabPress={onTabPress} />
@@ -35,32 +66,40 @@ const Search: React.FC<SearchProps> = ({ activeTab, onTabPress, onAddPress }) =>
 
 const styles = StyleSheet.create({
   container: {
-    margin: 10,
+    paddingLeft:20,
+    paddingRight: 20,
   },
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 20,
   },
   searchBoxContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    borderRadius: 20,
-    paddingHorizontal: 15,
-    backgroundColor: '#fff',
+        alignItems: 'center',
+        backgroundColor: '#ffffff',
+        borderRadius: 25,
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        marginHorizontal: 10,
+        marginVertical: 15,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+
   },
   searchIcon: {
-    marginRight: 10,
+    marginRight: 8,
   },
   searchBox: {
     flex: 1,
-    height: 40,
+    fontSize: 16,
+    color: '#333',
   },
-  addIcon: {
-    marginLeft: 10,
+  addButton: {
+    marginLeft: 8,
   },
 });
 
