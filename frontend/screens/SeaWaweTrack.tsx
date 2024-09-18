@@ -1,4 +1,3 @@
-// SeaWaveTrack.tsx
 import * as React from 'react';
 import { useState } from 'react';
 import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity } from 'react-native';

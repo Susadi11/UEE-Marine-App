@@ -34,8 +34,8 @@ const styles = StyleSheet.create({
   categoryCard: {
     flex: 1,
     margin: 2,
-    height: 90,
-    borderRadius: 0,
+    height: 70,
+    borderRadius: 10,
     overflow: 'hidden',
     backgroundColor: '#f9f9f9',
     shadowColor: '#000',
