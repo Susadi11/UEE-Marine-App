@@ -3,7 +3,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getStorage } from "firebase/storage";
+import { getStorage,ref,getDownloadURL} from "firebase/storage";
 import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
@@ -29,6 +29,19 @@ const db = getFirestore(app);
 const analytics = getAnalytics(app);
 
 const storage = getStorage(app);
+
+// Function to get the download URL for a file in Firebase Storage
+export const getAudioUrl = async (filePath: string): Promise<string> => {
+  try {
+    const audioRef = ref(storage, filePath);
+    const url = await getDownloadURL(audioRef);
+    return url;
+  } catch (error) {
+    console.error('Error fetching audio URL:', error);
+    throw error;
+  }
+};
+
 
 // Export the initialized app and analytics if needed
 export { app, db, analytics, storage };
