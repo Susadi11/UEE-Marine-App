@@ -39,7 +39,7 @@ const Card: React.FC<CardProps> = ({ title, description, imageUrl, navigateTo })
 const styles = StyleSheet.create({
   card: {
     width: 200,
-    height: 210,
+    height: 250,
     marginHorizontal: 3,
     overflow: 'hidden',
     backgroundColor: '#f9f9f9',
@@ -58,6 +58,7 @@ const styles = StyleSheet.create({
   textContainer: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     padding: 8,
+    borderRadius:10,
   },
   cardTitle: {
     fontSize: 16,

@@ -20,9 +20,9 @@ const Sound: React.FC = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Recommended for you</Text>
-      <ScrollView horizontal={true} contentContainerStyle={styles.cardsContainer} showsHorizontalScrollIndicator={false}>
+      <ScrollView horizontal={true} contentContainerStyle={styles.categoryRow} showsHorizontalScrollIndicator={false}>
         <Card 
-          title="Relaxing music with Ocean Waves" 
+          title="Relaxing with Ocean Waves" 
           description="Sleep music, Stress Relief" 
           imageUrl='https://i.pinimg.com/736x/76/27/b1/7627b146303d3bd73c057e04cba9a3a7.jpg' 
           navigateTo="MusicPlayer"
