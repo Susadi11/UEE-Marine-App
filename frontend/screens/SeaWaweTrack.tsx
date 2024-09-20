@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity, Modal, Pressable } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import SearchBar from '@/components/Vindi/Search';
 
@@ -42,12 +42,13 @@ const tracks: Track[] = [
     duration: '4:15',
     imageUrl: 'https://www.creativefabrica.com/wp-content/uploads/2023/09/21/Ocean-Underwater-Wallpaper-Graphics-79762400-1.jpg',
   },
-  // Add more tracks as needed
 ];
 
 const SeaWaveTrack: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredTracks, setFilteredTracks] = useState<Track[]>(tracks);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
 
   const handleSearch = () => {
     if (searchQuery) {
@@ -67,20 +68,53 @@ const SeaWaveTrack: React.FC = () => {
         <Text style={styles.trackTitle}>{item.title}</Text>
         <Text style={styles.trackDuration}>{item.duration}</Text>
       </View>
-      <TouchableOpacity style={styles.playButton}>
-        <Ionicons name="play-circle-outline" size={24} color="#000" />
+      <TouchableOpacity onPress={() => { setSelectedTrack(item); setModalVisible(true); }}>
+        <Ionicons name="ellipsis-vertical" size={24} color="#000" />
       </TouchableOpacity>
     </View>
   );
 
   return (
     <View style={styles.container}>
-      <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} onSearch={handleSearch} />
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Musics</Text>
+        <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} onSearch={handleSearch} />
+      </View>
       <FlatList
         data={filteredTracks}
         renderItem={renderTrack}
         keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.listContent} // Optional: Add padding to the list
       />
+      {selectedTrack && (
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text>{selectedTrack.title}</Text>
+              <TouchableOpacity onPress={() => { /* Add to favorite logic */ }} style={styles.modalButton}>
+                <Ionicons name="heart-outline" size={20} color="#000" />
+                <Text>Add to Favorite</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => { /* Download logic */ }} style={styles.modalButton}>
+                <Ionicons name="download-outline" size={20} color="#000" />
+                <Text>Download</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => { /* Add to queue logic */ }} style={styles.modalButton}>
+                <Ionicons name="add-circle-outline" size={20} color="#000" />
+                <Text>Add to Queue</Text>
+              </TouchableOpacity>
+              <Pressable onPress={() => setModalVisible(false)}>
+                <Text style={styles.closeButton}>Close</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+      )}
     </View>
   );
 };
@@ -88,8 +122,23 @@ const SeaWaveTrack: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    
     backgroundColor: '#fff',
+  },
+  header: {
+    backgroundColor: '#333',
+    paddingVertical: 20,
+    paddingHorizontal: 16,
+    borderRadius: 0,
+    marginBottom: 15,
+    height:200,
+    
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 20,
   },
   trackContainer: {
     flexDirection: 'row',
@@ -122,8 +171,30 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
   },
-  playButton: {
-    marginLeft: 16,
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: 200,
+    padding: 20,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    
+  },
+  modalButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  closeButton: {
+    color: 'blue',
+    marginTop: 20,
+  },
+  listContent: {
+    paddingBottom: 100, // Optional: Adjust as needed
   },
 });
 

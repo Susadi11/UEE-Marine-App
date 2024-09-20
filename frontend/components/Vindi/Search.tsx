@@ -18,9 +18,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ searchQuery, setSearchQuery, onSe
         value={searchQuery}
         onChangeText={setSearchQuery}
       />
-      <Ionicons name="search" size={20} color="#000" style={styles.searchIcon} />
+      
       <TouchableOpacity style={styles.searchButton} onPress={onSearch}>
-        <Ionicons name="ios-arrow-forward" size={20} color="#fff" />
+      <Ionicons name="search" size={20} color="#000" />
+    
       </TouchableOpacity>
     </View>
   );
