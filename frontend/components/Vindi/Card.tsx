@@ -77,7 +77,7 @@ const Card: React.FC<CardProps> = ({ title, description, imageUrl, navigateTo })
 
 const styles = StyleSheet.create({
   card: {
-    width: 180,
+    width: 190,
     height: 200,
     marginHorizontal: 3,
     overflow: 'hidden',
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   },
   menuText: {
     paddingLeft: 5,
-    fontSize: 16,
+    fontSize: 10,
     color: '#333',
   },
 });

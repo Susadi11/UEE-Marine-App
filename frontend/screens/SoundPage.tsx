@@ -32,7 +32,7 @@ const Sound: React.FC = () => {
   const filteredCards = cards; // Remove the old search query filtering logic (SearchBar handles it now)
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       {/* Custom Search Bar */}
       <SearchBar />
 
@@ -79,7 +79,8 @@ const Sound: React.FC = () => {
         contentContainerStyle={styles.categoryList}
         showsVerticalScrollIndicator={false}
       />
-    </ScrollView>
+      </View>
+    
   );
 };
 
