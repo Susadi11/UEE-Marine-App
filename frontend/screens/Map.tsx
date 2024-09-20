@@ -24,6 +24,6 @@ const styles = StyleSheet.create({
   red: {
     color: 'red',
   }, //
-});
+});//jj
 
 export default Map;
