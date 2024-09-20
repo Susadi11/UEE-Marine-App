@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
   },
   red: {
     color: 'red',
-  },
+  }, //
 });
 
 export default Map;
