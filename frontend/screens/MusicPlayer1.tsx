@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Alert ,ScrollView} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import { Audio } from 'expo-av';
 import { getAudioUrl } from '../firebaseConfig'; // Import the function to get audio URL
-import { Ionicons } from '@expo/vector-icons'; // For heart and close icons
+import { Ionicons } from '@expo/vector-icons'; // For heart icon
 
-const MusicPlayer = () => {
+const MusicPlayer1 = () => {
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
@@ -15,7 +15,7 @@ const MusicPlayer = () => {
   const [isFavorited, setIsFavorited] = useState(false); // State for heart button
 
   // Path to the audio file in Firebase Storage
-  const filePath = 'audios/ocean-waves-white-noise1-13752.mp3';
+  const filePath = 'audios/pray-for-ukraine-sleep-21715.mp3';
 
   const handlePlayPause = async () => {
     if (isPlaying) {
@@ -90,19 +90,27 @@ const MusicPlayer = () => {
   };
 
   const handleFavoriteToggle = () => {
-    setIsFavorited(!isFavorited);
+    setIsFavorited(!isFavorited); // Toggle the heart icon state
   };
 
   return (
-  
     <View style={styles.container}>
       <View>
         <Image
-          source={{ uri: 'https://media.istockphoto.com/id/596056886/photo/big-blue-right-vert.jpg?s=612x612&w=0&k=20&c=GYb-poaMWyLXE_DW0zwIByCi63avR05hk7sYUbEfBdE=' }}
+          source={{ uri: 'https://static.vecteezy.com/system/resources/previews/031/725/107/non_2x/dive-into-the-colorful-world-of-aquaticgraphy-by-a-renowned-wildlifegrapher-ai-generative-free-photo.jpg' }}
           style={styles.albumCover}
         />
         <Text style={styles.title}>Relaxing Music with Ocean Waves</Text>
       </View>
+
+      {/* Heart Icon for Favorite */}
+      <TouchableOpacity onPress={handleFavoriteToggle} style={styles.heartButton}>
+        <Ionicons
+          name={isFavorited ? 'heart' : 'heart-outline'}
+          size={32}
+          color={isFavorited ? 'red' : 'gray'}
+        />
+      </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.button}
@@ -121,15 +129,6 @@ const MusicPlayer = () => {
         }}
       >
         <Text style={styles.buttonText}>Set Timer</Text>
-      </TouchableOpacity>
-
-      {/* Heart Icon for Favorite */}
-      <TouchableOpacity onPress={handleFavoriteToggle} style={styles.heartButton}>
-        <Ionicons
-          name={isFavorited ? 'heart' : 'heart-outline'}
-          size={32}
-          color={isFavorited ? 'red' : 'gray'}
-        />
       </TouchableOpacity>
 
       <View style={styles.controls}>
@@ -170,7 +169,6 @@ const MusicPlayer = () => {
         </View>
       )}
     </View>
-    
   );
 };
 
@@ -240,7 +238,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
   },
   progressBarBackground: {
-    backgroundColor: '#fff',
+    backgroundColor: '#e0e0e0',
     height: 4,
     borderRadius: 2,
     width: '90%',
@@ -267,4 +265,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MusicPlayer;
+export default MusicPlayer1;
