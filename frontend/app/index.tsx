@@ -20,6 +20,7 @@ import ExploreEvents from '@/screens/ExploreEvents';
 import { useEffect } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import MusicPlayer1 from '@/screens/MusicPlayer1';
 
 
 const Stack = createNativeStackNavigator();
@@ -50,6 +51,11 @@ const SoundStack = () => (
     <Stack.Screen
       name="MusicPlayer"
       component={MusicPlayer}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="MusicPlayer1"
+      component={MusicPlayer1}
       options={{ headerShown: false }}
     />
   </Stack.Navigator>
