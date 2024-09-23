@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, ScrollView, StyleSheet, Animated, Easing } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, ScrollView, StyleSheet, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons'; // Import MaterialCommunityIcons
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 import { useNavigation } from '@react-navigation/native';
@@ -10,7 +10,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 type RootStackParamList = {
   Home: undefined;
   ExploreEvents: undefined;
-  // Add other screens here as needed
+  Settings: undefined; // Add Settings screen here
 };
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
@@ -19,120 +19,120 @@ type Event = {
   id: string;
   title: string;
   imageUrl?: string;
-  // Add other event properties as needed
 };
 
 const Home: React.FC = () => {
-    const [events, setEvents] = useState<Event[]>([]);
-    const [scaleValue] = useState(new Animated.Value(1)); // For scaling animation
-    const navigation = useNavigation<HomeScreenNavigationProp>();
+  const [events, setEvents] = useState<Event[]>([]);
+  const [scaleValue] = useState(new Animated.Value(1));
+  const navigation = useNavigation<HomeScreenNavigationProp>();
 
-    useEffect(() => {
-        const fetchEvents = async () => {
-            const eventsCollection = collection(db, 'events');
-            const eventsSnapshot = await getDocs(eventsCollection);
-            const eventsList = eventsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Event));
-            setEvents(eventsList);
-        };
-
-        fetchEvents();
-    }, []);
-
-    const handlePressIn = () => {
-        Animated.spring(scaleValue, {
-            toValue: 0.95,
-            useNativeDriver: true,
-        }).start();
+  useEffect(() => {
+    const fetchEvents = async () => {
+      const eventsCollection = collection(db, 'events');
+      const eventsSnapshot = await getDocs(eventsCollection);
+      const eventsList = eventsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Event));
+      setEvents(eventsList);
     };
 
-    const handlePressOut = () => {
-        Animated.spring(scaleValue, {
-            toValue: 1,
-            friction: 5,
-            tension: 200,
-            useNativeDriver: true,
-        }).start();
-    };
+    fetchEvents();
+  }, []);
 
-    return (
-        <ScrollView style={styles.container}>
-            {/* Welcome Message */}
-            <View style={styles.header}>
-                <Text style={styles.welcomeText}>Welcome to AquaVista!</Text>
-                <Ionicons name="settings-outline" size={28} color="#333" />
-            </View>
+  const handlePressIn = () => {
+    Animated.spring(scaleValue, {
+      toValue: 0.95,
+      useNativeDriver: true,
+    }).start();
+  };
 
-            {/* Search Bar */}
-            <View style={styles.searchContainer}>
-                <Ionicons name="search-outline" size={20} color="#999" />
-                <TextInput
-                    style={styles.searchInput}
-                    placeholder="Search"
-                    placeholderTextColor="#999"
-                />
-            </View>
+  const handlePressOut = () => {
+    Animated.spring(scaleValue, {
+      toValue: 1,
+      friction: 5,
+      tension: 200,
+      useNativeDriver: true,
+    }).start();
+  };
 
-            {/* Explore Events */}
-            <Text style={styles.sectionTitle}>Explore events</Text>
-            <ScrollView horizontal={true} style={styles.eventsContainer} showsHorizontalScrollIndicator={false}>
-                {events.slice(-4).map((event) => (
-                    <Animated.View
-                        key={event.id}
-                        style={[styles.eventCard, { transform: [{ scale: scaleValue }] }]}
-                    >
-                        <TouchableOpacity
-                            activeOpacity={0.8}
-                            onPressIn={handlePressIn}
-                            onPressOut={handlePressOut}
-                        >
-                            <Image
-                                source={{ uri: event.imageUrl || 'https://via.placeholder.com/150' }}
-                                style={styles.eventImage}
-                            />
-                            <Text style={styles.eventText}>{event.title}</Text>
-                        </TouchableOpacity>
-                    </Animated.View>
-                ))}
+  return (
+    <ScrollView style={styles.container}>
+      {/* Welcome Message */}
+      <View style={styles.header}>
+        <Text style={styles.welcomeText}>Welcome to AquaVista!</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+          <Ionicons name="settings-outline" size={28} color="#333" />
+        </TouchableOpacity>
+      </View>
 
-                {/* Explore More Card */}
-                <TouchableOpacity
-                    style={[styles.eventCard, styles.exploreMoreCard]}
-                    onPress={() => navigation.navigate('ExploreEvents')}
-                    activeOpacity={0.8}
-                >
-                    <Ionicons name="arrow-forward-circle-outline" size={40} color="#6C9EE5" />
-                    <Text style={styles.exploreMoreText}>Explore More</Text>
-                </TouchableOpacity>
-            </ScrollView>
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <Ionicons name="search-outline" size={20} color="#999" />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search"
+          placeholderTextColor="#999"
+        />
+      </View>
 
-            {/* Discover Ocean Sounds */}
+      {/* Explore Events */}
+      <Text style={styles.sectionTitle}>Explore events</Text>
+      <ScrollView horizontal={true} style={styles.eventsContainer} showsHorizontalScrollIndicator={false}>
+        {events.slice(-4).map((event) => (
+          <Animated.View
+            key={event.id}
+            style={[styles.eventCard, { transform: [{ scale: scaleValue }] }]}
+          >
             <TouchableOpacity
-                style={styles.actionButton}
-                activeOpacity={0.8}
-                onPressIn={handlePressIn}
-                onPressOut={handlePressOut}
+              activeOpacity={0.8}
+              onPressIn={handlePressIn}
+              onPressOut={handlePressOut}
             >
-                <View style={styles.buttonContent}>
-                    <Ionicons name="musical-note-outline" size={24} color="#6C9EE5" />
-                    <Text style={styles.buttonText}>Discover ocean sounds</Text>
-                </View>
+              <Image
+                source={{ uri: event.imageUrl || 'https://via.placeholder.com/150' }}
+                style={styles.eventImage}
+              />
+              <Text style={styles.eventText}>{event.title}</Text>
             </TouchableOpacity>
+          </Animated.View>
+        ))}
 
-            {/* Check Out Trending Blogs */}
-            <TouchableOpacity
-                style={styles.actionButton}
-                activeOpacity={0.8}
-                onPressIn={handlePressIn}
-                onPressOut={handlePressOut}
-            >
-                <View style={styles.buttonContent}>
-                    {/* Replace flame icon with MaterialCommunityIcons fire icon */}
-                    <MaterialCommunityIcons name="fire" size={30} color="#FD7600" />
-                    <Text style={styles.buttonText}>Check Out the Latest Trending Blogs</Text>
-                </View>
-            </TouchableOpacity>
-        </ScrollView>
-    );
+        {/* Explore More Card */}
+        <TouchableOpacity
+          style={[styles.eventCard, styles.exploreMoreCard]}
+          onPress={() => navigation.navigate('ExploreEvents')}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="arrow-forward-circle-outline" size={40} color="#6C9EE5" />
+          <Text style={styles.exploreMoreText}>Explore More</Text>
+        </TouchableOpacity>
+      </ScrollView>
+
+      {/* Discover Ocean Sounds */}
+      <TouchableOpacity
+        style={styles.actionButton}
+        activeOpacity={0.8}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+      >
+        <View style={styles.buttonContent}>
+          <Ionicons name="musical-note-outline" size={24} color="#6C9EE5" />
+          <Text style={styles.buttonText}>Discover ocean sounds</Text>
+        </View>
+      </TouchableOpacity>
+
+      {/* Check Out Trending Blogs */}
+      <TouchableOpacity
+        style={styles.actionButton}
+        activeOpacity={0.8}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+      >
+        <View style={styles.buttonContent}>
+          <MaterialCommunityIcons name="fire" size={30} color="#FD7600" />
+          <Text style={styles.buttonText}>Check Out the Latest Trending Blogs</Text>
+        </View>
+      </TouchableOpacity>
+    </ScrollView>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -250,4 +250,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Home;
+export default Home
