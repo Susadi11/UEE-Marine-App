@@ -23,6 +23,7 @@ import SetReminder from '@/screens/SetReminder';
 import SeaWaveTrack from '@/screens/SeaWaweTrack';
 import ExploreEvents from '@/screens/ExploreEvents';
 import Settings from '@/components/home/Settings';
+import Favorite from '@/screens/Favourite';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -57,6 +58,11 @@ const SoundStack = () => (
     <Stack.Screen
       name="MusicPlayer1"
       component={MusicPlayer1}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="Favourite"
+      component={Favorite}
       options={{ headerShown: false }}
     />
   </Stack.Navigator>
