@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Alert ,ScrollView} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import { Audio } from 'expo-av';
 import { getAudioUrl } from '../firebaseConfig'; // Import the function to get audio URL
-import { Ionicons } from '@expo/vector-icons'; // For heart and close icons
+import { Ionicons } from '@expo/vector-icons'; // For icons
 
 const MusicPlayer = () => {
   const [sound, setSound] = useState<Audio.Sound | null>(null);
@@ -94,15 +94,12 @@ const MusicPlayer = () => {
   };
 
   return (
-  
     <View style={styles.container}>
-      <View>
-        <Image
-          source={{ uri: 'https://media.istockphoto.com/id/596056886/photo/big-blue-right-vert.jpg?s=612x612&w=0&k=20&c=GYb-poaMWyLXE_DW0zwIByCi63avR05hk7sYUbEfBdE=' }}
-          style={styles.albumCover}
-        />
-        <Text style={styles.title}>Relaxing Music with Ocean Waves</Text>
-      </View>
+      <Image
+        source={{ uri: 'https://t4.ftcdn.net/jpg/02/69/82/11/360_F_269821180_UAEWi4xE7JhAqOUvOD1JoBLP0YDvqFvA.jpg' }}
+        style={styles.albumCover}
+      />
+      <Text style={styles.title}>Ocean Waves Relaxation</Text>
 
       <TouchableOpacity
         style={styles.button}
@@ -114,7 +111,7 @@ const MusicPlayer = () => {
               { text: '10 minutes', onPress: () => handleSetTimer(10) },
               { text: '20 minutes', onPress: () => handleSetTimer(20) },
               { text: '30 minutes', onPress: () => handleSetTimer(30) },
-              { text: 'Close', style: 'cancel' }, // Close button for the popup
+              { text: 'Close', style: 'cancel' },
             ],
             { cancelable: true }
           );
@@ -123,33 +120,26 @@ const MusicPlayer = () => {
         <Text style={styles.buttonText}>Set Timer</Text>
       </TouchableOpacity>
 
-      {/* Heart Icon for Favorite */}
-      <TouchableOpacity onPress={handleFavoriteToggle} style={styles.heartButton}>
+      <TouchableOpacity onPress={handleFavoriteToggle} style={styles.favoriteButton}>
         <Ionicons
           name={isFavorited ? 'heart' : 'heart-outline'}
-          size={32}
-          color={isFavorited ? 'red' : 'gray'}
+          size={30}
+          color={isFavorited ? '#FF6F61' : '#333'}
         />
       </TouchableOpacity>
 
       <View style={styles.controls}>
         <TouchableOpacity style={styles.controlButton}>
-          <View style={styles.iconBackground}>
-            <Text style={styles.icon}>{'<'}</Text>
-          </View>
+          <Ionicons name="play-back-outline" size={30} color="#333" />
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.controlButton, styles.playButton]}
           onPress={handlePlayPause}
         >
-          <View style={styles.iconBackground}>
-            <Text style={styles.icon}>{isPlaying ? '||' : '▶'}</Text>
-          </View>
+          <Ionicons name={isPlaying ? 'pause-outline' : 'play-outline'} size={30} color="#fff" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.controlButton}>
-          <View style={styles.iconBackground}>
-            <Text style={styles.icon}>{'>'}</Text>
-          </View>
+          <Ionicons name="play-forward-outline" size={30} color="#333" />
         </TouchableOpacity>
       </View>
 
@@ -166,11 +156,10 @@ const MusicPlayer = () => {
 
       {timerRunning && (
         <View style={styles.timerInfo}>
-          <Text style={styles.timeText}>Time remaining: {formatTime(timeRemaining || 0)}</Text>
+          <Text style={styles.timerText}>Time remaining: {formatTime(timeRemaining || 0)}</Text>
         </View>
       )}
     </View>
-    
   );
 };
 
@@ -179,40 +168,39 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f9f9fb',
-    padding: 16,
+    backgroundColor: '#F5F5F5',
+    padding: 10,
   },
   albumCover: {
-    width: 350,
-    height: 300,
-    borderRadius: 12,
+    width: '90%',
+    height: 350,
+    borderRadius: 15,
     marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
+    overflow: 'hidden',
+    borderColor: '#C4C4C4',
+    borderWidth: 2,
   },
   title: {
-    fontSize: 22,
-    fontWeight: 'bold',
+    fontSize: 24,
+    fontWeight: '600',
     marginVertical: 10,
     textAlign: 'center',
     color: '#333',
   },
   button: {
-    backgroundColor: '#2196F3',
-    padding: 10,
-    borderRadius: 25,
+    backgroundColor: '#A8A8A8',
+    padding: 15,
+    borderRadius: 30,
     alignItems: 'center',
-    marginTop: 15,
-    marginBottom: 20,
+    marginVertical: 5,
+    width: '30%',
   },
   buttonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '500',
   },
-  heartButton: {
+  favoriteButton: {
     marginBottom: 20,
   },
   controls: {
@@ -222,35 +210,26 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   controlButton: {
-    padding: 8,
+    backgroundColor: '#E0E0E0',
     borderRadius: 50,
-    backgroundColor: '#e0e0e0',
-    marginHorizontal: 8,
+    padding: 10,
+    marginHorizontal: 10,
   },
   playButton: {
-    padding: 16,
-    backgroundColor: '#4fd1c5',
-  },
-  iconBackground: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  icon: {
-    color: '#4b5563',
-    fontSize: 24,
+    backgroundColor: '#333',
   },
   progressBarBackground: {
-    backgroundColor: '#fff',
-    height: 4,
-    borderRadius: 2,
+    backgroundColor: '#C4C4C4',
+    height: 6,
+    borderRadius: 3,
     width: '90%',
-    marginTop: 30,
+    marginTop: 20,
     overflow: 'hidden',
   },
   progressBar: {
-    backgroundColor: '#3D6DCC',
-    height: 4,
-    borderRadius: 2,
+    backgroundColor: '#6C9EE5',
+    height: '100%',
+    borderRadius: 3,
   },
   timeInfo: {
     flexDirection: 'row',
@@ -259,11 +238,19 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   timeText: {
-    color: '#4b5563',
-    fontSize: 14,
+    color: '#333',
+    fontWeight: '500',
   },
   timerInfo: {
     marginTop: 20,
+    backgroundColor: '#F5F5F5',
+    padding: 10,
+    borderRadius: 10,
+  },
+  timerText: {
+    color: '#FF6F61',
+    fontSize: 14,
+    fontWeight: '500',
   },
 });
 

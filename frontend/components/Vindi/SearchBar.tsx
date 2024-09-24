@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   searchButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#6C9EE5',
     padding: 10,
     borderRadius: 25,
     marginLeft: 5,

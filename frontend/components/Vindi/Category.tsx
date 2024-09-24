@@ -45,6 +45,7 @@ const styles = StyleSheet.create({
     elevation: 2,
     justifyContent: 'flex-end', // Align text at the bottom
     marginBottom:5,
+    marginLeft:10,
   },
   categoryImage: {
     width: '100%',

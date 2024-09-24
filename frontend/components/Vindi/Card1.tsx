@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
 import { View, Text, ImageBackground, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import { FontAwesome } from '@expo/vector-icons';
-import { collection, addDoc } from "firebase/firestore";  // Firestore methods
-import { db } from '@/firebaseConfig';  // Firestore database instance
+import Icon from 'react-native-vector-icons/MaterialIcons'; // Importing icons
+import { FontAwesome } from '@expo/vector-icons'; // Importing additional icons
 
-interface CardProps {
+interface Card1Props {
   title: string;
   description: string;
   imageUrl: string;
   navigateTo?: string;
 }
 
-const Card: React.FC<CardProps> = ({ title, description, imageUrl, navigateTo }) => {
+const Card1: React.FC<Card1Props> = ({ title, description, imageUrl, navigateTo }) => {
   const navigation = useNavigation();
   const [menuVisible, setMenuVisible] = useState(false);
 
@@ -27,31 +25,21 @@ const Card: React.FC<CardProps> = ({ title, description, imageUrl, navigateTo })
     setMenuVisible(!menuVisible);
   };
 
-  const handleAddToFavorites = async () => {
-    try {
-      // Firestore collection reference
-      const favoritesCollection = collection(db, "favorites");
+  const handleAddToFavorites = () => {
+    console.log(`${title} added to favorites`);
+    setMenuVisible(false);
+  };
 
-      // Add document to Firestore
-      await addDoc(favoritesCollection, {
-        title: title,
-        description: description,
-        imageUrl: imageUrl,
-        addedAt: new Date().toISOString(), // Store the date when added to favorites
-      });
-
-      console.log(`${title} added to favorites`);
-      setMenuVisible(false);
-    } catch (error) {
-      console.error("Error adding to favorites:", error);
-    }
+  const handleAddToQueue = () => {
+    console.log(`${title} added to queue`);
+    setMenuVisible(false);
   };
 
   return (
     <TouchableOpacity onPress={handlePress} activeOpacity={0.9}>
-      <View style={styles.card}>
+      <View style={styles.card1}>
         <ImageBackground
-          style={styles.cardImage}
+          style={styles.card1Image}
           source={{ uri: imageUrl }}
           imageStyle={{ borderRadius: 10 }}
         >
@@ -63,19 +51,23 @@ const Card: React.FC<CardProps> = ({ title, description, imageUrl, navigateTo })
 
             {/* Conditional rendering of the dropdown menu */}
             {menuVisible && (
-              <View style={styles.menu}>
+              <View style={styles.menu1}>
                 <TouchableOpacity onPress={handleAddToFavorites} style={styles.menuItem}>
                   <FontAwesome name="star" size={16} color="#333" />
                   <Text style={styles.menuText}> Add to Favorites</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleAddToQueue} style={styles.menuItem}>
+                  <Icon name="queue" size={16} color="#333" />
+                  <Text style={styles.menuText}> Add to Queue</Text>
                 </TouchableOpacity>
               </View>
             )}
           </View>
 
           {/* Card text */}
-          <View style={styles.textContainer}>
-            <Text style={styles.cardTitle}>{title}</Text>
-            <Text style={styles.cardDescription}>{description}</Text>
+          <View style={styles.textContainer1}>
+            <Text style={styles.card1Title}>{title}</Text>
+            <Text style={styles.card1Description}>{description}</Text>
           </View>
         </ImageBackground>
       </View>
@@ -84,7 +76,7 @@ const Card: React.FC<CardProps> = ({ title, description, imageUrl, navigateTo })
 };
 
 const styles = StyleSheet.create({
-  card: {
+  card1: {
     width: 190,
     height: 180,
     marginHorizontal: 3,
@@ -98,22 +90,22 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 15,
   },
-  cardImage: {
+  card1Image: {
     width: '100%',
     height: '100%',
     justifyContent: 'flex-end',
   },
-  textContainer: {
+  textContainer1: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     padding: 8,
     borderRadius: 10,
   },
-  cardTitle: {
+  card1Title: {
     fontSize: 13,
     fontWeight: 'bold',
     color: 'white',
   },
-  cardDescription: {
+  card1Description: {
     fontSize: 10,
     color: 'white',
     marginTop: 5,
@@ -124,7 +116,7 @@ const styles = StyleSheet.create({
     right: 4,
     zIndex: 10,
   },
-  menu: {
+  menu1: {
     position: 'absolute',
     top: 30,
     right: 0,
@@ -136,7 +128,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
-    height: 45,
+    height: 70,
     width: 140,
   },
   menuItem: {
@@ -151,4 +143,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Card;
+export default Card1;
