@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import { Audio } from 'expo-av';
 import { getAudioUrl } from '../firebaseConfig'; // Import the function to get audio URL
@@ -9,13 +9,13 @@ const MusicPlayer1 = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [position, setPosition] = useState(0);
-  const [timer, setTimer] = useState<number | null>(null); // Timer in minutes
-  const [timerRunning, setTimerRunning] = useState(false); // Is the timer active?
-  const [timeRemaining, setTimeRemaining] = useState<number | null>(null); // Time remaining in milliseconds
-  const [isFavorited, setIsFavorited] = useState(false); // State for heart button
+  const [timer, setTimer] = useState<number | null>(null);
+  const [timerRunning, setTimerRunning] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
+  const [isFavorited, setIsFavorited] = useState(false);
 
   // Path to the audio file in Firebase Storage
-  const filePath = 'audios/pray-for-ukraine-sleep-21715.mp3';
+  const filePath = 'audios/depth-152401.mp3';
 
   const handlePlayPause = async () => {
     if (isPlaying) {
@@ -26,11 +26,9 @@ const MusicPlayer1 = () => {
     } else {
       try {
         const url = await getAudioUrl(filePath);
-
         if (sound) {
           await sound.unloadAsync();
         }
-
         const { sound: newSound } = await Audio.Sound.createAsync(
           { uri: url },
           { shouldPlay: true }
@@ -42,14 +40,11 @@ const MusicPlayer1 = () => {
           if (status.isLoaded) {
             setDuration(status.durationMillis || 0);
             setPosition(status.positionMillis || 0);
-
             if (status.didJustFinish && timerRunning) {
-              // Restart the music if within the timer duration
               newSound.playFromPositionAsync(0);
             }
-
             if (status.didJustFinish && !timerRunning) {
-              setIsPlaying(false); // Stop when no timer is active
+              setIsPlaying(false);
             }
           }
         });
@@ -62,11 +57,10 @@ const MusicPlayer1 = () => {
 
   const handleSetTimer = (minutes: number) => {
     setTimer(minutes);
-    const totalTime = minutes * 60 * 1000; // Convert minutes to milliseconds
+    const totalTime = minutes * 60 * 1000;
     setTimeRemaining(totalTime);
     setTimerRunning(true);
 
-    // Set interval to check time remaining
     const interval = setInterval(() => {
       setTimeRemaining((prevTime) => {
         if (prevTime && prevTime > 0) {
@@ -90,27 +84,16 @@ const MusicPlayer1 = () => {
   };
 
   const handleFavoriteToggle = () => {
-    setIsFavorited(!isFavorited); // Toggle the heart icon state
+    setIsFavorited(!isFavorited);
   };
 
   return (
     <View style={styles.container}>
-      <View>
-        <Image
-          source={{ uri: 'https://static.vecteezy.com/system/resources/previews/031/725/107/non_2x/dive-into-the-colorful-world-of-aquaticgraphy-by-a-renowned-wildlifegrapher-ai-generative-free-photo.jpg' }}
-          style={styles.albumCover}
-        />
-        <Text style={styles.title}>Relaxing Music with Ocean Waves</Text>
-      </View>
-
-      {/* Heart Icon for Favorite */}
-      <TouchableOpacity onPress={handleFavoriteToggle} style={styles.heartButton}>
-        <Ionicons
-          name={isFavorited ? 'heart' : 'heart-outline'}
-          size={32}
-          color={isFavorited ? 'red' : 'gray'}
-        />
-      </TouchableOpacity>
+      <Image
+        source={{ uri: 'https://static.vecteezy.com/system/resources/previews/031/725/107/non_2x/dive-into-the-colorful-world-of-aquaticgraphy-by-a-renowned-wildlifegrapher-ai-generative-free-photo.jpg' }}
+        style={styles.albumCover}
+      />
+      <Text style={styles.title}>Relaxing Music with Ocean Waves</Text>
 
       <TouchableOpacity
         style={styles.button}
@@ -122,7 +105,7 @@ const MusicPlayer1 = () => {
               { text: '10 minutes', onPress: () => handleSetTimer(10) },
               { text: '20 minutes', onPress: () => handleSetTimer(20) },
               { text: '30 minutes', onPress: () => handleSetTimer(30) },
-              { text: 'Close', style: 'cancel' }, // Close button for the popup
+              { text: 'Close', style: 'cancel' },
             ],
             { cancelable: true }
           );
@@ -131,24 +114,26 @@ const MusicPlayer1 = () => {
         <Text style={styles.buttonText}>Set Timer</Text>
       </TouchableOpacity>
 
+      <TouchableOpacity onPress={handleFavoriteToggle} style={styles.favoriteButton}>
+        <Ionicons
+          name={isFavorited ? 'heart' : 'heart-outline'}
+          size={30}
+          color={isFavorited ? '#FF6F61' : '#000'}
+        />
+      </TouchableOpacity>
+
       <View style={styles.controls}>
         <TouchableOpacity style={styles.controlButton}>
-          <View style={styles.iconBackground}>
-            <Text style={styles.icon}>{'<'}</Text>
-          </View>
+          <Ionicons name="play-back-outline" size={30} color="#000" />
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.controlButton, styles.playButton]}
           onPress={handlePlayPause}
         >
-          <View style={styles.iconBackground}>
-            <Text style={styles.icon}>{isPlaying ? '||' : '▶'}</Text>
-          </View>
+          <Ionicons name={isPlaying ? 'pause-outline' : 'play-outline'} size={30} color="#fff" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.controlButton}>
-          <View style={styles.iconBackground}>
-            <Text style={styles.icon}>{'>'}</Text>
-          </View>
+          <Ionicons name="play-forward-outline" size={30} color="#000" />
         </TouchableOpacity>
       </View>
 
@@ -165,7 +150,7 @@ const MusicPlayer1 = () => {
 
       {timerRunning && (
         <View style={styles.timerInfo}>
-          <Text style={styles.timeText}>Time remaining: {formatTime(timeRemaining || 0)}</Text>
+          <Text style={styles.timerText}>Time remaining: {formatTime(timeRemaining || 0)}</Text>
         </View>
       )}
     </View>
@@ -177,40 +162,39 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f9f9fb',
-    padding: 16,
+    backgroundColor: '#F5F5F5',
+    padding: 10,
   },
   albumCover: {
-    width: 350,
-    height: 300,
-    borderRadius: 12,
+    width: '90%',
+    height: 350,
+    borderRadius: 15,
     marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
+    overflow: 'hidden',
+    borderColor: '#BDBDBD',
+    borderWidth: 1,
   },
   title: {
     fontSize: 22,
-    fontWeight: 'bold',
+    fontWeight: '600',
     marginVertical: 10,
     textAlign: 'center',
     color: '#333',
   },
   button: {
-    backgroundColor: '#2196F3',
-    padding: 10,
+    backgroundColor: '#BDBDBD',
+    padding: 12,
     borderRadius: 25,
     alignItems: 'center',
-    marginTop: 15,
-    marginBottom: 20,
+    marginVertical: 5,
+    width: '30%',
   },
   buttonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '500',
   },
-  heartButton: {
+  favoriteButton: {
     marginBottom: 20,
   },
   controls: {
@@ -220,35 +204,26 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   controlButton: {
-    padding: 8,
+    backgroundColor: '#E0E0E0',
     borderRadius: 50,
-    backgroundColor: '#e0e0e0',
-    marginHorizontal: 8,
+    padding: 10,
+    marginHorizontal: 10,
   },
   playButton: {
-    padding: 16,
-    backgroundColor: '#4fd1c5',
-  },
-  iconBackground: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  icon: {
-    color: '#4b5563',
-    fontSize: 24,
+    backgroundColor: '#333',
   },
   progressBarBackground: {
-    backgroundColor: '#e0e0e0',
-    height: 4,
-    borderRadius: 2,
+    backgroundColor: '#BDBDBD',
+    height: 6,
+    borderRadius: 3,
     width: '90%',
-    marginTop: 30,
+    marginTop: 20,
     overflow: 'hidden',
   },
   progressBar: {
-    backgroundColor: '#3D6DCC',
-    height: 4,
-    borderRadius: 2,
+    backgroundColor: '#4A90E2',
+    height: '100%',
+    borderRadius: 3,
   },
   timeInfo: {
     flexDirection: 'row',
@@ -257,11 +232,18 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   timeText: {
-    color: '#4b5563',
-    fontSize: 14,
+    color: '#333',
+    fontWeight: '500',
   },
   timerInfo: {
     marginTop: 20,
+    padding: 10,
+    borderRadius: 10,
+  },
+  timerText: {
+    color: '#FF6F61',
+    fontSize: 14,
+    fontWeight: '500',
   },
 });
 

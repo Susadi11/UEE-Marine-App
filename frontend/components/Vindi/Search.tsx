@@ -36,9 +36,9 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     height: 40,
-    borderColor: '#ccc',
+    borderColor: '#fff',
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 20,
     paddingLeft: 8,
     paddingRight: 35, // Add padding for the icon
   },
@@ -48,8 +48,8 @@ const styles = StyleSheet.create({
   },
   searchButton: {
     marginLeft: 8,
-    backgroundColor: '#007BFF',
-    borderRadius: 8,
+    backgroundColor: 'white',
+    borderRadius: 20,
     padding: 8,
   },
 });
