@@ -13,6 +13,7 @@ type RootStackParamList = {
   Home: undefined;
   ExploreEvents: undefined;
   Settings: undefined; // Add Settings screen here
+  MapScreen: undefined;
 };
 
 // Define the navigation prop for the Home screen
