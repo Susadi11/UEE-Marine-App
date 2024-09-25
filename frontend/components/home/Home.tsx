@@ -12,8 +12,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 type RootStackParamList = {
   Home: undefined;
   ExploreEvents: undefined;
-  MapScreen: undefined; // Add your MapScreen here
-  // Add other screens as needed
+  Settings: undefined; // Add Settings screen here
 };
 
 // Define the navigation prop for the Home screen
@@ -24,12 +23,11 @@ type Event = {
   id: string;
   title: string;
   imageUrl?: string;
-  // Add other event properties as needed
 };
 
 const Home: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
-  const [scaleValue] = useState(new Animated.Value(1)); // For scaling animation
+  const [scaleValue] = useState(new Animated.Value(1));
   const navigation = useNavigation<HomeScreenNavigationProp>();
 
   useEffect(() => {
@@ -39,6 +37,7 @@ const Home: React.FC = () => {
       const eventsList = eventsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Event));
       setEvents(eventsList);
     };
+
 
     fetchEvents();
   }, []);
@@ -64,7 +63,10 @@ const Home: React.FC = () => {
       {/* Welcome Message */}
       <View style={styles.header}>
         <Text style={styles.welcomeText}>Welcome to AquaVista!</Text>
-        <Ionicons name="settings-outline" size={28} color="#333" />
+        <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+          <Ionicons name="settings-outline" size={28} color="#333" />
+        </TouchableOpacity>
+
       </View>
 
       {/* Search Bar */}
@@ -271,4 +273,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Home;
+export default Home

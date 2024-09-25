@@ -107,22 +107,23 @@ const BlogPage: React.FC<BlogPageProps> = ({ navigation }) => {
           >
             <View style={styles.blogList}>
               {blogs && blogs.length > 0 ? (
-                blogs.map((blog) => (
-                  <BlogPost
-                    key={blog.id}
-                    coverPhoto={blog.blog_coverPhoto}
-                    title={blog.blog_title}
-                    introduction={blog.blog_category}
-                    hashTags={blog.blog_hashtags || []}
-                    authorName="Author Name"
-                    authorImage="https://example.com/default-author-image.jpg"
-                    date="Date"
-                    onPress={() => handleReadMore(blog.id)}
-                  />
-                ))
-              ) : (
-                <Text style={styles.noBlogsText}>No blogs available</Text>
-              )}
+  blogs.map((blog) => (
+    <BlogPost
+      key={blog.id}
+      id={blog.id}  // Add this line
+      coverPhoto={blog.blog_coverPhoto}
+      title={blog.blog_title}
+      introduction={blog.blog_category}
+      hashTags={blog.blog_hashtags || []}
+      authorName="Author Name"
+      authorImage="https://example.com/default-author-image.jpg"
+      date="Date"
+      onPress={() => handleReadMore(blog.id)}
+    />
+  ))
+) : (
+  <Text style={styles.noBlogsText}>No blogs available</Text>
+)}
             </View>
           </ScrollView>
           <ScrollView 

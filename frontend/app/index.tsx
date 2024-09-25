@@ -3,25 +3,31 @@ import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { View, StyleSheet, Text } from 'react-native';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
+// Import all screens and components
 import WelcomePage from '@/screens/WelcomePage';
 import HomePage from '@/screens/HomePage';
 import BlogPage from '@/screens/BlogPage';
 import BlogDetail from '@/screens/BlogDetailPage';
 import SoundPage from '@/screens/SoundPage';
 import MusicPlayer from '@/screens/MusicPlayer';
+import MusicPlayer1 from '@/screens/MusicPlayer1';
 import EventPage from '@/screens/EventPage';
 import EventAdd from '@/screens/EventAdd';
 import EventDetails from '@/screens/EventDetails';
 import SetReminder from '@/screens/SetReminder';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import SeaWaveTrack from '@/screens/SeaWaweTrack';
 import ExploreEvents from '@/screens/ExploreEvents';
-import Map from '@/screens/Map';
+<!-- import Map from '@/screens/Map';
 import { useEffect } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
-import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
-
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'; -->
+import Settings from '@/components/home/Settings';
+import Favorite from '@/screens/Favourite';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -53,6 +59,16 @@ const SoundStack = () => (
       component={MusicPlayer}
       options={{ headerShown: false }}
     />
+    <Stack.Screen
+      name="MusicPlayer1"
+      component={MusicPlayer1}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="Favourite"
+      component={Favorite}
+      options={{ headerShown: false }}
+    />
   </Stack.Navigator>
 );
 
@@ -68,17 +84,17 @@ const EventStack = () => (
       component={EventAdd}
       options={{ headerShown: false }}
     />
-     <Stack.Screen                    
+    <Stack.Screen                    
       name="ExploreEvents"
       component={ExploreEvents}
       options={{ headerShown: false }}
     />
-     <Stack.Screen                    
+    <Stack.Screen                    
       name="EventDetails"
       component={EventDetails}
       options={{ headerShown: false }}
     />
-     <Stack.Screen                    
+    <Stack.Screen                    
       name="SetReminder"
       component={SetReminder}
       options={{ headerShown: false }}
@@ -102,7 +118,7 @@ const MainTabs = () => (
     screenOptions={({ route }) => ({
       tabBarIcon: ({ focused, color, size }) => {
         const scale = useSharedValue(0);
-        useEffect(() => {
+        React.useEffect(() => {
           scale.value = withSpring(focused ? 1 : 0, { duration: 350 });
         }, [focused]);
 
@@ -157,30 +173,20 @@ const MainTabs = () => (
   </Tab.Navigator>
 );
 
+const MainStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="Tabs" component={MainTabs} />
+    <Stack.Screen name="Settings" component={Settings} />
+    <Stack.Screen name="SeaWaveTrack" component={SeaWaveTrack} />
+  </Stack.Navigator>
+);
+
 const App = () => (
-  
-    <Stack.Navigator initialRouteName="Welcome">
-      <Stack.Screen
-        name="Welcome"
-        component={WelcomePage}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Main"
-        component={MainTabs}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="SeaWaveTrack"
-        component={SeaWaveTrack}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="MapScreen" 
-        component={Map} 
-        options={{ headerShown: false }}
-      />
-    </Stack.Navigator>
+    <Stack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Welcome" component={WelcomePage} />
+      <Stack.Screen name="Main" component={MainStack} />
+      <Stack.Screen  name="MapScreen" component={Map} />
+     </Stack.Navigator>
 );
 
 export default App;
