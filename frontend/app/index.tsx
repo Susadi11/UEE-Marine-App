@@ -17,6 +17,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import SeaWaveTrack from '@/screens/SeaWaweTrack';
 import ExploreEvents from '@/screens/ExploreEvents';
+import Map from '@/screens/Map';
 import { useEffect } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
@@ -84,6 +85,16 @@ const EventStack = () => (
     />
   </Stack.Navigator>
 );
+
+// const MapStack = () => (
+//   <Stack.Navigator initialRouteName="MapScreen">
+//     <Stack.Screen
+//       name="MapScreen"
+//       component={Map}
+//       options={{ headerShown: false }}
+//     />
+//   </Stack.Navigator>
+// );
 
 const MainTabs = () => (
   <Tab.Navigator
@@ -162,6 +173,11 @@ const App = () => (
       <Stack.Screen
         name="SeaWaveTrack"
         component={SeaWaveTrack}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="MapScreen" 
+        component={Map} 
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
