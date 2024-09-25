@@ -60,7 +60,7 @@ const Map = () => {
               longitude: location ? location?.longitude: 80.7718,
             }}
           />
-        <MapView/>
+        </MapView>
       
 
       {/* Search Bar */}
