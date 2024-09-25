@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TextInput, ActivityIndicator } from 'react-native';
-import MapView from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 
@@ -52,8 +52,16 @@ const Map = () => {
           latitudeDelta: 0.05,
           longitudeDelta: 0.05,
         }}
-        showsUserLocation={true} // Show user location on the map
-      />
+        showsUserLocation={true} 
+        >
+          <Marker
+            coordinate={{
+              latitude: location ? location?.latitude: 7.8731,
+              longitude: location ? location?.longitude: 80.7718,
+            }}
+          />
+        <MapView/>
+      
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
