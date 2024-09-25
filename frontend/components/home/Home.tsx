@@ -6,15 +6,19 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
+// Define the navigation stack params
 type RootStackParamList = {
   Home: undefined;
   ExploreEvents: undefined;
   Settings: undefined; // Add Settings screen here
 };
 
+// Define the navigation prop for the Home screen
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
+// Define the Event type
 type Event = {
   id: string;
   title: string;
@@ -33,6 +37,7 @@ const Home: React.FC = () => {
       const eventsList = eventsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Event));
       setEvents(eventsList);
     };
+
 
     fetchEvents();
   }, []);
@@ -61,6 +66,7 @@ const Home: React.FC = () => {
         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
           <Ionicons name="settings-outline" size={28} color="#333" />
         </TouchableOpacity>
+
       </View>
 
       {/* Search Bar */}
@@ -73,8 +79,14 @@ const Home: React.FC = () => {
         />
       </View>
 
-      {/* Explore Events */}
-      <Text style={styles.sectionTitle}>Explore events</Text>
+      {/* Explore Events with Find Icon */}
+      <View style={styles.exploreHeader}>
+        <Text style={styles.sectionTitle}>Explore events</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('MapScreen')}>
+          <AntDesign name="find" size={28} color="black" style={styles.findIcon} />
+        </TouchableOpacity>
+      </View>
+
       <ScrollView horizontal={true} style={styles.eventsContainer} showsHorizontalScrollIndicator={false}>
         {events.slice(-4).map((event) => (
           <Animated.View
@@ -136,118 +148,129 @@ const Home: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f7f9fc',
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingVertical: 15,
-    },
-    welcomeText: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#333',
-        opacity: 0.9,
-    },
-    searchContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#ffffff',
-        borderRadius: 25,
-        paddingHorizontal: 15,
-        paddingVertical: 10,
-        marginHorizontal: 20,
-        marginVertical: 15,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    searchInput: {
-        flex: 1,
-        marginLeft: 10,
-        color: '#333',
-        fontSize: 16,
-    },
-    sectionTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 15,
-        marginLeft: 20,
-        color: '#333',
-        marginTop: 20,
-        opacity: 0.9,
-    },
-    eventsContainer: {
-        paddingLeft: 20,
-        marginBottom: 25,
-        marginTop: 20,
-    },
-    eventCard: {
-        width: 200,
-        borderRadius: 30,
-        overflow: 'hidden',
-        backgroundColor: '#ffffff',
-        marginRight: 15,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 30,
-        elevation: 3,
-    },
-    eventImage: {
-        width: '100%',
-        height: 150,
-        resizeMode: 'cover',
-    },
-    eventText: {
-        textAlign: 'center',
-        padding: 12,
-        backgroundColor: '#d1e7ff',
-        color: '#333',
-        fontWeight: 'bold',
-        fontSize: 14,
-    },
-    exploreMoreCard: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f0f4ff',
-    },
-    exploreMoreText: {
-        color: '#6C9EE5',
-        fontWeight: 'bold',
-        marginTop: 10,
-        fontSize: 14,
-    },
-    actionButton: {
-        backgroundColor: '#ffffff',
-        borderRadius: 30,
-        paddingVertical: 15,
-        paddingHorizontal: 20,
-        marginHorizontal: 20,
-        marginBottom: 15,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-        marginTop: 20,
-    },
-    buttonContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    buttonText: {
-        marginLeft: 15,
-        color: '#333',
-        fontSize: 16,
-        fontWeight: '500',
-    },
+  container: {
+    flex: 1,
+    backgroundColor: '#f7f9fc',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+  },
+  welcomeText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    opacity: 0.9,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    borderRadius: 25,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    marginHorizontal: 20,
+    marginVertical: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  searchInput: {
+    flex: 1,
+    marginLeft: 10,
+    color: '#333',
+    fontSize: 16,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginLeft: 20,
+    color: '#333',
+    opacity: 0.9,
+  },
+  eventsContainer: {
+    paddingLeft: 20,
+    marginBottom: 25,
+    marginTop: 20,
+  },
+  eventCard: {
+    width: 200,
+    borderRadius: 30,
+    overflow: 'hidden',
+    backgroundColor: '#ffffff',
+    marginRight: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 30,
+    elevation: 3,
+  },
+  eventImage: {
+    width: '100%',
+    height: 150,
+    resizeMode: 'cover',
+  },
+  eventText: {
+    textAlign: 'center',
+    padding: 12,
+    backgroundColor: '#d1e7ff',
+    color: '#333',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  exploreMoreCard: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f0f4ff',
+  },
+  exploreMoreText: {
+    color: '#6C9EE5',
+    fontWeight: 'bold',
+    marginTop: 10,
+    fontSize: 14,
+  },
+  actionButton: {
+    backgroundColor: '#ffffff',
+    borderRadius: 30,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    marginHorizontal: 20,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    marginTop: 20,
+  },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  buttonText: {
+    marginLeft: 15,
+    color: '#333',
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  exploreHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginLeft: 10,
+    marginRight: 10,
+    marginBottom: 10,
+    marginTop: 5,
+  },
+  findIcon: {
+    marginRight: 10,
+    padding: 10, // Optional: Add padding for a better touch area
+  },
 });
 
 export default Home

@@ -1,29 +1,35 @@
 import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
+// import Map_cmp from '@/components/Vinuk/Map_cmp';
+import MapView from "react-native-maps";
 
 const Map = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.red}>just red</Text>
-      <Text style={styles.bigBlue}>just bigBlue</Text>
-      <Text style={[styles.bigBlue, styles.red]}>bigBlue, then red</Text>
-      <Text style={[styles.red, styles.bigBlue]}>red, then bigBlue</Text>
+      <MapView
+        style={styles.map}
+        initialRegion={{ //specify our coordinates.
+          latitude: 37.78825,
+          longitude: -122.4324,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        }}
+      />
     </View>
   );
 };
 
+//create our styling code:
 const styles = StyleSheet.create({
   container: {
-    marginTop: 50,
+    ...StyleSheet.absoluteFillObject,
+    flex: 1,
+    justifyContent: "flex-end",
+    alignItems: "center",
   },
-  bigBlue: {
-    color: 'blue',
-    fontWeight: 'bold',
-    fontSize: 30,
+  map: {
+    ...StyleSheet.absoluteFillObject,
   },
-  red: {
-    color: 'red',
-  }, //
-});//jj
+});
 
 export default Map;

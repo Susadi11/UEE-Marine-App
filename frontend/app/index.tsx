@@ -22,6 +22,10 @@ import EventDetails from '@/screens/EventDetails';
 import SetReminder from '@/screens/SetReminder';
 import SeaWaveTrack from '@/screens/SeaWaweTrack';
 import ExploreEvents from '@/screens/ExploreEvents';
+<!-- import Map from '@/screens/Map';
+import { useEffect } from 'react';
+import { View, StyleSheet, Text } from 'react-native';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'; -->
 import Settings from '@/components/home/Settings';
 import Favorite from '@/screens/Favourite';
 
@@ -98,6 +102,16 @@ const EventStack = () => (
   </Stack.Navigator>
 );
 
+// const MapStack = () => (
+//   <Stack.Navigator initialRouteName="MapScreen">
+//     <Stack.Screen
+//       name="MapScreen"
+//       component={Map}
+//       options={{ headerShown: false }}
+//     />
+//   </Stack.Navigator>
+// );
+
 const MainTabs = () => (
   <Tab.Navigator
     initialRouteName="Home"
@@ -168,11 +182,11 @@ const MainStack = () => (
 );
 
 const App = () => (
-  
     <Stack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Welcome" component={WelcomePage} />
       <Stack.Screen name="Main" component={MainStack} />
-    </Stack.Navigator>
+      <Stack.Screen  name="MapScreen" component={Map} />
+     </Stack.Navigator>
 );
 
 export default App;
