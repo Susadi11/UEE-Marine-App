@@ -20,7 +20,7 @@ import EventDetails from '@/screens/EventDetails';
 import SetReminder from '@/screens/SetReminder';
 import SeaWaveTrack from '@/screens/SeaWaweTrack';
 import ExploreEvents from '@/screens/ExploreEvents';
- import Map from '@/screens/Map';
+import Map from '@/screens/Map';
 import { useEffect } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'; 
