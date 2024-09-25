@@ -52,7 +52,7 @@ const Map = () => {
           latitudeDelta: 0.05,
           longitudeDelta: 0.05,
         }}
-        showsUserLocation={true} // Show user location on the map
+        showsUserLocation={true} 
       />
 
       {/* Search Bar */}
