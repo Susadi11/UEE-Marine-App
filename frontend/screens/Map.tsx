@@ -9,10 +9,10 @@ const Map = () => {
       <MapView
         style={styles.map}
         initialRegion={{ //specify our coordinates.
-          latitude: 7.8731, // Central point of Sri Lanka
-          longitude: 80.7718, // Central point of Sri Lanka
-          latitudeDelta: 2.5, // Larger values to show more area
-          longitudeDelta: 2.5, // Larger values to show more area
+          latitude: 7.8731, 
+          longitude: 80.7718, 
+          latitudeDelta: 2.5, 
+          longitudeDelta: 2.5, 
         }}
       />
     </View>
