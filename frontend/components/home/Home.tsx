@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, ScrollView, StyleSheet, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 // Define the navigation stack params
 type RootStackParamList = {
   Home: undefined;
   ExploreEvents: undefined;
-  Settings: undefined; // Add Settings screen here
+  Settings: undefined;
   MapScreen: undefined;
+  TrendingPage: undefined;
+  BlogDetail: { blogData: Blog };
 };
 
 // Define the navigation prop for the Home screen
@@ -26,9 +28,28 @@ type Event = {
   imageUrl?: string;
 };
 
+// Define the Blog type
+type Blog = {
+  id: string;
+  coverPhoto: string;
+  title: string;
+  introduction: string;
+  trendingScore: number;
+  blog_author?: string;
+  blog_sciname?: string;
+  blog_physicalCharacteristics?: string;
+  blog_category?: string;
+  blog_images?: string[];
+  blog_habitatDistribution?: string;
+  blog_behavior?: string;
+  blog_importanceEcosystem?: string;
+};
+
 const Home: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
+  const [trendingBlog, setTrendingBlog] = useState<Blog | null>(null);
   const [scaleValue] = useState(new Animated.Value(1));
+  const [fireScale] = useState(new Animated.Value(1));
   const navigation = useNavigation<HomeScreenNavigationProp>();
 
   useEffect(() => {
@@ -39,8 +60,58 @@ const Home: React.FC = () => {
       setEvents(eventsList);
     };
 
-
+    const fetchTrendingBlog = async () => {
+      try {
+        const blogsCollection = collection(db, 'blogs');
+        const trendingBlogQuery = query(blogsCollection, orderBy('trendingScore', 'desc'), limit(1));
+        const trendingBlogSnapshot = await getDocs(trendingBlogQuery);
+        
+        if (!trendingBlogSnapshot.empty) {
+          const blogDoc = trendingBlogSnapshot.docs[0];
+          const blogData = blogDoc.data();
+          setTrendingBlog({
+            id: blogDoc.id,
+            coverPhoto: blogData.blog_coverPhoto || 'https://example.com/default-cover.jpg',
+            title: blogData.blog_title || 'Untitled',
+            introduction: blogData.blog_behavior || 'No introduction available',
+            trendingScore: blogData.trendingScore || 0,
+            blog_author: blogData.blog_author,
+            blog_sciname: blogData.blog_sciname,
+            blog_physicalCharacteristics: blogData.blog_physicalCharacteristics,
+            blog_category: blogData.blog_category,
+            blog_images: blogData.blog_images,
+            blog_habitatDistribution: blogData.blog_habitatDistribution,
+            blog_behavior: blogData.blog_behavior,
+            blog_importanceEcosystem: blogData.blog_importanceEcosystem,
+          });
+        } else {
+          console.log('No trending blogs found');
+          setTrendingBlog(null);
+        }
+      } catch (error) {
+        console.error('Error fetching trending blog:', error);
+        setTrendingBlog(null);
+      }
+    };
+    
     fetchEvents();
+    fetchTrendingBlog();
+
+    // Fire icon animation (scale pulse effect)
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(fireScale, {
+          toValue: 1.2,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fireScale, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
   }, []);
 
   const handlePressIn = () => {
@@ -67,7 +138,6 @@ const Home: React.FC = () => {
         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
           <Ionicons name="settings-outline" size={28} color="#333" />
         </TouchableOpacity>
-
       </View>
 
       {/* Search Bar */}
@@ -132,18 +202,40 @@ const Home: React.FC = () => {
         </View>
       </TouchableOpacity>
 
-      {/* Check Out Trending Blogs */}
-      <TouchableOpacity
-        style={styles.actionButton}
-        activeOpacity={0.8}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-      >
-        <View style={styles.buttonContent}>
-          <MaterialCommunityIcons name="fire" size={30} color="#FD7600" />
-          <Text style={styles.buttonText}>Check Out the Latest Trending Blogs</Text>
+      {/* Trending Blogs Section */}
+      <View style={styles.trendingBlogsSection}>
+        <View style={styles.sectionHeader}>
+          <View style={styles.trendingTitleContainer}>
+            {/* Animated Fire Icon */}
+            <Animated.View style={{ transform: [{ scale: fireScale }] }}>
+              <MaterialCommunityIcons name="fire" size={24} color="#FF4500" />
+            </Animated.View>
+            <Text style={styles.sectionTitle}>Trending Blogs</Text>
+          </View>
+          <TouchableOpacity onPress={() => navigation.navigate('TrendingPage')}>
+            <Text style={styles.viewAllText}>View All</Text>
+          </TouchableOpacity>
         </View>
-      </TouchableOpacity>
+
+        {trendingBlog ? (
+          <TouchableOpacity
+            style={styles.trendingCard}
+            onPress={() => navigation.navigate('BlogDetail', { blogData: trendingBlog })}
+          >
+            <Image
+              source={{ uri: trendingBlog.coverPhoto }}
+              style={styles.trendingImage}
+            />
+            <View style={styles.trendingInfo}>
+              <Text style={styles.trendingName} numberOfLines={2}>{trendingBlog.title}</Text>
+              <Text style={styles.trendingIntro} numberOfLines={3}>{trendingBlog.introduction}</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={24} color="#666" />
+          </TouchableOpacity>
+        ) : (
+          <Text style={styles.noTrendingBlogsText}>No trending blogs available at the moment.</Text>
+        )}
+      </View>
     </ScrollView>
   );
 };
@@ -190,7 +282,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginLeft: 20,
+    marginLeft: 10, // Add space between the icon and the title
     color: '#333',
     opacity: 0.9,
   },
@@ -270,8 +362,70 @@ const styles = StyleSheet.create({
   },
   findIcon: {
     marginRight: 10,
-    padding: 10, // Optional: Add padding for a better touch area
+    padding: 10,
+  },
+  popularDoctorsSection: {
+    marginTop: 20,
+    marginHorizontal: 20,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  viewAllText: {
+    color: '#6C9EE5',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  trendingBlogsSection: {
+    marginTop: 20,
+    marginHorizontal: 20,
+    marginBottom: 20,
+  },
+  trendingCard: {
+    flexDirection: 'row',
+    backgroundColor: '#ffffff',
+    borderRadius: 10,
+    padding: 15,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  trendingImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 10,
+    marginRight: 15,
+  },
+  trendingInfo: {
+    flex: 1,
+  },
+  trendingName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 5,
+  },
+  trendingIntro: {
+    fontSize: 14,
+    color: '#666',
+  },
+  noTrendingBlogsText: {
+    fontSize: 14,
+    color: '#666',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  trendingTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
 
-export default Home
+export default Home; 

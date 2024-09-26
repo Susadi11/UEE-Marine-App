@@ -26,6 +26,7 @@ import { View, StyleSheet, Text } from 'react-native';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'; 
 import Settings from '@/components/home/Settings';
 import Favorite from '@/screens/Favourite';
+import TrendingPage from '@/screens/Blogs/TrendingPage';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -40,6 +41,11 @@ const BlogStack = () => (
     <Stack.Screen
       name="BlogDetail"
       component={BlogDetail as React.ComponentType<any>}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="TrendingPage"
+      component={TrendingPage}
       options={{ headerShown: false }}
     />
   </Stack.Navigator>

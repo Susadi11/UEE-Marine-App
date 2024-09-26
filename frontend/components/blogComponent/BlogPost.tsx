@@ -13,8 +13,8 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getFirestore, doc, getDoc, updateDoc, setDoc, increment } from 'firebase/firestore';
-import { app } from '../../firebaseConfig'; // Make sure to import your Firebase config
+import { getFirestore, doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
+import { app } from '../../firebaseConfig';
 
 interface BlogPostProps {
   id: string;
@@ -75,27 +75,27 @@ const BlogPost: React.FC<BlogPostProps> = ({
     }
   };
 
-const loadCounts = async () => {
-  try {
-    const docRef = doc(firestore, 'blogPosts', id);
-    const docSnap = await getDoc(docRef);
+  const loadCounts = async () => {
+    try {
+      const docRef = doc(firestore, 'blogs', id);
+      const docSnap = await getDoc(docRef);
 
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      setLikeCount(Math.max(0, data?.likeCount || 0));
-      setShareCount(Math.max(0, data?.shareCount || 0));
-    } else {
-      // Initialize with zeros if document doesn't exist
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setLikeCount(data.likeCount || 0);
+        setShareCount(data.shareCount || 0);
+      } else {
+        // Initialize counts if document doesn't exist
+        await setDoc(docRef, { likeCount: 0, shareCount: 0 });
+        setLikeCount(0);
+        setShareCount(0);
+      }
+    } catch (error) {
+      console.error('Error loading counts from Firebase:', error);
       setLikeCount(0);
       setShareCount(0);
     }
-  } catch (error) {
-    console.error('Error loading counts from Firebase:', error);
-    // Initialize with zeros in case of error
-    setLikeCount(0);
-    setShareCount(0);
-  }
-};
+  };
 
   const saveLikeStatus = async (status: boolean) => {
     try {
@@ -105,57 +105,68 @@ const loadCounts = async () => {
     }
   };
 
-  const updateFirebaseCounts = async (field: 'likeCount' | 'shareCount', change: number) => {
+  const updateTrendingScore = async () => {
     try {
-      const docRef = doc(firestore, 'blogPosts', id);
+      const trendingScore = likeCount + shareCount;
+      const docRef = doc(firestore, 'blogs', id);
+      await updateDoc(docRef, {
+        trendingScore: trendingScore,
+      });
+    } catch (error) {
+      console.error('Error updating trending score:', error);
+    }
+  };
+  
+  // Modify the updateFirebaseCounts to call updateTrendingScore after updating counts
+  const updateFirebaseCounts = async (field: 'likeCount' | 'shareCount', increment: number) => {
+    try {
+      const docRef = doc(firestore, 'blogs', id);
       const docSnap = await getDoc(docRef);
   
       if (docSnap.exists()) {
         const currentCount = docSnap.data()?.[field] || 0;
-        const newCount = Math.max(0, currentCount + change);
-        
+        const newCount = Math.max(0, currentCount + increment);
+  
         await updateDoc(docRef, {
-          [field]: newCount
+          [field]: newCount,
         });
   
-        // Update local state
         if (field === 'likeCount') {
           setLikeCount(newCount);
         } else {
           setShareCount(newCount);
         }
+  
+        // Call updateTrendingScore after updating counts
+        updateTrendingScore();
       } else {
-        // Document doesn't exist, create it with initial count of 1 (or 0 if unliking)
-        const initialCount = Math.max(0, change);
+        // Document doesn't exist, create it with initial counts
         await setDoc(docRef, {
-          [field]: initialCount
+          likeCount: field === 'likeCount' ? Math.max(0, increment) : 0,
+          shareCount: field === 'shareCount' ? Math.max(0, increment) : 0,
         });
   
-        // Update local state
         if (field === 'likeCount') {
-          setLikeCount(initialCount);
+          setLikeCount(Math.max(0, increment));
         } else {
-          setShareCount(initialCount);
+          setShareCount(Math.max(0, increment));
         }
+  
+        // Call updateTrendingScore after creating the document
+        updateTrendingScore();
       }
     } catch (error) {
       console.error('Error updating Firebase counts:', error);
-      // You might want to show an error message to the user here
     }
   };
+  
 
   const handleLike = async () => {
     const newLikedStatus = !liked;
     setLiked(newLikedStatus);
     await saveLikeStatus(newLikedStatus);
-  
-    if (newLikedStatus) {
-      await updateFirebaseCounts('likeCount', 1);
-    } else {
-      // Only decrease if current count is greater than 0
-      
-    }
-  
+
+    await updateFirebaseCounts('likeCount', newLikedStatus ? 1 : -1);
 
     Animated.sequence([
       Animated.timing(animatedScale, {
@@ -179,11 +190,10 @@ const loadCounts = async () => {
       const result = await Share.share({
         message: shareMessage,
         title: title,
-        url: coverPhoto, // This will work on iOS, but might not on Android
+        url: coverPhoto,
       });
 
       if (result.action === Share.sharedAction) {
-        setShareCount(prevCount => prevCount + 1);
         await updateFirebaseCounts('shareCount', 1);
         if (result.activityType) {
           console.log(`Shared via ${result.activityType}`);
@@ -223,7 +233,6 @@ const loadCounts = async () => {
                     name={liked ? 'heart' : 'heart-outline'}
                     size={24}
                     color={liked ? '#FF6B6B' : 'white'}
-                    style={styles.iconSpacing}
                   />
                 </Animated.View>
                 <Text style={styles.countText}>{likeCount}</Text>
@@ -233,7 +242,6 @@ const loadCounts = async () => {
                   name="paper-plane-outline"
                   size={24}
                   color="white"
-                  style={styles.iconSpacing}
                 />
                 <Text style={styles.countText}>{shareCount}</Text>
               </TouchableOpacity>
@@ -244,7 +252,6 @@ const loadCounts = async () => {
     </Animated.View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -302,6 +309,7 @@ const styles = StyleSheet.create({
   },
   readMoreText: {
     color: 'white',
+    fontSize: 16,
     fontWeight: 'bold',
   },
   iconContainer: {
@@ -312,12 +320,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: 16,
   },
-  iconSpacing: {
-    marginBottom: 4,
-  },
   countText: {
     color: 'white',
     fontSize: 12,
+    marginTop: 4,
   },
 });
 
