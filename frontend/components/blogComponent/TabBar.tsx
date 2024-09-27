@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 5,
+    marginBottom: 5,
   },
   tabButton: {
     alignItems: 'center',

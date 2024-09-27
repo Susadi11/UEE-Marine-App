@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   searchBoxContainer: {
     flexDirection: 'row',

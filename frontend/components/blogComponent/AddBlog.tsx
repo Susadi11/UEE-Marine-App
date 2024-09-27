@@ -5,19 +5,20 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  Alert,
-  ScrollView,
+  FlatList,
   Image,
   Animated,
   Platform,
   Dimensions,
   KeyboardAvoidingView,
+  Alert,
 } from 'react-native';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { app } from '../../firebaseConfig';
 import * as ImagePicker from 'expo-image-picker';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import CustomMessage from '../CustomMessage';
 
 const { width } = Dimensions.get('window');
 
@@ -33,10 +34,12 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [images, setImages] = useState<any[]>([]);
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(width));
-  const scrollViewRef = useRef<ScrollView>(null);
+  const flatListRef = useRef<FlatList>(null);
 
   const firestore = getFirestore(app);
   const storage = getStorage(app);
+
+  const [showMessage, setShowMessage] = useState(false);
 
   useEffect(() => {
     Animated.parallel([
@@ -91,8 +94,24 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
       const docRef = await addDoc(collection(firestore, 'blogs'), newBlog);
       console.log('Document written with ID: ', docRef.id);
-      Alert.alert('Blog saved successfully');
-      onClose();
+
+      setShowMessage(true);
+
+      // Clear the form after successful save
+      setTitle('');
+      setIntroduction('');
+      setSciName('');
+      setPhysicalCharacteristics('');
+      setHabitatDistribution('');
+      setBehavior('');
+      setImportanceEcosystem('');
+      setCoverPhoto(null);
+      setImages([]);
+
+      // Close the form after a short delay
+      setTimeout(() => {
+        onClose();
+      }, 3000);
     } catch (error: unknown) {
       console.error('Error adding document: ', error);
       if (error instanceof Error) {
@@ -157,70 +176,86 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     </Animated.View>
   );
 
+  const renderItem = ({ item }: { item: any }) => (
+    <Animated.Image
+      source={{ uri: item.uri }}
+      style={[styles.gridImage, { opacity: fadeAnim }]}
+    />
+  );
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
-      <Animated.ScrollView
-        ref={scrollViewRef}
-        contentContainerStyle={styles.scrollViewContent}
-        style={[styles.scrollView, { opacity: fadeAnim }]}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.header}>
-          <TouchableOpacity onPress={onClose}>
-            <MaterialCommunityIcons name="arrow-left" size={28} color="#6C9EE5" />
-          </TouchableOpacity>
-          <Text style={styles.title}>Create New Blog</Text>
-        </View>
+      <FlatList
+        ref={flatListRef}
+        data={[{ key: 'content' }]}
+        renderItem={() => (
+          <>
+            <View style={styles.header}>
+              <TouchableOpacity onPress={onClose}>
+                <MaterialCommunityIcons name="arrow-left" size={28} color="#6C9EE5" />
+              </TouchableOpacity>
+              <Text style={styles.title}>Create New Blog</Text>
+            </View>
 
-        {renderInputField("Title", title, setTitle)}
-        {renderInputField("Introduction", introduction, setIntroduction)}
-        {renderInputField("Scientific Name", sciName, setSciName)}
-        {renderInputField("Physical Characteristics", physicalCharacteristics, setPhysicalCharacteristics, true)}
-        {renderInputField("Habitat & Distribution", habitatDistribution, setHabitatDistribution, true)}
-        {renderInputField("Behavior", behavior, setBehavior, true)}
-        {renderInputField("Importance in the Ecosystem", importanceEcosystem, setImportanceEcosystem, true)}
+            {renderInputField("Title", title, setTitle)}
+            {renderInputField("Introduction", introduction, setIntroduction)}
+            {renderInputField("Scientific Name", sciName, setSciName)}
+            {renderInputField("Physical Characteristics", physicalCharacteristics, setPhysicalCharacteristics, true)}
+            {renderInputField("Habitat & Distribution", habitatDistribution, setHabitatDistribution, true)}
+            {renderInputField("Behavior", behavior, setBehavior, true)}
+            {renderInputField("Importance in the Ecosystem", importanceEcosystem, setImportanceEcosystem, true)}
 
-        <Animated.View style={[styles.section, { transform: [{ translateX: slideAnim }] }]}>
-          <Text style={styles.subtitle}>Cover Photo</Text>
-          {coverPhoto && (
-            <Animated.Image
-              source={{ uri: coverPhoto.uri }}
-              style={[styles.image, { opacity: fadeAnim }]}
-            />
-          )}
-          <TouchableOpacity style={styles.addButton} onPress={() => pickImage(setCoverPhoto)}>
-            <Text style={styles.addButtonText}>Select Cover Photo</Text>
-          </TouchableOpacity>
-        </Animated.View>
+            <Animated.View style={[styles.section, { transform: [{ translateX: slideAnim }] }]}>
+              <Text style={styles.subtitle}>Cover Photo</Text>
+              {coverPhoto && (
+                <Animated.Image
+                  source={{ uri: coverPhoto.uri }}
+                  style={[styles.image, { opacity: fadeAnim }]}
+                />
+              )}
+              <TouchableOpacity style={styles.addButton} onPress={() => pickImage(setCoverPhoto)}>
+                <Text style={styles.addButtonText}>Select Cover Photo</Text>
+              </TouchableOpacity>
+            </Animated.View>
 
-        <Animated.View style={[styles.section, { transform: [{ translateX: slideAnim }] }]}>
-          <Text style={styles.subtitle}>Add Images (up to 9)</Text>
-          <View style={styles.imageGrid}>
-            {images.map((image, index) => (
-              <Animated.Image
-                key={index}
-                source={{ uri: image.uri }}
-                style={[styles.gridImage, { opacity: fadeAnim }]}
+            <Animated.View style={[styles.section, { transform: [{ translateX: slideAnim }] }]}>
+              <Text style={styles.subtitle}>Add Images (up to 9)</Text>
+              <FlatList
+                data={images}
+                renderItem={renderItem}
+                keyExtractor={(item, index) => index.toString()}
+                numColumns={3}
+                scrollEnabled={false}
               />
-            ))}
-          </View>
-          <TouchableOpacity style={styles.addButton} onPress={handleAddImage}>
-            <Text style={styles.addButtonText}>+ Add Image</Text>
-          </TouchableOpacity>
-        </Animated.View>
+              <TouchableOpacity style={styles.addButton} onPress={handleAddImage}>
+                <Text style={styles.addButtonText}>+ Add Image</Text>
+              </TouchableOpacity>
+            </Animated.View>
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={onClose}>
-            <Text style={styles.buttonText}>Cancel</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleSave}>
-            <Text style={[styles.buttonText, styles.saveButtonText]}>Save</Text>
-          </TouchableOpacity>
-        </View>
-      </Animated.ScrollView>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity style={styles.button} onPress={onClose}>
+                <Text style={styles.buttonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleSave}>
+                <Text style={[styles.buttonText, styles.saveButtonText]}>Save</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
+        keyExtractor={(item) => item.key}
+        contentContainerStyle={styles.scrollViewContent}
+        showsVerticalScrollIndicator={false}
+      />
+
+      <CustomMessage 
+        message="Blog saved successfully!" 
+        type="success" 
+        visible={showMessage} 
+        onHide={() => setShowMessage(false)} 
+      />
     </KeyboardAvoidingView>
   );
 };
@@ -229,9 +264,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#ffffff',
-  },
-  scrollView: {
-    flex: 1,
   },
   scrollViewContent: {
     padding: 20,
@@ -243,65 +275,58 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#6C9EE5',
-    marginLeft: 20,
+    fontSize: 22,
+    fontWeight: '600',
+    color: '#2d3748',
+    marginLeft: 10,
   },
   inputContainer: {
-    marginBottom: 15,
+    marginBottom: 20,
   },
   input: {
     backgroundColor: '#f7fafc',
-    borderRadius: 12,
     padding: 15,
-    fontSize: 16,
-    color: '#2d3748',
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: '#e2e8f0',
+    fontSize: 16,
+    color: '#2d3748',
   },
   textArea: {
-    height: 120,
+    height: 100,
     textAlignVertical: 'top',
   },
   section: {
     marginBottom: 20,
   },
   subtitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#2d3748',
     marginBottom: 10,
-    color: '#000000',
   },
   image: {
     width: '100%',
     height: 200,
-    resizeMode: 'cover',
+    borderRadius: 10,
     marginBottom: 10,
-    borderRadius: 12,
-  },
-  imageGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 15,
   },
   gridImage: {
-    width: (width - 60) / 3,
-    height: (width - 60) / 3,
-    marginRight: 10,
-    marginBottom: 10,
-    borderRadius: 8,
+    width: '30%',
+    height: 100,
+    margin: '1.5%',
+    borderRadius: 10,
   },
   addButton: {
     backgroundColor: '#6C9EE5',
-    padding: 15,
-    borderRadius: 12,
+    paddingVertical: 10,
+    borderRadius: 8,
     alignItems: 'center',
+    marginTop: 10,
   },
   addButtonText: {
     color: '#ffffff',
-    fontWeight: 'bold',
-    fontSize: 16,
+    fontWeight: '600',
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -310,19 +335,19 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 1,
+    paddingVertical: 15,
+    borderRadius: 30,
+    alignItems: 'center',
+    marginHorizontal: 10,
     backgroundColor: '#e2e8f0',
-    padding: 15,
-    borderRadius: 12,
-    marginHorizontal: 5,
+  },
+  buttonText: {
+    color: '#2d3748',
+    fontWeight: '600',
+    fontSize: 16,
   },
   saveButton: {
     backgroundColor: '#6C9EE5',
-  },
-  buttonText: {
-    color: '#6C9EE5',
-    textAlign: 'center',
-    fontWeight: 'bold',
-    fontSize: 16,
   },
   saveButtonText: {
     color: '#ffffff',
