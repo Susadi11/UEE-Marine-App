@@ -14,6 +14,7 @@ import {
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
 interface ImageItem {
   url: string;
@@ -46,7 +47,12 @@ const BlogDetailPage: React.FC<BlogDetailPageProps> = ({ route, navigation }) =>
   const { blogData } = route.params;
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  
+  let [fontsLoaded] = useFonts({
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+  });
+
   const scrollY = useRef(new Animated.Value(0)).current;
   const headerOpacity = scrollY.interpolate({
     inputRange: [0, 200],
@@ -84,6 +90,9 @@ const BlogDetailPage: React.FC<BlogDetailPageProps> = ({ route, navigation }) =>
     if (newIndex >= blogData.blog_images.length) newIndex = 0;
     setSelectedImage(newIndex);
   };
+  if (!fontsLoaded) {
+    return null; // or a loading indicator
+  }
 
   return (
     <View style={styles.container}>
@@ -195,6 +204,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+    fontFamily: 'Inter_700Bold',
   },
   backButton: {
     position: 'absolute',
@@ -229,7 +239,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textShadowColor: 'rgba(0, 0, 0, 0.75)',
     textShadowOffset: {width: -1, height: 1},
-    textShadowRadius: 10
+    textShadowRadius: 10,
+    fontFamily: 'Inter_700Bold',
   },
   author: {
     fontSize: 16,
@@ -241,6 +252,7 @@ const styles = StyleSheet.create({
   authorName: {
     color: '#6366F1',
     fontWeight: 'bold',
+    fontFamily: 'Inter_600SemiBold',
   },
   content: {
     padding: 20,
@@ -251,12 +263,14 @@ const styles = StyleSheet.create({
     color: '#111827',
     marginTop: 25,
     marginBottom: 15,
+    fontFamily: 'Inter_600SemiBold',
   },
   bodyText: {
     fontSize: 16,
     color: '#374151',
     lineHeight: 24,
     marginBottom: 20,
+    fontFamily: 'Inter_600SemiBold',
   },
   imageGrid: {
     flexDirection: 'row',

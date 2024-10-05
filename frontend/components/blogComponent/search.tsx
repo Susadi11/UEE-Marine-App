@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import TabBar from './TabBar';
+import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
 // Use TabName type from TabBar to ensure type consistency
 type TabName = 'AllBlogs' | 'TrendingPage' | 'MyBlogPage';
@@ -23,6 +24,12 @@ const Search: React.FC<SearchProps> = ({ activeTab, onTabPress, onAddPress }) =>
   const [searchQuery, setSearchQuery] = useState('');
   const animatedWidth = React.useRef(new Animated.Value(0)).current;
 
+  let [fontsLoaded] = useFonts({
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+  });
+
   React.useEffect(() => {
     Animated.timing(animatedWidth, {
       toValue: 1,
@@ -31,6 +38,10 @@ const Search: React.FC<SearchProps> = ({ activeTab, onTabPress, onAddPress }) =>
       easing: Easing.out(Easing.cubic),
     }).start();
   }, []);
+
+  if (!fontsLoaded) {
+    return null; // or a loading indicator
+  }
 
   return (
     <View style={styles.container}>
@@ -97,6 +108,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#333',
+    fontFamily: 'Inter_600SemiBold',
   },
   addButton: {
     marginLeft: 8,

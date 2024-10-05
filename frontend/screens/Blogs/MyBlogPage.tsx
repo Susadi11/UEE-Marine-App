@@ -6,6 +6,7 @@ import MyBlog from '@/components/blogComponent/MyBlog';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
 type RootStackParamList = {
   BlogDetail: { blogData: any };
@@ -18,6 +19,11 @@ const MyBlogPage: React.FC = () => {
   const [selectedBlogId, setSelectedBlogId] = useState<string | null>(null);
   const firestore = getFirestore(app);
   const navigation = useNavigation<NavigationProp>();
+  let [fontsLoaded] = useFonts({
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+  });
 
   useEffect(() => {
     const blogCollection = collection(firestore, 'blogs');
@@ -65,6 +71,10 @@ const MyBlogPage: React.FC = () => {
 
   const renderContextMenu = (blogId: string) => {
     if (selectedBlogId !== blogId) return null;
+
+    if (!fontsLoaded) {
+      return null; // or a loading indicator
+    }
 
     return (
       <View style={styles.contextMenu}>
@@ -124,6 +134,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1f2937',
     padding: 16,
+    fontFamily: 'Inter_700Bold',
   },
   blogList: {
   },
@@ -162,6 +173,7 @@ const styles = StyleSheet.create({
   menuItemText: {
     marginLeft: 10,
     color: '#4b5563',
+    fontFamily: 'Inter_600SemiBold',
   },
   noBlogsText: {
     fontSize: 16,

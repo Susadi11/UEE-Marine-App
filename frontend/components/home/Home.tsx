@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
 // Define the navigation stack params
 type RootStackParamList = {
@@ -51,6 +52,11 @@ const Home: React.FC = () => {
   const [scaleValue] = useState(new Animated.Value(1));
   const [fireScale] = useState(new Animated.Value(1));
   const navigation = useNavigation<HomeScreenNavigationProp>();
+  let [fontsLoaded] = useFonts({
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+  });
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -129,6 +135,10 @@ const Home: React.FC = () => {
       useNativeDriver: true,
     }).start();
   };
+
+  if (!fontsLoaded) {
+    return null; // or a loading indicator
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -257,6 +267,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
     opacity: 0.9,
+    fontFamily: 'Inter_700Bold',
   },
   searchContainer: {
     flexDirection: 'row',
@@ -278,6 +289,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     color: '#333',
     fontSize: 16,
+    fontFamily: 'Inter_600SemiBold',
   },
   sectionTitle: {
     fontSize: 20,
@@ -285,6 +297,7 @@ const styles = StyleSheet.create({
     marginLeft: 10, // Add space between the icon and the title
     color: '#333',
     opacity: 0.9,
+    fontFamily: 'Inter_600SemiBold',
   },
   eventsContainer: {
     paddingLeft: 20,
@@ -315,6 +328,7 @@ const styles = StyleSheet.create({
     color: '#333',
     fontWeight: 'bold',
     fontSize: 14,
+    fontFamily: 'Inter_600SemiBold',
   },
   exploreMoreCard: {
     justifyContent: 'center',
@@ -326,6 +340,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 10,
     fontSize: 14,
+    fontFamily: 'Inter_600SemiBold',
   },
   actionButton: {
     backgroundColor: '#ffffff',
@@ -350,6 +365,7 @@ const styles = StyleSheet.create({
     color: '#333',
     fontSize: 16,
     fontWeight: '500',
+    fontFamily: 'Inter_600SemiBold',
   },
   exploreHeader: {
     flexDirection: 'row',
@@ -378,6 +394,7 @@ const styles = StyleSheet.create({
     color: '#6C9EE5',
     fontSize: 14,
     fontWeight: '500',
+    fontFamily: 'Inter_500Medium',
   },
   trendingBlogsSection: {
     marginTop: 20,
@@ -410,10 +427,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 5,
+    fontFamily: 'Inter_600SemiBold',
   },
   trendingIntro: {
     fontSize: 14,
     color: '#666',
+    fontFamily: 'Inter_600SemiBold',
   },
   noTrendingBlogsText: {
     fontSize: 14,
@@ -425,6 +444,7 @@ const styles = StyleSheet.create({
   trendingTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    fontFamily: 'Inter_600SemiBold',
   },
 });
 

@@ -2,13 +2,22 @@ import React, { useState } from 'react';
 import { View, Text, Switch, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider'; // Import Slider from the correct package
+import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
 const Settings = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [soundLevel, setSoundLevel] = useState(50);
+  let [fontsLoaded] = useFonts({
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+  });
 
   const toggleDarkMode = () => setIsDarkMode((prevMode) => !prevMode);
-
+  if (!fontsLoaded) {
+    return null; // or a loading indicator
+  }
+  
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Settings</Text>
@@ -58,6 +67,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    fontFamily: 'Inter_700Bold',
   },
   settingContainer: {
     flexDirection: 'row',
@@ -70,6 +80,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 18,
+    fontFamily: 'Inter_600SemiBold',
   },
   slider: {
     width: 150,

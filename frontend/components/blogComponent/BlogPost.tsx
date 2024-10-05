@@ -15,6 +15,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getFirestore, doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import { app } from '../../firebaseConfig';
+import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
 interface BlogPostProps {
   id: string;
@@ -46,6 +47,12 @@ const BlogPost: React.FC<BlogPostProps> = ({
   const [shareCount, setShareCount] = useState(0);
   const animatedScale = useRef(new Animated.Value(1)).current;
   const animatedOpacity = useRef(new Animated.Value(0)).current;
+
+  let [fontsLoaded] = useFonts({
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+  });
 
   const firestore = getFirestore(app);
 
@@ -208,6 +215,10 @@ const BlogPost: React.FC<BlogPostProps> = ({
     }
   };
 
+  if (!fontsLoaded) {
+    return null; // or a loading indicator
+  }
+
   return (
     <Animated.View style={[styles.container, { opacity: animatedOpacity }]}>
       <Image source={{ uri: coverPhoto }} style={styles.image} />
@@ -289,12 +300,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
     marginBottom: 8,
+    fontFamily: 'Inter_700Bold',
   },
   description: {
     fontSize: 16,
     color: 'rgba(255, 255, 255, 0.8)',
     lineHeight: 24,
     marginBottom: 16,
+    fontFamily: 'Inter_600SemiBold',
   },
   footer: {
     flexDirection: 'row',
@@ -311,6 +324,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+    fontFamily: 'Inter_600SemiBold',
   },
   iconContainer: {
     flexDirection: 'row',
