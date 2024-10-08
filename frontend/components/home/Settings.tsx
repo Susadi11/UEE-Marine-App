@@ -1,12 +1,28 @@
 import React, { useState } from 'react';
-import { View, Text, Switch, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Switch, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import Slider from '@react-native-community/slider'; // Import Slider from the correct package
+import Slider from '@react-native-community/slider';
 import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
+import { getAuth, signOut } from 'firebase/auth';
+import { useNavigation, NavigationProp, ParamListBase } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Define the types for our navigation
+type RootStackParamList = {
+  Login: undefined;
+  Signup: undefined;
+  Main: undefined;
+  Settings: undefined;
+  // Add other screen names and their params here
+};
+
+type SettingsScreenNavigationProp = NavigationProp<RootStackParamList>;
 
 const Settings = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [soundLevel, setSoundLevel] = useState(50);
+  const navigation = useNavigation<SettingsScreenNavigationProp>();
+
   let [fontsLoaded] = useFonts({
     Inter_500Medium,
     Inter_600SemiBold,
@@ -14,10 +30,25 @@ const Settings = () => {
   });
 
   const toggleDarkMode = () => setIsDarkMode((prevMode) => !prevMode);
+
+  const handleLogout = async () => {
+    const auth = getAuth();
+    try {
+      await signOut(auth);
+      await AsyncStorage.removeItem('user');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+    } catch (error) {
+      Alert.alert('Logout Error', 'An error occurred while logging out. Please try again.');
+    }
+  };
+
   if (!fontsLoaded) {
     return null; // or a loading indicator
   }
-  
+
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Settings</Text>
@@ -53,6 +84,11 @@ const Settings = () => {
           maximumTrackTintColor="#767577"
         />
       </View>
+
+      {/* Logout Button */}
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Text style={styles.logoutButtonText}>Logout</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -85,6 +121,18 @@ const styles = StyleSheet.create({
   slider: {
     width: 150,
     height: 40,
+  },
+  logoutButton: {
+    backgroundColor: '#FF3B30',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  logoutButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontFamily: 'Inter_600SemiBold',
   },
 });
 

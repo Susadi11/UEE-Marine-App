@@ -1,12 +1,18 @@
-// App.tsx
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import { Text } from 'react-native';
 
 // Import all screens and components
+import Login from '@/screens/Login';
+import Signup from '@/screens/Signup';
 import WelcomePage from '@/screens/WelcomePage';
 import HomePage from '@/screens/HomePage';
 import BlogPage from '@/screens/BlogPage';
@@ -21,9 +27,6 @@ import SetReminder from '@/screens/SetReminder';
 import SeaWaveTrack from '@/screens/SeaWaweTrack';
 import ExploreEvents from '@/screens/ExploreEvents';
 import Map from '@/screens/Map';
-import { useEffect } from 'react';
-import { View, StyleSheet, Text } from 'react-native';
-import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'; 
 import Settings from '@/components/home/Settings';
 import Favorite from '@/screens/Favourite';
 import TrendingPage from '@/screens/Blogs/TrendingPage';
@@ -106,16 +109,6 @@ const EventStack = () => (
   </Stack.Navigator>
 );
 
-// const MapStack = () => (
-//   <Stack.Navigator initialRouteName="MapScreen">
-//     <Stack.Screen
-//       name="MapScreen"
-//       component={Map}
-//       options={{ headerShown: false }}
-//     />
-//   </Stack.Navigator>
-// );
-
 const MainTabs = () => (
   <Tab.Navigator
     initialRouteName="Home"
@@ -182,15 +175,65 @@ const MainStack = () => (
     <Stack.Screen name="Tabs" component={MainTabs} />
     <Stack.Screen name="Settings" component={Settings} />
     <Stack.Screen name="SeaWaveTrack" component={SeaWaveTrack} />
+    <Stack.Screen name="MapScreen" component={Map} />
   </Stack.Navigator>
 );
 
-const App = () => (
-    <Stack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Welcome" component={WelcomePage} />
-      <Stack.Screen name="Main" component={MainStack} />
-      <Stack.Screen  name="MapScreen" component={Map} />
-     </Stack.Navigator>
+const AuthStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="Login" component={Login} />
+    <Stack.Screen name="Signup" component={Signup} />
+  </Stack.Navigator>
 );
+
+const App = () => {
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const savedUser = await AsyncStorage.getItem('user');
+        if (savedUser) {
+          setUser(JSON.parse(savedUser));
+        }
+        setInitializing(false);
+      } catch (error) {
+        console.error('Error reading user from AsyncStorage:', error);
+        setInitializing(false);
+      }
+    };
+
+    checkUser();
+
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        // User is signed in
+        await AsyncStorage.setItem('user', JSON.stringify(firebaseUser));
+        setUser(firebaseUser);
+      } else {
+        // User is signed out
+        await AsyncStorage.removeItem('user');
+        setUser(null);
+      }
+      if (initializing) setInitializing(false);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  if (initializing) return null;
+
+  return (
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {user ? (
+          <Stack.Screen name="Main" component={MainStack} />
+        ) : (
+          <Stack.Screen name="Auth" component={AuthStack} />
+        )}
+      </Stack.Navigator>
+  );
+};
 
 export default App;

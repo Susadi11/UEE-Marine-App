@@ -1,10 +1,9 @@
-// firebaseConfig.js
-
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getStorage,ref,getDownloadURL} from "firebase/storage";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { getFirestore } from "firebase/firestore";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -20,14 +19,16 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-
 // Initialize Firestore
 const db = getFirestore(app);
 
+// Initialize Firebase Auth
+const auth = getAuth(app);
 
 // Initialize Analytics (optional)
 const analytics = getAnalytics(app);
 
+// Initialize Storage
 const storage = getStorage(app);
 
 // Function to get the download URL for a file in Firebase Storage
@@ -42,6 +43,5 @@ export const getAudioUrl = async (filePath: string): Promise<string> => {
   }
 };
 
-
-// Export the initialized app and analytics if needed
-export { app, db, analytics, storage };
+// Export Firebase modules for use in other files
+export { app, db, analytics, storage, auth };
