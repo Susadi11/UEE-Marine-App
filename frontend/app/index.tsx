@@ -30,6 +30,7 @@ import Map from '@/screens/Map';
 import Settings from '@/components/home/Settings';
 import Favorite from '@/screens/Favourite';
 import TrendingPage from '@/screens/Blogs/TrendingPage';
+import PremiumPage from '@/screens/PremiumPage';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -176,6 +177,7 @@ const MainStack = () => (
     <Stack.Screen name="Settings" component={Settings} />
     <Stack.Screen name="SeaWaveTrack" component={SeaWaveTrack} />
     <Stack.Screen name="MapScreen" component={Map} />
+    <Stack.Screen name="PremiumPage" component={PremiumPage} />
   </Stack.Navigator>
 );
 

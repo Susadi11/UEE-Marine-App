@@ -107,7 +107,7 @@ const TrendingPage: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#ffffff',
   },
   loadingContainer: {
     flex: 1,

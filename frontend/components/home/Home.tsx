@@ -8,6 +8,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
+import Advertisement from './Advertisement';
 
 // Define the navigation stack params
 type RootStackParamList = {
@@ -144,7 +145,12 @@ const Home: React.FC = () => {
     <ScrollView style={styles.container}>
       {/* Welcome Message */}
       <View style={styles.header}>
-        <Text style={styles.welcomeText}>Welcome to AquaVista!</Text>
+      <View style={styles.headerLeft}>
+          <TouchableOpacity>
+            <Ionicons name="person-circle-outline" size={28} color="#333" />
+          </TouchableOpacity>
+          <Text style={styles.welcomeText}>Hi</Text>
+        </View>
         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
           <Ionicons name="settings-outline" size={28} color="#333" />
         </TouchableOpacity>
@@ -158,6 +164,10 @@ const Home: React.FC = () => {
           placeholder="Search"
           placeholderTextColor="#999"
         />
+      </View>
+
+      <View style={styles.adv}>
+        <Advertisement />
       </View>
 
       {/* Explore Events with Find Icon */}
@@ -253,7 +263,7 @@ const Home: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f9fc',
+    backgroundColor: '#ffffff',
   },
   header: {
     flexDirection: 'row',
@@ -262,12 +272,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 15,
   },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   welcomeText: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
     opacity: 0.9,
     fontFamily: 'Inter_700Bold',
+    marginLeft: 10,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -374,7 +389,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10,
     marginBottom: 10,
-    marginTop: 5,
   },
   findIcon: {
     marginRight: 10,
@@ -446,6 +460,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     fontFamily: 'Inter_600SemiBold',
   },
+  adv:{
+    padding: 20,
+  }
 });
 
 export default Home; 

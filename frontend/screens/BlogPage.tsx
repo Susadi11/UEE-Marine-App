@@ -147,7 +147,7 @@ const BlogPage: React.FC<BlogPageProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f3f4f6', // bg-gray-100
+    backgroundColor: '#ffffff', // bg-gray-100
   },
   page: {
     flex: 1,
