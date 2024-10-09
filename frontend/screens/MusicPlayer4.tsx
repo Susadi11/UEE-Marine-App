@@ -10,15 +10,15 @@ import { collection, addDoc } from 'firebase/firestore'; // Import Firestore fun
 
 // Define the type for your stack navigation
 type RootStackParamList = {
-  MusicPlayer1: undefined;
+  MusicPlayer4: undefined;
+  MusicPlayer3: undefined;
   MusicPlayer2: undefined;
-  MusicPlayer: undefined;
 };
 
 // Define the navigation prop for this screen
-type MusicPlayer1NavigationProp = StackNavigationProp<RootStackParamList, 'MusicPlayer1'>;
+type MusicPlayer1NavigationProp = StackNavigationProp<RootStackParamList, 'MusicPlayer3'>;
 
-const MusicPlayer1 = () => {
+const MusicPlayer4 = () => {
   const navigation = useNavigation<MusicPlayer1NavigationProp>(); // Using typed navigation
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -30,9 +30,9 @@ const MusicPlayer1 = () => {
   const [isFavorited, setIsFavorited] = useState(false);
 
   // Path to the audio file in Firebase Storage
-  const filePath = 'audios/pray-for-ukraine-sleep-21715.mp3';
-  const title = 'Soothing music with nerves'; // Title of the track
-  const imageUrl = 'https://r2.erweima.ai/imgcompressed/compressed_3fa29463650f93b31495a9d26c188435.webp'; // Image URL
+  const filePath = 'audios/mixkit-sea-waves-with-birds-loop-1185.wav';
+  const title = 'Relaxing Music with Ocean Waves'; // Title of the track
+  const imageUrl = 'https://assets.newatlas.com/dims4/default/41d7451/2147483647/strip/true/crop/1000x744+0+0/resize/1000x744!/quality/90/?url=http%3A%2F%2Fnewatlas-brightspot.s3.amazonaws.com%2Farchive%2Fdolphinspeaker.jpg'; // Image URL
 
   const handlePlayPause = async () => {
     if (isPlaying) {
@@ -113,7 +113,7 @@ const MusicPlayer1 = () => {
   };
 
   const handleBack = () => {
-    navigation.navigate('MusicPlayer'); // Navigate to MusicPlayer screen
+    navigation.navigate('MusicPlayer3'); // Navigate to MusicPlayer screen
   };
   const handlforward = () => {
     navigation.navigate('MusicPlayer2'); // Navigate to MusicPlayer screen
@@ -277,4 +277,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MusicPlayer1;
+export default MusicPlayer4;

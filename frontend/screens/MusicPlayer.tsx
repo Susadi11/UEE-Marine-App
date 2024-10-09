@@ -1,21 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 import { Audio } from 'expo-av';
 import { getAudioUrl } from '../firebaseConfig'; // Import the function to get audio URL
-import { Ionicons } from '@expo/vector-icons'; // For icons
+import { Ionicons } from '@expo/vector-icons'; // For heart icon
+import { useNavigation } from '@react-navigation/native'; // Navigation hook
+import { StackNavigationProp } from '@react-navigation/stack'; // Stack navigation prop
+import { db } from '../firebaseConfig'; // Import your Firestore configuration
+import { collection, addDoc } from 'firebase/firestore'; // Import Firestore functions
+
+// Define the type for your stack navigation
+type RootStackParamList = {
+  MusicPlayer: undefined;
+  MusicPlayer1: undefined;
+  MusicPlayer4: undefined;
+};
+
+// Define the navigation prop for this screen
+type MusicPlayer1NavigationProp = StackNavigationProp<RootStackParamList, 'MusicPlayer'>;
 
 const MusicPlayer = () => {
+  const navigation = useNavigation<MusicPlayer1NavigationProp>(); // Using typed navigation
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [position, setPosition] = useState(0);
-  const [timer, setTimer] = useState<number | null>(null); // Timer in minutes
-  const [timerRunning, setTimerRunning] = useState(false); // Is the timer active?
-  const [timeRemaining, setTimeRemaining] = useState<number | null>(null); // Time remaining in milliseconds
-  const [isFavorited, setIsFavorited] = useState(false); // State for heart button
+  const [timer, setTimer] = useState<number | null>(null);
+  const [timerRunning, setTimerRunning] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
+  const [isFavorited, setIsFavorited] = useState(false);
 
   // Path to the audio file in Firebase Storage
   const filePath = 'audios/ocean-waves-white-noise1-13752.mp3';
+  const title = 'Relaxing Music with Ocean Waves'; // Title of the track
+  const imageUrl = 'https://t4.ftcdn.net/jpg/02/69/82/11/360_F_269821180_UAEWi4xE7JhAqOUvOD1JoBLP0YDvqFvA.jpg'; // Image URL
 
   const handlePlayPause = async () => {
     if (isPlaying) {
@@ -26,11 +43,9 @@ const MusicPlayer = () => {
     } else {
       try {
         const url = await getAudioUrl(filePath);
-
         if (sound) {
           await sound.unloadAsync();
         }
-
         const { sound: newSound } = await Audio.Sound.createAsync(
           { uri: url },
           { shouldPlay: true }
@@ -38,18 +53,23 @@ const MusicPlayer = () => {
         setSound(newSound);
         setIsPlaying(true);
 
+        // Add document to Firestore
+        await addDoc(collection(db, 'musicTracks'), {
+          title: title,
+          audioUrl: url,
+          imageUrl: imageUrl,
+          createdAt: new Date(),
+        });
+
         newSound.setOnPlaybackStatusUpdate((status) => {
           if (status.isLoaded) {
             setDuration(status.durationMillis || 0);
             setPosition(status.positionMillis || 0);
-
             if (status.didJustFinish && timerRunning) {
-              // Restart the music if within the timer duration
               newSound.playFromPositionAsync(0);
             }
-
             if (status.didJustFinish && !timerRunning) {
-              setIsPlaying(false); // Stop when no timer is active
+              setIsPlaying(false);
             }
           }
         });
@@ -62,11 +82,10 @@ const MusicPlayer = () => {
 
   const handleSetTimer = (minutes: number) => {
     setTimer(minutes);
-    const totalTime = minutes * 60 * 1000; // Convert minutes to milliseconds
+    const totalTime = minutes * 60 * 1000;
     setTimeRemaining(totalTime);
     setTimerRunning(true);
 
-    // Set interval to check time remaining
     const interval = setInterval(() => {
       setTimeRemaining((prevTime) => {
         if (prevTime && prevTime > 0) {
@@ -93,13 +112,20 @@ const MusicPlayer = () => {
     setIsFavorited(!isFavorited);
   };
 
+  const handleBack = () => {
+    navigation.navigate('MusicPlayer4'); // Navigate to MusicPlayer screen
+  };
+  const handlforward = () => {
+    navigation.navigate('MusicPlayer1'); // Navigate to MusicPlayer screen
+  };
+
   return (
     <View style={styles.container}>
       <Image
-        source={{ uri: 'https://t4.ftcdn.net/jpg/02/69/82/11/360_F_269821180_UAEWi4xE7JhAqOUvOD1JoBLP0YDvqFvA.jpg' }}
+        source={{ uri: imageUrl }}
         style={styles.albumCover}
       />
-      <Text style={styles.title}>Ocean Waves Relaxation</Text>
+      <Text style={styles.title}>{title}</Text>
 
       <TouchableOpacity
         style={styles.button}
@@ -111,6 +137,7 @@ const MusicPlayer = () => {
               { text: '10 minutes', onPress: () => handleSetTimer(10) },
               { text: '20 minutes', onPress: () => handleSetTimer(20) },
               { text: '30 minutes', onPress: () => handleSetTimer(30) },
+              { text: '45 minutes', onPress: () => handleSetTimer(30) },
               { text: 'Close', style: 'cancel' },
             ],
             { cancelable: true }
@@ -124,13 +151,13 @@ const MusicPlayer = () => {
         <Ionicons
           name={isFavorited ? 'heart' : 'heart-outline'}
           size={30}
-          color={isFavorited ? '#FF6F61' : '#333'}
+          color={isFavorited ? '#FF6F61' : '#000'}
         />
       </TouchableOpacity>
 
       <View style={styles.controls}>
-        <TouchableOpacity style={styles.controlButton}>
-          <Ionicons name="play-back-outline" size={30} color="#333" />
+        <TouchableOpacity style={styles.controlButton} onPress={handleBack}>
+          <Ionicons name="play-back-outline" size={30} color="#000" />
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.controlButton, styles.playButton]}
@@ -138,8 +165,8 @@ const MusicPlayer = () => {
         >
           <Ionicons name={isPlaying ? 'pause-outline' : 'play-outline'} size={30} color="#fff" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.controlButton}>
-          <Ionicons name="play-forward-outline" size={30} color="#333" />
+        <TouchableOpacity style={styles.controlButton} onPress={handlforward}>
+          <Ionicons name="play-forward-outline" size={30} color="#000" />
         </TouchableOpacity>
       </View>
 
@@ -164,6 +191,7 @@ const MusicPlayer = () => {
 };
 
 const styles = StyleSheet.create({
+  // Same styles as before
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -177,20 +205,20 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     marginBottom: 20,
     overflow: 'hidden',
-    borderColor: '#C4C4C4',
-    borderWidth: 2,
+    borderColor: '#BDBDBD',
+    borderWidth: 1,
   },
   title: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '600',
     marginVertical: 10,
     textAlign: 'center',
     color: '#333',
   },
   button: {
-    backgroundColor: '#A8A8A8',
-    padding: 15,
-    borderRadius: 30,
+    backgroundColor: '#BDBDBD',
+    padding: 12,
+    borderRadius: 25,
     alignItems: 'center',
     marginVertical: 5,
     width: '30%',
@@ -216,41 +244,36 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   playButton: {
-    backgroundColor: '#333',
+    backgroundColor: '#FF6F61',
   },
   progressBarBackground: {
-    backgroundColor: '#C4C4C4',
-    height: 6,
-    borderRadius: 3,
     width: '90%',
-    marginTop: 20,
+    height: 10,
+    backgroundColor: '#BDBDBD',
+    borderRadius: 5,
     overflow: 'hidden',
+    marginVertical: 10,
   },
   progressBar: {
-    backgroundColor: '#6C9EE5',
     height: '100%',
-    borderRadius: 3,
+    backgroundColor: '#FF6F61',
   },
   timeInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '90%',
-    marginTop: 8,
+    marginTop: 5,
   },
   timeText: {
-    color: '#333',
-    fontWeight: '500',
+    fontSize: 14,
+    color: '#666',
   },
   timerInfo: {
-    marginTop: 20,
-    backgroundColor: '#F5F5F5',
-    padding: 10,
-    borderRadius: 10,
+    marginTop: 10,
   },
   timerText: {
+    fontSize: 16,
     color: '#FF6F61',
-    fontSize: 14,
-    fontWeight: '500',
   },
 });
 

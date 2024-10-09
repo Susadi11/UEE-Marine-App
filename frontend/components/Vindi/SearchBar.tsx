@@ -44,6 +44,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 15,
     position: 'relative',
+    width:'90%',
+    marginLeft:20,
     
   },
   searchIcon: {

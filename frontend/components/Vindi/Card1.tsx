@@ -3,6 +3,8 @@ import { View, Text, ImageBackground, StyleSheet, TouchableOpacity } from 'react
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Importing icons
 import { FontAwesome } from '@expo/vector-icons'; // Importing additional icons
+import { collection, addDoc } from "firebase/firestore";  // Firestore methods
+import { db } from '@/firebaseConfig';  // Firestore database instance
 
 interface Card1Props {
   title: string;
@@ -25,15 +27,26 @@ const Card1: React.FC<Card1Props> = ({ title, description, imageUrl, navigateTo 
     setMenuVisible(!menuVisible);
   };
 
-  const handleAddToFavorites = () => {
-    console.log(`${title} added to favorites`);
-    setMenuVisible(false);
+  const handleAddToFavorites = async () => {
+    try {
+      // Firestore collection reference
+      const favoritesCollection = collection(db, "favorites");
+
+      // Add document to Firestore
+      await addDoc(favoritesCollection, {
+        title: title,
+        description: description,
+        imageUrl: imageUrl,
+        addedAt: new Date().toISOString(), // Store the date when added to favorites
+      });
+
+      console.log(`${title} added to favorites`);
+      setMenuVisible(false);
+    } catch (error) {
+      console.error("Error adding to favorites:", error);
+    }
   };
 
-  const handleAddToQueue = () => {
-    console.log(`${title} added to queue`);
-    setMenuVisible(false);
-  };
 
   return (
     <TouchableOpacity onPress={handlePress} activeOpacity={0.9}>
@@ -56,10 +69,7 @@ const Card1: React.FC<Card1Props> = ({ title, description, imageUrl, navigateTo 
                   <FontAwesome name="star" size={16} color="#333" />
                   <Text style={styles.menuText}> Add to Favorites</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={handleAddToQueue} style={styles.menuItem}>
-                  <Icon name="queue" size={16} color="#333" />
-                  <Text style={styles.menuText}> Add to Queue</Text>
-                </TouchableOpacity>
+                
               </View>
             )}
           </View>
@@ -128,7 +138,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
-    height: 70,
+    height: 50,
     width: 140,
   },
   menuItem: {

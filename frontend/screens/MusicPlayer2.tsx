@@ -10,15 +10,15 @@ import { collection, addDoc } from 'firebase/firestore'; // Import Firestore fun
 
 // Define the type for your stack navigation
 type RootStackParamList = {
-  MusicPlayer1: undefined;
   MusicPlayer2: undefined;
-  MusicPlayer: undefined;
+  MusicPlayer1: undefined;
+  MusicPlayer3: undefined;
 };
 
 // Define the navigation prop for this screen
-type MusicPlayer1NavigationProp = StackNavigationProp<RootStackParamList, 'MusicPlayer1'>;
+type MusicPlayer1NavigationProp = StackNavigationProp<RootStackParamList, 'MusicPlayer2'>;
 
-const MusicPlayer1 = () => {
+const MusicPlayer2 = () => {
   const navigation = useNavigation<MusicPlayer1NavigationProp>(); // Using typed navigation
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -30,9 +30,9 @@ const MusicPlayer1 = () => {
   const [isFavorited, setIsFavorited] = useState(false);
 
   // Path to the audio file in Firebase Storage
-  const filePath = 'audios/pray-for-ukraine-sleep-21715.mp3';
-  const title = 'Soothing music with nerves'; // Title of the track
-  const imageUrl = 'https://r2.erweima.ai/imgcompressed/compressed_3fa29463650f93b31495a9d26c188435.webp'; // Image URL
+  const filePath = 'audios/depth-152401.mp3';
+  const title = 'Gentle Ocean waves birdsong'; // Title of the track
+  const imageUrl = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7cqyVqFGAZelNqFnSKNArYXJOqp-L16mMSl1hDBu5QwNLdGjCL4cYliHdewU2zVuup9g&usqp=CAU'; // Image URL
 
   const handlePlayPause = async () => {
     if (isPlaying) {
@@ -113,10 +113,10 @@ const MusicPlayer1 = () => {
   };
 
   const handleBack = () => {
-    navigation.navigate('MusicPlayer'); // Navigate to MusicPlayer screen
+    navigation.navigate('MusicPlayer1'); // Navigate to MusicPlayer screen
   };
   const handlforward = () => {
-    navigation.navigate('MusicPlayer2'); // Navigate to MusicPlayer screen
+    navigation.navigate('MusicPlayer3'); // Navigate to MusicPlayer screen
   };
 
   return (
@@ -277,4 +277,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MusicPlayer1;
+export default MusicPlayer2;
