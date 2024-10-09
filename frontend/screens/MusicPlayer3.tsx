@@ -10,15 +10,15 @@ import { collection, addDoc } from 'firebase/firestore'; // Import Firestore fun
 
 // Define the type for your stack navigation
 type RootStackParamList = {
-  MusicPlayer1: undefined;
+  MusicPlayer3: undefined;
   MusicPlayer2: undefined;
-  MusicPlayer: undefined;
+  MusicPlayer4: undefined;
 };
 
 // Define the navigation prop for this screen
-type MusicPlayer1NavigationProp = StackNavigationProp<RootStackParamList, 'MusicPlayer1'>;
+type MusicPlayer1NavigationProp = StackNavigationProp<RootStackParamList, 'MusicPlayer3'>;
 
-const MusicPlayer1 = () => {
+const MusicPlayer3 = () => {
   const navigation = useNavigation<MusicPlayer1NavigationProp>(); // Using typed navigation
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -30,8 +30,8 @@ const MusicPlayer1 = () => {
   const [isFavorited, setIsFavorited] = useState(false);
 
   // Path to the audio file in Firebase Storage
-  const filePath = 'audios/pray-for-ukraine-sleep-21715.mp3';
-  const title = 'Soothing music with nerves'; // Title of the track
+  const filePath = 'audios/ocean-currents-meditation-161684.mp3';
+  const title = 'Relaxing Music with Ocean Waves'; // Title of the track
   const imageUrl = 'https://r2.erweima.ai/imgcompressed/compressed_3fa29463650f93b31495a9d26c188435.webp'; // Image URL
 
   const handlePlayPause = async () => {
@@ -113,10 +113,10 @@ const MusicPlayer1 = () => {
   };
 
   const handleBack = () => {
-    navigation.navigate('MusicPlayer'); // Navigate to MusicPlayer screen
+    navigation.navigate('MusicPlayer2'); // Navigate to MusicPlayer screen
   };
   const handlforward = () => {
-    navigation.navigate('MusicPlayer2'); // Navigate to MusicPlayer screen
+    navigation.navigate('MusicPlayer4'); // Navigate to MusicPlayer screen
   };
 
   return (
@@ -277,4 +277,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MusicPlayer1;
+export default MusicPlayer3;

@@ -12,9 +12,13 @@ import Favourite from '@/screens/Favourite';
 type RootStackParamList = {
   Sound: undefined;
   Favourite: undefined;
+  MusicHistory: undefined;
   SeaWaveTrack: undefined;
   MusicPlayer: undefined;
   MusicPlayer1: undefined;
+  MusicPlayer2:undefined;
+  MusicPlayer3:undefined;
+  MusicPlayer4:undefined;
   // Add other routes here
 };
 
@@ -35,13 +39,13 @@ const Sound: React.FC = () => {
   const cards = [
     { title: 'Relaxing with Ocean Waves', description: 'Sleep music, Stress Relief', imageUrl: 'https://t4.ftcdn.net/jpg/02/69/82/11/360_F_269821180_UAEWi4xE7JhAqOUvOD1JoBLP0YDvqFvA.jpg', navigateTo: 'MusicPlayer' },
     { title: 'Soothing music with nerves', description: 'Relieve Anxiety and Depression', imageUrl: 'https://r2.erweima.ai/imgcompressed/compressed_3fa29463650f93b31495a9d26c188435.webp', navigateTo: 'MusicPlayer1' },
-    { title: 'Gentle Ocean waves birdsong', description: 'Anxiety and Depression', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7cqyVqFGAZelNqFnSKNArYXJOqp-L16mMSl1hDBu5QwNLdGjCL4cYliHdewU2zVuup9g&usqp=CAU' },
+    { title: 'Gentle Ocean waves birdsong', description: 'Anxiety and Depression', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7cqyVqFGAZelNqFnSKNArYXJOqp-L16mMSl1hDBu5QwNLdGjCL4cYliHdewU2zVuup9g&usqp=CAU',navigateTo:'MusicPlayer2' },
     { title: 'Calm Marimba Music', description: 'Calm, Stress Relief and study', imageUrl: 'https://t3.ftcdn.net/jpg/02/50/04/62/360_F_250046250_a9bzhoJV6eHkewZ4fNsORF2buw45YAuz.jpg' },
   ];
 
   const card1 = [
-    { title: 'Underwater Wonders + Relaxing Music', description: 'sleep, meditation, yoga, study.', imageUrl: 'https://t4.ftcdn.net/jpg/07/73/59/15/360_F_773591509_0jqWLDEOE0jlir1s3Tab735khb3TcXEu.jpg', navigateTo: 'MusicPlayer' },
-    { title: 'Healing songs of Dolphins & Whales', description: 'Deep Meditative Music for Harmony', imageUrl: 'https://assets.newatlas.com/dims4/default/41d7451/2147483647/strip/true/crop/1000x744+0+0/resize/1000x744!/quality/90/?url=http%3A%2F%2Fnewatlas-brightspot.s3.amazonaws.com%2Farchive%2Fdolphinspeaker.jpg', navigateTo: 'MusicPlayer1' },
+    { title: 'Underwater Wonders + Relaxing Music', description: 'sleep, meditation, yoga, study.', imageUrl: 'https://t4.ftcdn.net/jpg/07/73/59/15/360_F_773591509_0jqWLDEOE0jlir1s3Tab735khb3TcXEu.jpg', navigateTo: 'MusicPlayer3' },
+    { title: 'Healing songs of Dolphins & Whales', description: 'Deep Meditative Music for Harmony', imageUrl: 'https://assets.newatlas.com/dims4/default/41d7451/2147483647/strip/true/crop/1000x744+0+0/resize/1000x744!/quality/90/?url=http%3A%2F%2Fnewatlas-brightspot.s3.amazonaws.com%2Farchive%2Fdolphinspeaker.jpg', navigateTo: 'MusicPlayer4' },
     { title: 'Deep Sleep with Calming Ocean Sounds', description: 'Waves Whispering ASMR For Sleeping', imageUrl: 'https://t4.ftcdn.net/jpg/06/28/19/89/360_F_628198974_t3XrQ03eTCM3Fcs7u0QNfm3JMhFB0YLw.jpg' },
     { title: 'Ocean Sounds For Deep Sleeping', description: 'Need To Fall Asleep', imageUrl: 'https://t3.ftcdn.net/jpg/02/50/04/62/360_F_250046250_a9bzhoJV6eHkewZ4fNsORF2buw45YAuz.jpg' },
   ];
@@ -59,7 +63,7 @@ const Sound: React.FC = () => {
 
           {/* Navigation Buttons: All, History, Favorite */}
           <View style={styles.navButtons}>
-            {['All', 'Liked Musics', 'Recently Played'].map((tab) => (
+            {['All', 'Liked Musics', 'History'].map((tab) => (
               <TouchableOpacity
                 key={tab}
                 style={[styles.navButton, activeTab === tab && styles.activeNavButton]}
@@ -67,6 +71,9 @@ const Sound: React.FC = () => {
                   setActiveTab(tab);
                   if (tab === 'Liked Musics') {
                     navigation.navigate('Favourite'); // Navigate to Favourite page
+                  }
+                  if (tab === 'History') {
+                    navigation.navigate('MusicHistory'); // Navigate to Favourite page
                   }
                 }}
               >
