@@ -31,6 +31,10 @@ import Settings from '@/components/home/Settings';
 import Favorite from '@/screens/Favourite';
 import TrendingPage from '@/screens/Blogs/TrendingPage';
 import PremiumPage from '@/screens/PremiumPage';
+import MusicPlayer2 from '@/screens/MusicPlayer2';
+import MusicPlayer3 from '@/screens/MusicPlayer3';
+import MusicPlayer4 from '@/screens/MusicPlayer4';
+import MusicHistory from '@/screens/MusicHistory';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -77,6 +81,27 @@ const SoundStack = () => (
       component={Favorite}
       options={{ headerShown: false }}
     />
+     <Stack.Screen
+      name="MusicHistory"
+      component={MusicHistory}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="MusicPlayer2"
+      component={MusicPlayer2}
+      options={{ headerShown: false }}
+    />
+      <Stack.Screen
+      name="MusicPlayer3"
+      component={MusicPlayer3}
+      options={{ headerShown: false }}
+    />
+      <Stack.Screen
+      name="MusicPlayer4"
+      component={MusicPlayer4}
+      options={{ headerShown: false }}
+    />
+
   </Stack.Navigator>
 );
 
