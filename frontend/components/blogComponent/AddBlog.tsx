@@ -19,6 +19,7 @@ import { app } from '../../firebaseConfig';
 import * as ImagePicker from 'expo-image-picker';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import CustomMessage from '../CustomMessage';
+import { getAuth } from 'firebase/auth';
 
 const { width } = Dimensions.get('window');
 
@@ -77,6 +78,14 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     }
 
     try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      if (!user) {
+        Alert.alert('Error', 'User not authenticated');
+        return;
+      }
+
       const coverPhotoUrl = await uploadImage(coverPhoto.uri);
       const imageUrls = await Promise.all(images.map(image => uploadImage(image.uri)));
 
@@ -90,6 +99,8 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         blog_importanceEcosystem: importanceEcosystem,
         blog_coverPhoto: coverPhotoUrl,
         blog_images: imageUrls,
+        userId: user.uid,  // Add this line to associate the blog with the user
+        createdAt: new Date(),
       };
 
       const docRef = await addDoc(collection(firestore, 'blogs'), newBlog);

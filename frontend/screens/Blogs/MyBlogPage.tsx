@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity } from 'react-native';
-import { getFirestore, collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
+import { getFirestore, collection, onSnapshot, deleteDoc, doc, where, query } from 'firebase/firestore';
 import { app } from '../../firebaseConfig';
 import MyBlog from '@/components/blogComponent/MyBlog';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
+import { getAuth } from 'firebase/auth';
 
 type RootStackParamList = {
   BlogDetail: { blogData: any };
@@ -19,16 +20,26 @@ const MyBlogPage: React.FC = () => {
   const [selectedBlogId, setSelectedBlogId] = useState<string | null>(null);
   const firestore = getFirestore(app);
   const navigation = useNavigation<NavigationProp>();
+  const auth = getAuth();
+
   let [fontsLoaded] = useFonts({
     Inter_500Medium,
     Inter_600SemiBold,
     Inter_700Bold,
   });
 
+
   useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) {
+      console.error('User not authenticated');
+      return;
+    }
+
     const blogCollection = collection(firestore, 'blogs');
+    const q = query(blogCollection, where('userId', '==', user.uid));
     const unsubscribe = onSnapshot(
-      blogCollection,
+      q,
       (snapshot) => {
         const blogList = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         setMyBlogs(blogList);
@@ -40,7 +51,7 @@ const MyBlogPage: React.FC = () => {
     );
 
     return () => unsubscribe();
-  }, [firestore]);
+  }, [firestore, auth]);
 
   const handleReadMore = (blogId: string) => {
     const selectedBlog = myBlogs.find(blog => blog.id === blogId);
