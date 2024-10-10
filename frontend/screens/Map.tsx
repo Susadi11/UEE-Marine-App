@@ -55,12 +55,12 @@ const Map = () => {
         showsUserLocation={true} 
 
         >
-          <Marker
+          {/* <Marker
             coordinate={{
               latitude: location ? location?.latitude: 7.8731,
               longitude: location ? location?.longitude: 80.7718,
             }}
-          />
+          /> */}
       </MapView>
 
       {/* Search Bar */}
