@@ -1,17 +1,17 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  FlatList,
   Image,
   Animated,
   Platform,
   Dimensions,
   KeyboardAvoidingView,
   Alert,
+  ScrollView,
 } from 'react-native';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -20,6 +20,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import CustomMessage from '../CustomMessage';
 import { getAuth } from 'firebase/auth';
+import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
 const { width } = Dimensions.get('window');
 
@@ -35,12 +36,16 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [images, setImages] = useState<any[]>([]);
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(width));
-  const flatListRef = useRef<FlatList>(null);
+  const [showMessage, setShowMessage] = useState(false);
+
+  let [fontsLoaded] = useFonts({
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+  });
 
   const firestore = getFirestore(app);
   const storage = getStorage(app);
-
-  const [showMessage, setShowMessage] = useState(false);
 
   useEffect(() => {
     Animated.parallel([
@@ -99,7 +104,7 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         blog_importanceEcosystem: importanceEcosystem,
         blog_coverPhoto: coverPhotoUrl,
         blog_images: imageUrls,
-        userId: user.uid,  // Add this line to associate the blog with the user
+        userId: user.uid,
         createdAt: new Date(),
       };
 
@@ -108,16 +113,7 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
       setShowMessage(true);
 
-      // Clear the form after successful save
-      setTitle('');
-      setIntroduction('');
-      setSciName('');
-      setPhysicalCharacteristics('');
-      setHabitatDistribution('');
-      setBehavior('');
-      setImportanceEcosystem('');
-      setCoverPhoto(null);
-      setImages([]);
+      clearForm();
 
       // Close the form after a short delay
       setTimeout(() => {
@@ -143,8 +139,7 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
+        allowsEditing: false,
         quality: 1,
       });
 
@@ -170,96 +165,126 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   };
 
   const renderInputField = (
+    label: string,
     placeholder: string,
     value: string,
     onChangeText: (text: string) => void,
     multiline = false
   ) => (
-    <Animated.View style={[styles.inputContainer, { transform: [{ translateX: slideAnim }] }]}>
+    <View style={styles.inputContainer}>
+      <Text style={styles.label}>{label}</Text>
       <TextInput
         style={[styles.input, multiline && styles.textArea]}
         placeholder={placeholder}
         value={value}
         onChangeText={onChangeText}
-        placeholderTextColor="#a0aec0"
+        placeholderTextColor="#9CA3AF"
         multiline={multiline}
+        selectionColor='black'
       />
-    </Animated.View>
+    </View>
   );
 
-  const renderItem = ({ item }: { item: any }) => (
-    <Animated.Image
-      source={{ uri: item.uri }}
-      style={[styles.gridImage, { opacity: fadeAnim }]}
-    />
-  );
+  const removeImage = (index: number) => {
+    const newImages = [...images];
+    newImages.splice(index, 1);
+    setImages(newImages);
+  };
+
+  const clearForm = () => {
+    setTitle('');
+    setIntroduction('');
+    setSciName('');
+    setPhysicalCharacteristics('');
+    setHabitatDistribution('');
+    setBehavior('');
+    setImportanceEcosystem('');
+    setCoverPhoto(null);
+    setImages([]);
+  };
+
+  if (!fontsLoaded) {
+    return null; // or a loading indicator
+  }
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
-      <FlatList
-        ref={flatListRef}
-        data={[{ key: 'content' }]}
-        renderItem={() => (
-          <>
-            <View style={styles.header}>
-              <TouchableOpacity onPress={onClose}>
-                <MaterialCommunityIcons name="arrow-left" size={28} color="#6C9EE5" />
-              </TouchableOpacity>
-              <Text style={styles.title}>Create New Blog</Text>
-            </View>
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+        <View style={styles.innerContainer}>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={onClose}>
+              <MaterialCommunityIcons name="arrow-left" size={28} color="#6C9EE5" />
+            </TouchableOpacity>
+            <Text style={styles.title}>Create New Blog</Text>
+          </View>
 
-            {renderInputField("Title", title, setTitle)}
-            {renderInputField("Introduction", introduction, setIntroduction)}
-            {renderInputField("Scientific Name", sciName, setSciName)}
-            {renderInputField("Physical Characteristics", physicalCharacteristics, setPhysicalCharacteristics, true)}
-            {renderInputField("Habitat & Distribution", habitatDistribution, setHabitatDistribution, true)}
-            {renderInputField("Behavior", behavior, setBehavior, true)}
-            {renderInputField("Importance in the Ecosystem", importanceEcosystem, setImportanceEcosystem, true)}
+          {renderInputField("Title", "Enter blog title", title, setTitle)}
+          {renderInputField("Introduction", "Enter introduction", introduction, setIntroduction)}
+          {renderInputField("Scientific Name", "Enter scientific name", sciName, setSciName)}
+          {renderInputField("Physical Characteristics", "Enter physical characteristics", physicalCharacteristics, setPhysicalCharacteristics, true)}
+          {renderInputField("Habitat & Distribution", "Enter habitat and distribution", habitatDistribution, setHabitatDistribution, true)}
+          {renderInputField("Behavior", "Enter behavior", behavior, setBehavior, true)}
+          {renderInputField("Importance in the Ecosystem", "Enter importance in the ecosystem", importanceEcosystem, setImportanceEcosystem, true)}
 
-            <Animated.View style={[styles.section, { transform: [{ translateX: slideAnim }] }]}>
-              <Text style={styles.subtitle}>Cover Photo</Text>
-              {coverPhoto && (
-                <Animated.Image
-                  source={{ uri: coverPhoto.uri }}
-                  style={[styles.image, { opacity: fadeAnim }]}
-                />
+          <Text style={styles.label}>Cover Photo</Text>
+          <View style={styles.imagePickerContainer}>
+            <TouchableOpacity
+              style={styles.imagePickerButton}
+              onPress={() => pickImage(setCoverPhoto)}
+            >
+              {coverPhoto ? (
+                <Image source={{ uri: coverPhoto.uri }} style={styles.coverImage} resizeMode="contain" />
+              ) : (
+                <>
+                  <MaterialCommunityIcons name="image-outline" size={60} color="grey" />
+                  <Text style={styles.imagePickerButtonText}>Add Cover Photo</Text>
+                </>
               )}
-              <TouchableOpacity style={styles.addButton} onPress={() => pickImage(setCoverPhoto)}>
-                <Text style={styles.addButtonText}>Select Cover Photo</Text>
-              </TouchableOpacity>
-            </Animated.View>
+            </TouchableOpacity>
+          </View>
 
-            <Animated.View style={[styles.section, { transform: [{ translateX: slideAnim }] }]}>
-              <Text style={styles.subtitle}>Add Images (up to 9)</Text>
-              <FlatList
-                data={images}
-                renderItem={renderItem}
-                keyExtractor={(item, index) => index.toString()}
-                numColumns={3}
-                scrollEnabled={false}
-              />
-              <TouchableOpacity style={styles.addButton} onPress={handleAddImage}>
-                <Text style={styles.addButtonText}>+ Add Image</Text>
-              </TouchableOpacity>
-            </Animated.View>
-
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.button} onPress={onClose}>
-                <Text style={styles.buttonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleSave}>
-                <Text style={[styles.buttonText, styles.saveButtonText]}>Save</Text>
-              </TouchableOpacity>
+          <Text style={styles.label}>Images</Text>
+          <View style={styles.imagePickerContainer}>
+            <TouchableOpacity
+              style={styles.imagePickerButton}
+              onPress={handleAddImage}
+            >
+              <MaterialCommunityIcons name="image-outline" size={60} color="grey" />
+              <Text style={styles.imagePickerButtonText}>
+                {images.length === 0 ? "Add Images" : "Add More Images"}
+              </Text>
+            </TouchableOpacity>
+            <View style={styles.imageContainer}>
+              {images.map((image, index) => (
+                <View key={index} style={styles.imageWrapper}>
+                  <Image source={{ uri: image.uri }} style={styles.image} resizeMode="contain" />
+                  <TouchableOpacity style={styles.removeButton} onPress={() => removeImage(index)}>
+                    <Text style={styles.removeButtonText}>X</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
             </View>
-          </>
-        )}
-        keyExtractor={(item) => item.key}
-        contentContainerStyle={styles.scrollViewContent}
-        showsVerticalScrollIndicator={false}
-      />
+          </View>
+
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={[styles.button, styles.cancelButton]}
+              onPress={clearForm}
+            >
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.button, styles.addBlogButton]}
+              onPress={handleSave}
+            >
+              <Text style={styles.addBlogButtonText}>Add Blog</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
 
       <CustomMessage 
         message="Blog saved successfully!" 
@@ -274,94 +299,140 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#F9FAFB',
   },
   scrollViewContent: {
-    padding: 20,
+    flexGrow: 1,
+  },
+  innerContainer: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingHorizontal: 20,
     paddingBottom: 40,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    width: '100%',
     marginBottom: 20,
   },
   title: {
-    fontSize: 22,
-    fontWeight: '600',
-    color: '#2d3748',
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#000',
     marginLeft: 10,
+    fontFamily: 'Inter_700Bold',
   },
   inputContainer: {
-    marginBottom: 20,
+    width: '100%',
+    marginBottom: 15,
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 5,
+    fontWeight: 'bold',
+    alignSelf: 'flex-start',
+    fontFamily: 'Inter_600SemiBold',
   },
   input: {
-    backgroundColor: '#f7fafc',
-    padding: 15,
-    borderRadius: 8,
+    width: '100%',
     borderWidth: 1,
-    borderColor: '#e2e8f0',
-    fontSize: 16,
-    color: '#2d3748',
+    borderColor: '#ccc',
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: 'white',
   },
   textArea: {
     height: 100,
     textAlignVertical: 'top',
   },
-  section: {
-    marginBottom: 20,
+  imagePickerContainer: {
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    width: '100%',
+    justifyContent: 'center',
+    padding: 10,
+    marginTop: 10,
+    borderColor: 'grey',
+    marginBottom: 15,
   },
-  subtitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#2d3748',
-    marginBottom: 10,
+  imagePickerButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  image: {
+  imagePickerButtonText: {
+    color: 'grey',
+    textAlign: 'center',
+    fontSize: 14,
+    fontWeight: 'bold',
+    fontFamily: 'Inter_500Medium',
+  },
+  coverImage: {
     width: '100%',
     height: 200,
     borderRadius: 10,
-    marginBottom: 10,
   },
-  gridImage: {
-    width: '30%',
-    height: 100,
-    margin: '1.5%',
-    borderRadius: 10,
-  },
-  addButton: {
-    backgroundColor: '#6C9EE5',
-    paddingVertical: 10,
-    borderRadius: 8,
-    alignItems: 'center',
+  imageContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
     marginTop: 10,
   },
-  addButtonText: {
-    color: '#ffffff',
-    fontWeight: '600',
+  imageWrapper: {
+    position: 'relative',
+    margin: 5,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    borderRadius: 5,
+  },
+  removeButton: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    backgroundColor: 'silver',
+    borderRadius: 100,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  removeButtonText: {
+    color: 'black',
+    fontWeight: 'bold',
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    width: '100%',
     marginTop: 20,
   },
   button: {
-    flex: 1,
-    paddingVertical: 15,
-    borderRadius: 30,
-    alignItems: 'center',
-    marginHorizontal: 10,
-    backgroundColor: '#e2e8f0',
+    borderRadius: 10,
+    padding: 12,
+    width: '48%',
   },
-  buttonText: {
-    color: '#2d3748',
-    fontWeight: '600',
+  cancelButton: {
+    backgroundColor: '#f3f4f6',
+  },
+  cancelButtonText: {
+    color: '#4b5563',
     fontSize: 16,
+    fontWeight: '500',
+    textAlign: 'center',
+    fontFamily: 'Inter_600SemiBold',
   },
-  saveButton: {
+  addBlogButton: {
     backgroundColor: '#6C9EE5',
   },
-  saveButtonText: {
-    color: '#ffffff',
+  addBlogButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '500',
+    textAlign: 'center',
+    fontFamily: 'Inter_600SemiBold',
   },
 });
 

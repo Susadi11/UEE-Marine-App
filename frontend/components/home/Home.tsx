@@ -9,6 +9,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import Advertisement from './Advertisement';
+import OceanSoundsCard from './OceanSoundsCard';
 
 // Define the navigation stack params
 type RootStackParamList = {
@@ -18,6 +19,7 @@ type RootStackParamList = {
   MapScreen: undefined;
   TrendingPage: undefined;
   BlogDetail: { blogData: Blog };
+  SeaWaveTrack: undefined; // Add this line
 };
 
 // Define the navigation prop for the Home screen
@@ -145,7 +147,7 @@ const Home: React.FC = () => {
     <ScrollView style={styles.container}>
       {/* Welcome Message */}
       <View style={styles.header}>
-      <View style={styles.headerLeft}>
+        <View style={styles.headerLeft}>
           <TouchableOpacity>
             <Ionicons name="person-circle-outline" size={28} color="#333" />
           </TouchableOpacity>
@@ -216,10 +218,7 @@ const Home: React.FC = () => {
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
       >
-        <View style={styles.buttonContent}>
-          <Ionicons name="musical-note-outline" size={24} color="#6C9EE5" />
-          <Text style={styles.buttonText}>Discover ocean sounds</Text>
-        </View>
+        <OceanSoundsCard onPress={() => navigation.navigate('SeaWaveTrack')} tracks={[]} />
       </TouchableOpacity>
 
       {/* Trending Blogs Section */}
