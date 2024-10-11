@@ -4,7 +4,7 @@ import CalendarEvents from 'react-native-calendar-events'; // For managing calen
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook
 
-const EventDetailScreen = ({ route }: any) => {
+const EventDetails= ({ route }: any) => {
     const navigation = useNavigation(); // Use the hook to get navigation object
     const { event } = route.params; // Get the event data from route params
 
@@ -136,4 +136,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default EventDetailScreen;
+export default EventDetails;

@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Alert, TouchableOpacity, Image } from 'react-native';
-import { Input } from 'react-native-elements';
+import {
+    View, Text, ScrollView, StyleSheet, Alert,
+    TouchableOpacity, Image, TextInput, KeyboardAvoidingView,
+    Platform
+} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import MapView, { Marker } from 'react-native-maps';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
-import { db, storage } from '../firebaseConfig'; 
+import { db, storage } from '../firebaseConfig';
 import * as ImagePicker from 'expo-image-picker';
-import { useNavigation } from '@react-navigation/native'; 
+import { useNavigation } from '@react-navigation/native';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getAuth } from 'firebase/auth';
 
 const EventPublish: React.FC = () => {
     const navigation = useNavigation();
@@ -48,8 +52,6 @@ const EventPublish: React.FC = () => {
 
         if (!result.canceled) {
             setImageUri(result.assets[0].uri);
-        } else {
-            console.log('Image picking was canceled');
         }
     };
 
@@ -57,7 +59,6 @@ const EventPublish: React.FC = () => {
         if (imageUri) {
             try {
                 const response = await fetch(imageUri);
-                if (!response.ok) throw new Error('Failed to fetch image');
                 const blob = await response.blob();
                 const storageRef = ref(storage, `events/${Date.now()}`);
                 await uploadBytes(storageRef, blob);
@@ -77,14 +78,23 @@ const EventPublish: React.FC = () => {
         }
 
         try {
+            const auth = getAuth();
+            const user = auth.currentUser;
+            if (!user) {
+                Alert.alert('Error', 'User not authenticated');
+                return;
+            }
+
             const imageUrl = await uploadImage();
             const eventData = {
                 title,
                 description,
-                date: eventDate.toISOString(),
+                date :eventDate.toLocaleDateString(),
                 time: eventTime.toLocaleTimeString(),
                 location,
-                imageUrl
+                imageUrl,
+                userId: user.uid,
+                createdAt: new Date(),
             };
             await addDoc(collection(db, 'events'), eventData);
             Alert.alert('Success', 'Event published successfully');
@@ -96,60 +106,113 @@ const EventPublish: React.FC = () => {
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <Text style={styles.heading}>Publish Event</Text>
-            <Input placeholder="Enter event title" value={title} onChangeText={setTitle} />
-            <Input placeholder="Enter event description" value={description} onChangeText={setDescription} multiline numberOfLines={4} />
+        <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+            <ScrollView contentContainerStyle={styles.form}>
+                <Text style={styles.heading}>Publish a New Event</Text>
 
-            <TouchableOpacity onPress={() => setShowDatePicker(true)}>
-                <Input placeholder="Tap to select date" value={eventDate.toDateString()} editable={false} />
-            </TouchableOpacity>
-            {showDatePicker && (
-                <DateTimePicker value={eventDate} mode="date" display="default" onChange={handleDateChange} />
-            )}
+                {/* Title Input */}
+                <TextInput
+                    style={styles.input}
+                    placeholder="Enter event title"
+                    value={title}
+                    cursorColor={'#007BFF'}
+                    placeholderTextColor={'#ccc'}
+                    onChangeText={setTitle}
+                />
 
-            <TouchableOpacity onPress={() => setShowTimePicker(true)}>
-                <Input placeholder="Tap to select time" value={eventTime.toLocaleTimeString()} editable={false} />
-            </TouchableOpacity>
-            {showTimePicker && (
-                <DateTimePicker value={eventTime} mode="time" display="default" onChange={handleTimeChange} />
-            )}
+                {/* Description Input */}
+                <TextInput
+                    style={[styles.input, styles.textArea]}
+                    placeholder="Enter event description"
+                    placeholderTextColor={'#ccc'}
+                    value={description}
+                    onChangeText={setDescription}
+                    multiline
+                />
 
-            <MapView
-                style={styles.map}
-                initialRegion={{
-                    latitude: location.latitude,
-                    longitude: location.longitude,
-                    latitudeDelta: 0.0922,
-                    longitudeDelta: 0.0421,
-                }}
-                onPress={(e) => setLocation(e.nativeEvent.coordinate)}
-            >
-                <Marker coordinate={location} />
-            </MapView>
+                {/* Date Picker */}
+                <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.picker}>
+                    <Text style={styles.pickerText}>Select Date: {eventDate.toDateString()}</Text>
+                </TouchableOpacity>
+                {showDatePicker && (
+                    <DateTimePicker value={eventDate} mode="date" display="default" onChange={handleDateChange} />
+                )}
 
-            <TouchableOpacity onPress={handleImagePick} style={styles.imagePicker}>
-                {imageUri ? <Image source={{ uri: imageUri }} style={styles.image} /> : <Text>Select Cover Photo</Text>}
-            </TouchableOpacity>
+                {/* Time Picker */}
+                <TouchableOpacity onPress={() => setShowTimePicker(true)} style={styles.picker}>
+                    <Text style={styles.pickerText}>Select Time: {eventTime.toLocaleTimeString()}</Text>
+                </TouchableOpacity>
+                {showTimePicker && (
+                    <DateTimePicker value={eventTime} mode="time" display="default" onChange={handleTimeChange} />
+                )}
 
-            <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-                <Text style={styles.submitButtonText}>Publish Event</Text>
-            </TouchableOpacity>
-        </ScrollView>
+                {/* Map View */}
+                <MapView
+                    style={styles.map}
+                    initialRegion={{
+                        latitude: location.latitude,
+                        longitude: location.longitude,
+                        latitudeDelta: 0.0922,
+                        longitudeDelta: 0.0421,
+                    }}
+                    onPress={(e) => setLocation(e.nativeEvent.coordinate)}
+                >
+                    <Marker coordinate={location} />
+                </MapView>
+
+                {/* Image Picker */}
+                <TouchableOpacity onPress={handleImagePick} style={styles.imagePicker}>
+                    {imageUri ? <Image source={{ uri: imageUri }} style={styles.image} /> : <Text>+ Add Cover Photo</Text>}
+                </TouchableOpacity>
+
+                {/* Submit Button */}
+                <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+                    <Text style={styles.submitButtonText}>Publish Event</Text>
+                </TouchableOpacity>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        padding: 16,
+        flex: 1,
         backgroundColor: '#f3f4f6',
     },
+    form: {
+        padding: 16,
+    },
     heading: {
-        fontSize: 28,
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 20,
+        fontSize: 24,
         fontWeight: 'bold',
-        textAlign: 'center',
-        marginVertical: 16,
-        color: '#007BFF',
+    },
+    input: {
+        backgroundColor: '#f7fafc',
+        padding: 20,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#e2e8f0',
+        fontSize: 16,
+        color: '#2d3748',
+        marginTop: 8,
+    },
+    textArea: {
+        height: 100,
+        textAlignVertical: 'top',
+    },
+    picker: {
+        backgroundColor: '#ffffff',
+        padding: 12,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        marginVertical: 8,
+    },
+    pickerText: {
+        color: '#ccc',
     },
     map: {
         width: '100%',
@@ -163,24 +226,23 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         borderWidth: 1,
         marginVertical: 12,
+        backgroundColor: '#f3f3f3',
     },
     image: {
         width: '100%',
         height: '100%',
     },
     submitButton: {
-        backgroundColor: '#007BFF',
-        paddingVertical: 14,
-        borderRadius: 10,
-        marginTop: 16,
+        flex: 1,
+        paddingVertical: 15,
+        borderRadius: 30,
+        alignItems: 'center',
+        marginHorizontal: 10,
+        backgroundColor: '#6C9EE5',
     },
     submitButtonText: {
         color: '#ffffff',
-        fontSize: 18,
-        fontWeight: 'bold',
-        textAlign: 'center',
     },
 });
 
 export default EventPublish;
- 
