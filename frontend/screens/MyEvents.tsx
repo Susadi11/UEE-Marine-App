@@ -324,14 +324,15 @@ input: {
     borderColor: '#6C9EE5',
     paddingVertical: 8,
     paddingHorizontal: 24,
-    borderRadius: 6,
+    borderRadius: 30,
     backgroundColor: 'transparent',
     marginTop: 10,
   },
   text: {
     color: '#6C9EE5',
     fontSize: 16,
-    fontFamily:'inter',
+    fontWeight: 'bold',
+ 
   },
   icon: {
     width: 16,

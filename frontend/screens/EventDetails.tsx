@@ -45,6 +45,7 @@ const EventDetails = ({ route }: any) => {
                 <Text style={styles.description}>{event.description}</Text>
 
                 <TouchableOpacity style={styles.calendarButton} onPress={handleNavigateToReminder}>
+                    <Icon name="calendar" size={20} color="#fff" />
                     <Text style={styles.calendarButtonText}>Set Reminder</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.locationButton} onPress={handleAddToCalendar}>
@@ -69,12 +70,13 @@ const styles = StyleSheet.create({
         borderRadius: 50,
     },
     detailsContainer: {
-        padding: 16,
+        padding: 20,
+        paddingHorizontal: 10,
         backgroundColor: '#fff',
         borderRadius: 10,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
+        shadowOpacity: 0.1,
         shadowRadius: 6,
         marginTop: -30, // Overlap with image
     },
@@ -111,7 +113,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFD700',
         paddingVertical: 12,
         paddingHorizontal: 20,
-        borderRadius: 5,
+        borderRadius: 30,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
@@ -121,12 +123,13 @@ const styles = StyleSheet.create({
         color: '#666',
         fontSize: 16,
         fontWeight: 'bold',
+        marginLeft: 10,
     },
     locationButton: {
-        backgroundColor: '#007BFF',
+        backgroundColor: '#6C9EE5',
         paddingVertical: 12,
         paddingHorizontal: 20,
-        borderRadius: 5,
+        borderRadius: 30,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',

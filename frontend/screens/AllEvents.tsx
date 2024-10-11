@@ -5,7 +5,7 @@ import { getFirestore, collection, getDocs, deleteDoc, doc } from 'firebase/fire
 import { app } from '../firebaseConfig';
 import Svg, { Path } from 'react-native-svg';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
+ 
 
 const AllEvents = ({ navigation }: any) => {
     const [events, setEvents] = useState<{ id: string; title: string; date: string; time: string;  location: { latitude: number; longitude: number; }; imageUrl: string; description: string; }[]>([]);
@@ -69,6 +69,7 @@ const AllEvents = ({ navigation }: any) => {
               
                     <Text style={styles.title}>Upcoming Events</Text>
                     <View style={styles.inputContainer}>
+ 
         <TextInput
           style={styles.input}
           placeholder="Search for event"
@@ -78,6 +79,7 @@ const AllEvents = ({ navigation }: any) => {
         />
         <Ionicons name="search" size={20} color="#888" style={{ position: 'absolute', right: 20, top: 15 }} />
       </View>
+ 
                     <View style={styles.container}>
             {/* Navigation Tabs */}
             <View style={styles.navButtons}>
@@ -333,14 +335,15 @@ const styles = StyleSheet.create({
         borderColor: '#6C9EE5', // Equivalent to indigo-600
         paddingVertical: 8, // Equivalent to py-2
         paddingHorizontal: 24, // Equivalent to px-6
-        borderRadius: 6, // Equivalent to rounded
+        borderRadius: 30, // Equivalent to rounded
         backgroundColor: 'transparent',
         marginTop: 10, // Equivalent to mt-4
     },
     text: {
         color: '#6C9EE5', // Equivalent to indigo-700
         fontSize: 16,
-        fontFamily:'inter',
+        fontWeight: 'bold',
+ 
     },
     icon: {
         width: 16, // Equivalent to w-4
