@@ -27,7 +27,9 @@ import EventAdd from '@/screens/EventAdd';
 import EventDetails from '@/screens/EventDetails';
 import SetReminder from '@/screens/SetReminder';
 import SeaWaveTrack from '@/screens/SeaWaweTrack';
-import ExploreEvents from '@/screens/ExploreEvents';
+import MyEvents from '@/screens/MyEvents';
+import AllEvents from '@/screens/AllEvents';
+import EditEvent from '@/screens/EditEvent';
 import Map from '@/screens/Map';
 import Settings from '@/components/home/Settings';
 import Favorite from '@/screens/Favourite';
@@ -120,8 +122,18 @@ const EventStack = () => (
       options={{ headerShown: false }}
     />
     <Stack.Screen                    
-      name="ExploreEvents"
-      component={ExploreEvents}
+      name="AllEvents"
+      component={AllEvents}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen                    
+      name="MyEvents"
+      component={MyEvents}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen                    
+      name="EditEvent"
+      component={EditEvent}
       options={{ headerShown: false }}
     />
     <Stack.Screen                    

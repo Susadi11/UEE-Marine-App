@@ -3,11 +3,13 @@ import { View, Text, TouchableOpacity, StyleSheet, Image, Alert, TextInput, Imag
 import Icon from 'react-native-vector-icons/FontAwesome'; // For icons
 import { getFirestore, collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { app } from '../firebaseConfig';
+import Svg, { Path } from 'react-native-svg';
 
-const ExploreEvents = ({ navigation }: any) => {
+const AllEvents = ({ navigation }: any) => {
     const [events, setEvents] = useState<{ id: string; title: string; date: string; time: string;  location: { latitude: number; longitude: number; }; imageUrl: string; description: string; }[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const firestore = getFirestore(app);
+    const [activeTab, setActiveTab] = useState('All Events');
 
     useEffect(() => {
         const fetchEvents = async () => {
@@ -61,12 +63,9 @@ const ExploreEvents = ({ navigation }: any) => {
     
     return (
         <ScrollView style={styles.container}>
-            <ImageBackground
-                source={{ uri: 'https://t4.ftcdn.net/jpg/05/79/90/33/360_F_579903359_dPN7YwyB8l5lUUCrP3nj0kvPcFe90Lbg.jpg' }} // Replace with a relevant image URL
-            >
-                <View style={styles.overlay}>
+          
+              
                     <Text style={styles.title}>Upcoming Events</Text>
-                    <Text style={styles.subtitle}>Explore events happening near you</Text>
                     <View style={styles.inputContainer}>
                         <TextInput
                             style={styles.input}
@@ -76,8 +75,28 @@ const ExploreEvents = ({ navigation }: any) => {
                             onChangeText={text => setSearchQuery(text)}
                         />
                     </View>
-                </View>
-            </ImageBackground>
+                    <View style={styles.container}>
+            {/* Navigation Tabs */}
+            <View style={styles.navButtons}>
+                {['All Events', 'My Events'].map((tab) => (
+                    <TouchableOpacity
+                        key={tab}
+                        style={[styles.navButton, activeTab === tab && styles.activeNavButton]}
+                        onPress={() => {
+                            setActiveTab(tab);
+                            if (tab === 'My Events') {
+                                navigation.navigate('MyEvents');
+                            }
+                        }}
+                    >
+                        <Text style={[styles.navButtonText, activeTab === tab && styles.activeNavButtonText]}>
+                            {tab}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
+            </View>
+               
 
             {filteredEvents.map(event => (
                 <View key={event.id} style={styles.eventCard}>
@@ -86,16 +105,23 @@ const ExploreEvents = ({ navigation }: any) => {
                     </TouchableOpacity>
                     <View style={styles.detailsContainer}>
                         <Text style={styles.eventName}>{event.title}</Text>
-                        <Text style={styles.eventDate}>Date: {event.date}</Text>
-                       
-                        <TouchableOpacity style={styles.attendButton} onPress={() => handleAttendEvent(event)}>
-                            <Icon name="eye" size={20} color="#fff" />
-                            <Text style={styles.attendButtonText}>View Post</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteEvent(event.id)}>
-                            <Icon name="trash" size={20} color="#fff" />
-                            <Text style={styles.deleteButtonText}>Delete Post</Text>
+                        <Text style={styles.eventDate}>{event.description}</Text>
+                        
+                        <TouchableOpacity style={styles.button}onPress={() => handleAttendEvent(event)}>
+                        <Text style={styles.text}>View More</Text>
+                                <Svg
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    style={styles.icon}
+                                >
+                                <Path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                />
+                                </Svg>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -112,6 +138,28 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 200,
     },
+    navButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginVertical: 10,
+    },
+    navButton: {
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 30,
+        backgroundColor: '#fff',
+    },
+    activeNavButton: {
+        backgroundColor: '#6C9EE5',
+    },
+    navButtonText: {
+        fontSize: 16,
+        
+        color: '#666',
+    },
+    activeNavButtonText: {
+        color: '#000',
+    },
     overlay: {
         flex: 3,
         justifyContent: 'center',
@@ -121,11 +169,20 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     title: {
-        color: '#ffffff',
+        color: '#333',
         fontWeight: 'bold',
-        fontSize: 33,
+        fontSize: 25,
         textAlign: 'center',
         marginBottom: 20,
+        marginTop: 20,
+    },
+    description:{
+        color: '#28116b',
+        fontWeight: 'bold',
+        fontSize: 25,
+        textAlign: 'center',
+        marginBottom: 20,
+        marginTop: 20,
     },
     subtitle: {
         color: '#ffffff',
@@ -135,9 +192,10 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     inputContainer: {
-        width: '90%',
+        width: '85%',
         maxWidth: 400,
         alignItems: 'center',
+        marginLeft: 30,
     },
     input: {
         backgroundColor: '#fff',
@@ -204,7 +262,7 @@ const styles = StyleSheet.create({
         marginVertical: 5,
     },
     eventDescription: {
-        fontSize: 14,
+        fontSize: 12,
         color: '#224671',
         marginVertical: 10,
     },
@@ -240,6 +298,45 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginLeft: 10,
     },
+    heroButton: {
+        backgroundColor: '#FFD700',
+        paddingVertical: 5,
+        paddingHorizontal: 20,
+        borderRadius: 16,
+        marginVertical: 10,
+        marginHorizontal: 130,
+        flexDirection: 'row',
+     
+        
+      },
+       
+      heroButtonText: {
+        color: '#666',
+        fontSize: 20,
+        fontWeight: 'bold',
+        
+      },
+      button: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: '#6C9EE5', // Equivalent to indigo-600
+        paddingVertical: 8, // Equivalent to py-2
+        paddingHorizontal: 24, // Equivalent to px-6
+        borderRadius: 6, // Equivalent to rounded
+        backgroundColor: 'transparent',
+        marginTop: 10, // Equivalent to mt-4
+    },
+    text: {
+        color: '#6C9EE5', // Equivalent to indigo-700
+        fontSize: 16,
+    },
+    icon: {
+        width: 16, // Equivalent to w-4
+        height: 16,
+        marginLeft: 8, // Equivalent to ml-2
+        color: '#6C9EE5',
+    },
 });
 
-export default ExploreEvents;
+export default AllEvents;

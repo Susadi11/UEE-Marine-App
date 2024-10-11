@@ -16,7 +16,7 @@ const EventPage = () => {
           </Text>
           <TouchableOpacity
                 style={styles. heroButton}
-                onPress={() => navigation.navigate('ExploreEvents')}
+                onPress={() => navigation.navigate('AllEvents')}
             >
                 <Text style={styles.heroButtonText}>Explore</Text>
  
