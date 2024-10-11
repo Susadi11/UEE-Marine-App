@@ -14,13 +14,13 @@ const EventDetails= ({ route }: any) => {
 
     const handleAddToCalendar = async () => {
         const { date, time, title, description } = event;
-        const eventDate = new Date(`${date} ${time}`);
-        const endDate = new Date(eventDate.getTime() + 60 * 60 * 1000); // Assuming 1-hour event duration
-
+        const eventDate = new Date(`${date} ${date}`);
+        const eventTime = new Date(`${date} ${time}`);
+ 
         try {
             await CalendarEvents.saveEvent(title, {
                 startDate: eventDate.toISOString(),
-                endDate: endDate.toISOString(),
+                endDate: eventTime.toISOString(),
                 notes: description,
                 location: `Latitude: ${event.location.latitude}, Longitude: ${event.location.longitude}`,
             });
