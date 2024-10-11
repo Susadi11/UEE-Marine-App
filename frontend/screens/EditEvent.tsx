@@ -177,11 +177,14 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 16,
+        fontFamily:'inter',
+        paddingLeft: 130,
     },
     label: {
         fontSize: 16,
         fontWeight: 'bold',
         marginBottom: 8,
+        fontFamily:'inter'
     },
     picker: {
         backgroundColor: '#ffffff',
@@ -193,6 +196,7 @@ const styles = StyleSheet.create({
     },
     pickerText: {
         color: '#ccc',
+         fontFamily:'inter'
     },
     map: {
         width: '100%',
@@ -205,14 +209,15 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     button: {
-        backgroundColor: '#4F46E5',
+        backgroundColor: '#6C9EE5',
         padding: 16,
-        borderRadius: 8,
+        borderRadius: 30,
         alignItems: 'center',
     },
     buttonText: {
         color: '#fff',
         fontWeight: 'bold',
+         fontFamily:'inter'
     },
 });
 
