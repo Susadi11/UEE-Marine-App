@@ -5,6 +5,7 @@ import { getFirestore, collection, getDocs, deleteDoc, doc } from 'firebase/fire
 import { app } from '../firebaseConfig';
 import Svg, { Path } from 'react-native-svg';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+ 
 
 const AllEvents = ({ navigation }: any) => {
     const [events, setEvents] = useState<{ id: string; title: string; date: string; time: string;  location: { latitude: number; longitude: number; }; imageUrl: string; description: string; }[]>([]);
@@ -68,15 +69,17 @@ const AllEvents = ({ navigation }: any) => {
               
                     <Text style={styles.title}>Upcoming Events</Text>
                     <View style={styles.inputContainer}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Search for event"
-                            placeholderTextColor="#888"
-                            value={searchQuery}
-                            onChangeText={text => setSearchQuery(text)}
-                        />
-                         <Ionicons name="search" size={20} color="#888" style={{ position: 'absolute', right: 20, top: 15 }} />
-                    </View>
+ 
+        <TextInput
+          style={styles.input}
+          placeholder="Search for event"
+          placeholderTextColor="#888"
+          value={searchQuery}
+          onChangeText={text => setSearchQuery(text)}
+        />
+        <Ionicons name="search" size={20} color="#888" style={{ position: 'absolute', right: 20, top: 15 }} />
+      </View>
+ 
                     <View style={styles.container}>
             {/* Navigation Tabs */}
             <View style={styles.navButtons}>
@@ -177,6 +180,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginBottom: 20,
         marginTop: 20,
+        fontFamily:'inter',
     },
     description:{
         color: '#28116b',
@@ -185,6 +189,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginBottom: 20,
         marginTop: 20,
+        fontFamily:'inter',
     },
     subtitle: {
         color: '#ffffff',
@@ -192,6 +197,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         textAlign: 'center',
         marginBottom: 20,
+        fontFamily:'inter',
     },
     inputContainer: {
         width: '85%',
@@ -211,6 +217,7 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         fontSize: 16,
         color: '#000',
+        fontFamily:'inter',
     },
     eventCard: {
         marginBottom: 20,
@@ -245,12 +252,14 @@ const styles = StyleSheet.create({
         fontSize: 30,
         fontWeight: 'bold',
         color: '#1f2937',
+        fontFamily:'inter',
     },
     eventDate: {
         fontSize: 16,
         color: '#250071',
         marginVertical: 5,
         fontWeight:'semibold'
+        
     },
     eventTime: {
         fontSize: 16,
@@ -267,6 +276,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: '#224671',
         marginVertical: 10,
+        fontFamily:'inter',
     },
     attendButton: {
         backgroundColor: '#007BFF',
@@ -333,6 +343,7 @@ const styles = StyleSheet.create({
         color: '#6C9EE5', // Equivalent to indigo-700
         fontSize: 16,
         fontWeight: 'bold',
+ 
     },
     icon: {
         width: 16, // Equivalent to w-4

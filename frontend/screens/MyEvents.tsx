@@ -107,8 +107,10 @@ return (
 };
   return (
     <ScrollView style={styles.container}>
+      <Text style={styles.title}>My Events</Text>
       {/* Search Bar */}
       <View style={styles.inputContainer}>
+      
         <TextInput
           style={styles.input}
           placeholder="Search for event"
@@ -186,6 +188,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.009)',
   },
+   title: {
+        color: '#333',
+        fontWeight: 'bold',
+        fontSize: 25,
+        textAlign: 'center',
+        marginBottom: 20,
+        marginTop: 20,
+        fontFamily:'inter',
+        marginRight: 11,
+    },
   contextMenu: {
     position: 'absolute',
     top: 40,
@@ -250,12 +262,11 @@ const styles = StyleSheet.create({
     maxWidth: 400,
     alignItems: 'center',
     marginLeft: 30,
-    marginTop: 50,
-  },
-  input: {
+},
+input: {
     backgroundColor: '#fff',
-    borderRadius: 22,
-    paddingVertical: 15,
+    borderRadius: 20,
+    paddingVertical: 10,
     paddingHorizontal: 20,
     width: '100%',
     shadowColor: '#000',
@@ -264,7 +275,8 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     fontSize: 16,
     color: '#000',
-  },
+    fontFamily:'inter',
+},
   eventCard: {
     marginBottom: 20,
     borderRadius: 10,
@@ -291,19 +303,19 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     borderRadius: 25,
   },
-  detailsContainer: {
-    padding: 15,
-  },
+ 
   eventName: {
     fontSize: 30,
     fontWeight: 'bold',
     color: '#1f2937',
+    fontFamily:'inter',
   },
   eventDate: {
     fontSize: 16,
     color: '#250071',
     marginVertical: 5,
     fontWeight: 'semibold',
+    fontFamily:'inter',
   },
   button: {
     flexDirection: 'row',
@@ -320,6 +332,7 @@ const styles = StyleSheet.create({
     color: '#6C9EE5',
     fontSize: 16,
     fontWeight: 'bold',
+ 
   },
   icon: {
     width: 16,

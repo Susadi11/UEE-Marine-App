@@ -137,7 +137,7 @@ const EditEvent: React.FC = () => {
                 <Text style={styles.pickerText}>Select Time: {formatTime(eventTime)}</Text>
                 </TouchableOpacity>
                 {showTimePicker && (
-                    <DateTimePicker value={eventDate} mode="time" display="default" onChange={handleDateChange} />
+                    <DateTimePicker value={eventDate} mode="time" display="default" onChange={handleTimeChange} />
                 )}
 
             <Text style={styles.label}>Location</Text>
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     title: {
-        fontSize: 24,
+        color: '#333',
         fontWeight: 'bold',
         marginBottom: 16,
         fontFamily:'inter',
