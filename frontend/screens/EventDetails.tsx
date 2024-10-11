@@ -4,9 +4,13 @@ import CalendarEvents from 'react-native-calendar-events'; // For managing calen
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook
 
-const EventDetails= ({ route }: any) => {
+const EventDetails = ({ route }: any) => {
     const navigation = useNavigation(); // Use the hook to get navigation object
     const { event } = route.params; // Get the event data from route params
+
+    // Format the date and time
+    const formattedDate = new Date(event.date).toISOString().split('T')[0]; // Extract "YYYY-MM-DD"
+    const formattedTime = new Date(event.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Format "HH:MM AM/PM"
 
     const handleNavigateToReminder = () => {
         navigation.navigate('SetReminder', { event });
@@ -35,8 +39,8 @@ const EventDetails= ({ route }: any) => {
             <Image source={{ uri: event.imageUrl }} style={styles.image} />
             <View style={styles.detailsContainer}>
                 <Text style={styles.title}>{event.title}</Text>
-                <Text style={styles.date}>Date: {event.date}</Text>
-                <Text style={styles.time}>Time: {event.time}</Text>
+                <Text style={styles.date}>Date: {formattedDate}</Text>
+                <Text style={styles.time}>Time: {formattedTime}</Text>
                 
                 <Text style={styles.description}>{event.description}</Text>
 
