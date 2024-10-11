@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, ScrollView, StyleSheet, Animated } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import AntDesign from '@expo/vector-icons/AntDesign';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import Advertisement from './Advertisement';
 import OceanSoundsCard from './OceanSoundsCard';
@@ -19,7 +17,7 @@ type RootStackParamList = {
   MapScreen: undefined;
   TrendingPage: undefined;
   BlogDetail: { blogData: Blog };
-  SeaWaveTrack: undefined; // Add this line
+  SeaWaveTrack: undefined;
 };
 
 // Define the navigation prop for the Home screen
@@ -172,54 +170,65 @@ const Home: React.FC = () => {
         <Advertisement />
       </View>
 
-      {/* Explore Events with Find Icon */}
-      <View style={styles.exploreHeader}>
-        <Text style={styles.sectionTitle}>Explore events</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('MapScreen')}>
-          <AntDesign name="find" size={28} color="black" style={styles.findIcon} />
-        </TouchableOpacity>
+      {/* Updated Explore Events Section */}
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>Explore Events</Text>
+        <View style={styles.headerRight}>
+          <TouchableOpacity onPress={() => navigation.navigate('ExploreEvents')}>
+            <Text style={styles.viewAllText}>See More →</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <ScrollView horizontal={true} style={styles.eventsContainer} showsHorizontalScrollIndicator={false}>
+      <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.eventsContainer}>
         {events.slice(-4).map((event) => (
-          <Animated.View
+          <TouchableOpacity
             key={event.id}
-            style={[styles.eventCard, { transform: [{ scale: scaleValue }] }]}
+            style={styles.eventCard}
+            onPress={() => {/* Navigate to event details */}}
           >
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPressIn={handlePressIn}
-              onPressOut={handlePressOut}
-            >
-              <Image
-                source={{ uri: event.imageUrl || 'https://via.placeholder.com/150' }}
-                style={styles.eventImage}
-              />
+            <Image
+              source={{ uri: event.imageUrl || 'https://via.placeholder.com/150' }}
+              style={styles.eventImage}
+            />
+            <View style={styles.eventOverlay}>
               <Text style={styles.eventText}>{event.title}</Text>
-            </TouchableOpacity>
-          </Animated.View>
+            </View>
+          </TouchableOpacity>
         ))}
-
-        {/* Explore More Card */}
-        <TouchableOpacity
-          style={[styles.eventCard, styles.exploreMoreCard]}
-          onPress={() => navigation.navigate('ExploreEvents')}
-          activeOpacity={0.8}
-        >
-          <Ionicons name="arrow-forward-circle-outline" size={40} color="#6C9EE5" />
-          <Text style={styles.exploreMoreText}>Explore More</Text>
-        </TouchableOpacity>
       </ScrollView>
 
-      {/* Discover Ocean Sounds */}
-      <TouchableOpacity
-        style={styles.actionButton}
-        activeOpacity={0.8}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-      >
-        <OceanSoundsCard onPress={() => navigation.navigate('SeaWaveTrack')} tracks={[]} />
-      </TouchableOpacity>
+      {/* Navigations and Discover Ocean Sounds */}
+      <View style={styles.cardContainer}>
+        {/* Navigations Card */}
+        <TouchableOpacity
+          style={[styles.actionButton, styles.navigationCard]}
+          activeOpacity={0.8}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          onPress={() => navigation.navigate('MapScreen')}
+        >
+          <View style={styles.cardContent}>
+            <AntDesign name="find" size={24} color="#333" />
+            <Text style={styles.cardTitle}>Navigations</Text>
+          </View>
+        </TouchableOpacity>
+
+        {/* Discover Ocean Sounds Card */}
+        <TouchableOpacity
+          style={[styles.actionButton, styles.navigationCard]}
+          activeOpacity={0.8}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          onPress={() => navigation.navigate('SeaWaveTrack')}
+        >
+          <View style={styles.cardContent}>
+            <AntDesign name="find" size={24} color="#333" />
+            <Text style={styles.cardTitle}>Ocean Sounds</Text>
+          </View>
+        </TouchableOpacity>
+        
+      </View>
 
       {/* Trending Blogs Section */}
       <View style={styles.trendingBlogsSection}>
@@ -305,103 +314,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Inter_600SemiBold',
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginLeft: 10, // Add space between the icon and the title
-    color: '#333',
-    opacity: 0.9,
-    fontFamily: 'Inter_600SemiBold',
-  },
-  eventsContainer: {
-    paddingLeft: 20,
-    marginBottom: 25,
-    marginTop: 20,
-  },
-  eventCard: {
-    width: 200,
-    borderRadius: 30,
-    overflow: 'hidden',
-    backgroundColor: '#ffffff',
-    marginRight: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 30,
-    elevation: 3,
-  },
-  eventImage: {
-    width: '100%',
-    height: 150,
-    resizeMode: 'cover',
-  },
-  eventText: {
-    textAlign: 'center',
-    padding: 12,
-    backgroundColor: '#d1e7ff',
-    color: '#333',
-    fontWeight: 'bold',
-    fontSize: 14,
-    fontFamily: 'Inter_600SemiBold',
-  },
-  exploreMoreCard: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f0f4ff',
-  },
-  exploreMoreText: {
-    color: '#6C9EE5',
-    fontWeight: 'bold',
-    marginTop: 10,
-    fontSize: 14,
-    fontFamily: 'Inter_600SemiBold',
-  },
-  actionButton: {
-    backgroundColor: '#ffffff',
-    borderRadius: 30,
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    marginHorizontal: 20,
-    marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    marginTop: 20,
-  },
-  buttonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  buttonText: {
-    marginLeft: 15,
-    color: '#333',
-    fontSize: 16,
-    fontWeight: '500',
-    fontFamily: 'Inter_600SemiBold',
-  },
-  exploreHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginLeft: 10,
-    marginRight: 10,
-    marginBottom: 10,
-  },
-  findIcon: {
-    marginRight: 10,
-    padding: 10,
-  },
-  popularDoctorsSection: {
-    marginTop: 20,
-    marginHorizontal: 20,
-  },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginHorizontal: 20,
+    marginTop: 1,
     marginBottom: 10,
+  },
+  sectionTitle: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    color: '#333',
+    opacity: 0.9,
+    fontFamily: 'Inter_600SemiBold',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  findIconContainer: {
+    marginRight: 10,
   },
   viewAllText: {
     color: '#6C9EE5',
@@ -409,10 +342,80 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontFamily: 'Inter_500Medium',
   },
+  eventsContainer: {
+    paddingLeft: 20,
+    marginBottom: 25,
+  },
+  eventCard: {
+    width: 200,
+    height: 150,
+    borderRadius: 10,
+    overflow: 'hidden',
+    marginRight: 15,
+    marginTop: 20,
+  },
+  eventImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  eventOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: 10,
+  },
+  eventText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+    fontSize: 14,
+    fontFamily: 'Inter_600SemiBold',
+  },
+  cardContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginHorizontal: 20,
+    marginBottom: 15,
+  },
+  actionButton: {
+    backgroundColor: '#ffffff',
+    borderRadius: 30,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  navigationCard: {
+    flex: 1,
+    marginRight: 10,
+  },
+  oceanSoundsCard: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  cardContent: {
+    alignItems: 'center',
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginTop: 10,
+    fontFamily: 'Inter_600SemiBold',
+  },
   trendingBlogsSection: {
     marginTop: 20,
     marginHorizontal: 20,
     marginBottom: 20,
+  },
+  trendingTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   trendingCard: {
     flexDirection: 'row',
@@ -445,7 +448,7 @@ const styles = StyleSheet.create({
   trendingIntro: {
     fontSize: 14,
     color: '#666',
-    fontFamily: 'Inter_600SemiBold',
+    fontFamily: 'Inter_500Medium',
   },
   noTrendingBlogsText: {
     fontSize: 14,
@@ -454,14 +457,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 10,
   },
-  trendingTitleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    fontFamily: 'Inter_600SemiBold',
-  },
-  adv:{
+  adv: {
     padding: 20,
-  }
+  },
 });
 
-export default Home; 
+export default Home;

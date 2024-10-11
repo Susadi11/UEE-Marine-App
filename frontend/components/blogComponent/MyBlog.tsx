@@ -103,7 +103,7 @@ const MyBlog: React.FC<BlogPostProps> = ({
                   <Ionicons
                     name={liked ? 'heart' : 'heart-outline'}
                     size={24}
-                    color={liked ? 'red' : 'black'}
+                    color={liked ? 'red' : 'white'}
                     style={styles.iconSpacing}
                   />
                 </Animated.View>
@@ -112,7 +112,7 @@ const MyBlog: React.FC<BlogPostProps> = ({
                 <Ionicons
                   name="paper-plane-outline"
                   size={24}
-                  color="black"
+                  color="white"
                   style={styles.iconSpacing}
                 />
               </TouchableOpacity>

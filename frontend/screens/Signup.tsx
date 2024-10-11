@@ -1,27 +1,96 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-const Signup = ({ navigation }: { navigation: any }) => {
+// Define your RootStackParamList
+type RootStackParamList = {
+  Signup: undefined;
+  Login: undefined;
+  Main: undefined;
+};
+
+type SignupScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Signup'>;
+
+const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [fullName, setFullName] = useState('');
   const [error, setError] = useState('');
+  const [emailError, setEmailError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
+
+  const navigation = useNavigation<SignupScreenNavigationProp>();
 
   const handleSignup = async () => {
+    let isValid = true;
+    if (!email) {
+      setEmailError(true);
+      isValid = false;
+    } else {
+      setEmailError(false);
+    }
+
+    if (!password) {
+      setPasswordError(true);
+      isValid = false;
+    } else {
+      setPasswordError(false);
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert('Error!', 'Passwords do not match.');
+      return;
+    }
+
+    if (!isValid) {
+      Alert.alert('Signup Failed!', 'Please enter both email and password!');
+      return;
+    }
+
     try {
       const auth = getAuth();
-      await createUserWithEmailAndPassword(auth, email, password);
-      navigation.replace('Main');
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      await updateProfile(user, {
+        displayName: fullName,
+      });
+
+      Alert.alert('Success', 'Account created successfully!', [
+        { text: 'OK', onPress: () => navigation.navigate('Main') }
+      ]);
     } catch (err: any) {
       setError(err.message);
+      Alert.alert('Oops! Signup Failed', err.message);
     }
   };
 
   return (
     <View style={styles.container}>
+      <View style={styles.backButtonContainer}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={20} />
+        </TouchableOpacity>
+      </View>
       <Text style={styles.title}>Sign Up</Text>
+      <Text style={styles.subtitle}>Create an account to continue!</Text>
+      
+      <Text style={styles.inputLabel}>Full Name</Text>
       <TextInput
         style={[styles.input, styles.shadow]}
+        placeholder="Full Name"
+        value={fullName}
+        onChangeText={setFullName}
+        placeholderTextColor="#9CA3AF"
+      />
+
+      <Text style={styles.inputLabel}>Email</Text>
+      <TextInput
+        style={[styles.input, styles.shadow, emailError && styles.inputError]}
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
@@ -29,21 +98,39 @@ const Signup = ({ navigation }: { navigation: any }) => {
         autoCapitalize="none"
         placeholderTextColor="#9CA3AF"
       />
+
+      <Text style={styles.inputLabel}>Set Password</Text>
       <TextInput
-        style={[styles.input, styles.shadow]}
+        style={[styles.input, styles.shadow, passwordError && styles.inputError]}
         placeholder="Password"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
         placeholderTextColor="#9CA3AF"
       />
+
+      <Text style={styles.inputLabel}>Confirm Password</Text>
+      <TextInput
+        style={[styles.input, styles.shadow]}
+        placeholder="Confirm Password"
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
+        secureTextEntry
+        placeholderTextColor="#9CA3AF"
+      />
+
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
+      
       <TouchableOpacity style={[styles.button, styles.shadow]} onPress={handleSignup}>
         <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-        <Text style={styles.linkText}>Already have an account? Log in</Text>
-      </TouchableOpacity>
+      
+      <View style={styles.loginLinkContainer}>
+        <Text style={styles.loginLinkText}>Already have an account?</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          <Text style={styles.loginLink}>Log In</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -52,15 +139,28 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
     padding: 20,
     backgroundColor: '#F9FAFB',
   },
+  backButtonContainer: {
+    position: 'absolute',
+    top: 60,
+    left: 20,
+  },
   title: {
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: 'bold',
     color: '#000',
-    marginBottom: 30,
+    marginBottom: 5,
+  },
+  subtitle: {
+    fontSize: 12,
+    color: 'gray',
+    marginBottom: 20,
+  },
+  inputLabel: {
+    marginBottom: 5,
+    color: 'grey',
   },
   input: {
     width: '100%',
@@ -68,9 +168,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 10,
     paddingHorizontal: 15,
-    marginBottom: 20,
+    marginBottom: 13,
     borderWidth: 1,
     borderColor: '#E5E7EB',
+  },
+  inputError: {
+    borderColor: 'red',
   },
   button: {
     backgroundColor: '#6C9EE5',
@@ -89,10 +192,18 @@ const styles = StyleSheet.create({
     color: 'red',
     marginBottom: 10,
   },
-  linkText: {
-    marginTop: 20,
+  loginLinkContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 35,
+  },
+  loginLinkText: {
+    color: 'gray',
+  },
+  loginLink: {
     color: '#6C9EE5',
-    fontSize: 16,
+    marginLeft: 5,
   },
   shadow: {
     shadowColor: '#000',

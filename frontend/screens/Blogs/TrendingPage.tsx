@@ -89,7 +89,7 @@ const TrendingPage: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Top 20 Trending Blogs</Text>
+      <Text style={styles.header}>Trending Blogs</Text>
       {trendingBlogs.length > 0 ? (
         <FlatList
           data={trendingBlogs}
@@ -115,11 +115,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   header: {
-    fontSize: 24,
+    fontSize: 30,
     fontWeight: 'bold',
     color: '#1f2937',
     padding: 16,
     textAlign: 'center',
+    marginRight: 90,
   },
   listContent: {
     paddingBottom: 20,

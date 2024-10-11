@@ -39,6 +39,7 @@ import MusicPlayer2 from '@/screens/MusicPlayer2';
 import MusicPlayer3 from '@/screens/MusicPlayer3';
 import MusicPlayer4 from '@/screens/MusicPlayer4';
 import MusicHistory from '@/screens/MusicHistory';
+import AddBlog from '@/components/blogComponent/AddBlog';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -60,6 +61,11 @@ const BlogStack = () => (
       component={TrendingPage}
       options={{ headerShown: false }}
     />
+    <Stack.Screen 
+  name="AddBlog" 
+  component={AddBlog} 
+  options={{ headerShown: false }}
+/>
   </Stack.Navigator>
 );
 

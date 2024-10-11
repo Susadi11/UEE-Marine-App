@@ -11,9 +11,10 @@ import { getAuth } from 'firebase/auth';
 
 type RootStackParamList = {
   BlogDetail: { blogData: any };
+  AddBlog: { blogData?: any, isEditing: boolean };
 };
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'BlogDetail'>;
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'BlogDetail' | 'AddBlog'>;
 
 const MyBlogPage: React.FC = () => {
   const [myBlogs, setMyBlogs] = useState<any[]>([]);
@@ -27,7 +28,6 @@ const MyBlogPage: React.FC = () => {
     Inter_600SemiBold,
     Inter_700Bold,
   });
-
 
   useEffect(() => {
     const user = auth.currentUser;
@@ -64,8 +64,27 @@ const MyBlogPage: React.FC = () => {
   };
 
   const handleEdit = (blogId: string) => {
-    // Implement edit functionality
-    console.log('Edit blog:', blogId);
+    const selectedBlog = myBlogs.find(blog => blog.id === blogId);
+    if (selectedBlog) {
+      // Ensure all required fields are present in the blogData object
+      const blogData = {
+        id: selectedBlog.id,
+        blog_title: selectedBlog.blog_title || '',
+        blog_category: selectedBlog.blog_category || '',
+        blog_sciname: selectedBlog.blog_sciname || '',
+        blog_physicalCharacteristics: selectedBlog.blog_physicalCharacteristics || '',
+        blog_habitatDistribution: selectedBlog.blog_habitatDistribution || '',
+        blog_behavior: selectedBlog.blog_behavior || '',
+        blog_importanceEcosystem: selectedBlog.blog_importanceEcosystem || '',
+        blog_coverPhoto: selectedBlog.blog_coverPhoto || '',
+        blog_images: selectedBlog.blog_images || [],
+        updatedAt: selectedBlog.updatedAt || new Date(),
+      };
+      navigation.navigate('AddBlog', { blogData, isEditing: true });
+    } else {
+      console.error('Blog not found:', blogId);
+      Alert.alert('Error', 'Failed to load blog for editing');
+    }
     setSelectedBlogId(null);
   };
 
@@ -141,7 +160,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   title: {
-    fontSize: 24,
+    fontSize: 30,
     fontWeight: 'bold',
     color: '#1f2937',
     padding: 16,

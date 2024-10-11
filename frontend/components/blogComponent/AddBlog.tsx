@@ -13,7 +13,7 @@ import {
   Alert,
   ScrollView,
 } from 'react-native';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, updateDoc, doc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { app } from '../../firebaseConfig';
 import * as ImagePicker from 'expo-image-picker';
@@ -21,10 +21,36 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import CustomMessage from '../CustomMessage';
 import { getAuth } from 'firebase/auth';
 import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { NativeStackNavigationProp } from 'react-native-screens/lib/typescript/native-stack/types';
 
 const { width } = Dimensions.get('window');
 
-const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+// Define the type for your route params
+type RootStackParamList = {
+  BlogDetail: { blogData: any };
+  AddBlog: { blogData?: BlogData; isEditing: boolean };
+};
+
+// Define the type for your blog data
+type BlogData = {
+  id: string;
+  blog_title: string;
+  blog_category: string;
+  blog_sciname: string;
+  blog_physicalCharacteristics: string;
+  blog_habitatDistribution: string;
+  blog_behavior: string;
+  blog_importanceEcosystem: string;
+  blog_coverPhoto: string;
+  blog_images: string[];
+};
+
+type AddBlogScreenRouteProp = RouteProp<RootStackParamList, 'AddBlog'>;
+type AddBlogScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'AddBlog'>;
+
+
+const AddBlog: React.FC = () => {
   const [title, setTitle] = useState('');
   const [introduction, setIntroduction] = useState('');
   const [sciName, setSciName] = useState('');
@@ -37,6 +63,11 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(width));
   const [showMessage, setShowMessage] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [blogId, setBlogId] = useState<string | null>(null);
+
+  const navigation = useNavigation<AddBlogScreenNavigationProp>();
+  const route = useRoute<AddBlogScreenRouteProp>();
 
   let [fontsLoaded] = useFonts({
     Inter_500Medium,
@@ -61,7 +92,23 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         useNativeDriver: true,
       }),
     ]).start();
-  }, []);
+
+    // Check if we're in edit mode and pre-fill the form
+    if (route.params?.blogData) {
+      const blogData = route.params.blogData;
+      setIsEditing(true);
+      setBlogId(blogData.id);
+      setTitle(blogData.blog_title);
+      setIntroduction(blogData.blog_category);
+      setSciName(blogData.blog_sciname);
+      setPhysicalCharacteristics(blogData.blog_physicalCharacteristics);
+      setHabitatDistribution(blogData.blog_habitatDistribution);
+      setBehavior(blogData.blog_behavior);
+      setImportanceEcosystem(blogData.blog_importanceEcosystem);
+      setCoverPhoto({ uri: blogData.blog_coverPhoto });
+      setImages(blogData.blog_images.map((uri: string) => ({ uri })));
+    }
+  }, [route.params]);
 
   const uploadImage = async (uri: string): Promise<string> => {
     const response = await fetch(uri);
@@ -91,10 +138,16 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         return;
       }
 
-      const coverPhotoUrl = await uploadImage(coverPhoto.uri);
-      const imageUrls = await Promise.all(images.map(image => uploadImage(image.uri)));
+      let coverPhotoUrl = coverPhoto.uri;
+      if (!coverPhotoUrl.startsWith('http')) {
+        coverPhotoUrl = await uploadImage(coverPhoto.uri);
+      }
 
-      const newBlog = {
+      const imageUrls = await Promise.all(images.map(image => 
+        image.uri.startsWith('http') ? image.uri : uploadImage(image.uri)
+      ));
+
+      const blogData = {
         blog_title: title,
         blog_category: introduction,
         blog_sciname: sciName,
@@ -105,22 +158,28 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         blog_coverPhoto: coverPhotoUrl,
         blog_images: imageUrls,
         userId: user.uid,
-        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
-      const docRef = await addDoc(collection(firestore, 'blogs'), newBlog);
-      console.log('Document written with ID: ', docRef.id);
+      if (isEditing && blogId) {
+        await updateDoc(doc(firestore, 'blogs', blogId), blogData);
+        console.log('Document updated with ID: ', blogId);
+      } else {
+        const docRef = await addDoc(collection(firestore, 'blogs'), {
+          ...blogData,
+          createdAt: new Date(),
+        });
+        console.log('Document written with ID: ', docRef.id);
+      }
 
       setShowMessage(true);
 
-      clearForm();
-
-      // Close the form after a short delay
+      // Navigate back after a short delay
       setTimeout(() => {
-        onClose();
+        navigation.goBack();
       }, 3000);
     } catch (error: unknown) {
-      console.error('Error adding document: ', error);
+      console.error('Error saving document: ', error);
       if (error instanceof Error) {
         Alert.alert('Error', error.message);
       } else {
@@ -191,18 +250,6 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     setImages(newImages);
   };
 
-  const clearForm = () => {
-    setTitle('');
-    setIntroduction('');
-    setSciName('');
-    setPhysicalCharacteristics('');
-    setHabitatDistribution('');
-    setBehavior('');
-    setImportanceEcosystem('');
-    setCoverPhoto(null);
-    setImages([]);
-  };
-
   if (!fontsLoaded) {
     return null; // or a loading indicator
   }
@@ -215,10 +262,10 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={styles.innerContainer}>
           <View style={styles.header}>
-            <TouchableOpacity onPress={onClose}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
               <MaterialCommunityIcons name="arrow-left" size={28} color="#6C9EE5" />
             </TouchableOpacity>
-            <Text style={styles.title}>Create New Blog</Text>
+            <Text style={styles.title}>{isEditing ? 'Edit Blog' : 'Create New Blog'}</Text>
           </View>
 
           {renderInputField("Title", "Enter blog title", title, setTitle)}
@@ -272,7 +319,7 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={[styles.button, styles.cancelButton]}
-              onPress={clearForm}
+              onPress={() => navigation.goBack()}
             >
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
@@ -280,14 +327,14 @@ const AddBlog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               style={[styles.button, styles.addBlogButton]}
               onPress={handleSave}
             >
-              <Text style={styles.addBlogButtonText}>Add Blog</Text>
+              <Text style={styles.addBlogButtonText}>{isEditing ? 'Save Changes' : 'Add Blog'}</Text>
             </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
 
       <CustomMessage 
-        message="Blog saved successfully!" 
+        message={isEditing ? "Blog updated successfully!" : "Blog saved successfully!"} 
         type="success" 
         visible={showMessage} 
         onHide={() => setShowMessage(false)} 
