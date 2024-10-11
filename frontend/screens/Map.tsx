@@ -3,8 +3,10 @@ import { StyleSheet, Text, View, TextInput, ActivityIndicator } from 'react-nati
 import MapView, { Marker } from "react-native-maps";
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
+import Header from '../components/Vinuk/Header'; // Import the header component
+import SearchBar from '@/components/Vinuk/SearchBar';
 
-const Map = () => {
+const MapScreen = () => {
   // Specify the type of location, which will hold coordinates
   const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null); // Make errorMsg a string or null
@@ -44,6 +46,11 @@ const Map = () => {
 
   return (
     <View style={styles.container}>
+      {/* Header Component */}
+      <Header />
+      <SearchBar />
+
+      {/* Map */}
       <MapView
         style={styles.map}
         initialRegion={{
@@ -52,26 +59,9 @@ const Map = () => {
           latitudeDelta: 0.05,
           longitudeDelta: 0.05,
         }}
-        showsUserLocation={true} 
+        showsUserLocation={true}
+      />
 
-        >
-          {/* <Marker
-            coordinate={{
-              latitude: location ? location?.latitude: 7.8731,
-              longitude: location ? location?.longitude: 80.7718,
-            }}
-          /> */}
-      </MapView>
-
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <Ionicons name="search-outline" size={20} color="#999" />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search"
-          placeholderTextColor="#999"
-        />
-      </View>
     </View>
   );
 };
@@ -85,29 +75,6 @@ const styles = StyleSheet.create({
   map: {
     ...StyleSheet.absoluteFillObject,
   },
-  searchContainer: {
-    position: 'absolute',
-    top: 50,
-    left: 20,
-    right: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
-    borderRadius: 25,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: 10,
-    color: '#333',
-    fontSize: 16,
-  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -115,4 +82,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Map;
+export default MapScreen;
