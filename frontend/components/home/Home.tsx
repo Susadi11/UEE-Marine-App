@@ -223,11 +223,11 @@ const Home: React.FC = () => {
           onPress={() => navigation.navigate('SeaWaveTrack')}
         >
           <View style={styles.cardContent}>
-            <AntDesign name="find" size={24} color="#333" />
+            <MaterialCommunityIcons name="dolphin" size={24} color="#333" />
             <Text style={styles.cardTitle}>Ocean Sounds</Text>
           </View>
         </TouchableOpacity>
-        
+
       </View>
 
       {/* Trending Blogs Section */}
@@ -343,12 +343,14 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_500Medium',
   },
   eventsContainer: {
+    height: 250,
     paddingLeft: 20,
+    backgroundColor: '#f8f8f8',
     marginBottom: 25,
   },
   eventCard: {
     width: 200,
-    height: 150,
+    height: 250,
     borderRadius: 10,
     overflow: 'hidden',
     marginRight: 15,
@@ -361,14 +363,14 @@ const styles = StyleSheet.create({
   },
   eventOverlay: {
     position: 'absolute',
-    bottom: 0,
+    bottom: 20,
     left: 0,
     right: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(140,200,248,0.9)',
     padding: 10,
   },
   eventText: {
-    color: '#ffffff',
+    color: '#323232',
     fontWeight: 'bold',
     fontSize: 14,
     fontFamily: 'Inter_600SemiBold',
@@ -386,9 +388,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 0,
+    shadowOpacity: 0,
+    borderWidth: 1,
+    borderColor: '#55b0f8',
   },
   navigationCard: {
     flex: 1,

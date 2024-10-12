@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Alert, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Alert, ScrollView } from 'react-native';
 import { getFirestore, collection, onSnapshot, doc, getDoc } from 'firebase/firestore';
 import { app } from '../firebaseConfig';
 import BlogPost from '@/components/blogComponent/BlogPost';
@@ -8,32 +8,38 @@ import Swiper from 'react-native-swiper';
 import AddBlog from '@/components/blogComponent/AddBlog';
 import TrendingPage from '@/screens/Blogs/TrendingPage';
 import MyBlogPage from '@/screens/Blogs/MyBlogPage';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 
 type BlogPageProps = {
   navigation: any; // Replace 'any' with the appropriate type if using TypeScript
 };
-const BlogPage: React.FC<BlogPageProps> = ({ navigation }) => {
+
+const BlogPage: React.FC<BlogPageProps> = () => {
   const [blogs, setBlogs] = useState<any[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [showAddBlog, setShowAddBlog] = useState(false);
   const firestore = getFirestore(app);
+  const navigation = useNavigation();
+  const isFocused = useIsFocused();
 
   useEffect(() => {
-    const blogCollection = collection(firestore, 'blogs');
-    const unsubscribe = onSnapshot(
-      blogCollection,
-      (snapshot) => {
-        const blogList = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        setBlogs(blogList);
-      },
-      (error) => {
-        console.error('Error fetching blogs: ', error);
-        Alert.alert('Error', error.message || 'An unknown error occurred');
-      }
-    );
+    if (isFocused) {
+      const blogCollection = collection(firestore, 'blogs');
+      const unsubscribe = onSnapshot(
+        blogCollection,
+        (snapshot) => {
+          const blogList = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+          setBlogs(blogList);
+        },
+        (error) => {
+          console.error('Error fetching blogs: ', error);
+          Alert.alert('Error', error.message || 'An unknown error occurred');
+        }
+      );
 
-    return () => unsubscribe();
-  }, [firestore]);
+      return () => unsubscribe();
+    }
+  }, [firestore, isFocused]);
 
   const handleIndexChange = (index: number) => {
     setActiveIndex(index);
@@ -45,11 +51,7 @@ const BlogPage: React.FC<BlogPageProps> = ({ navigation }) => {
   };
 
   const handleAddPress = () => {
-    setShowAddBlog(true);
-  };
-
-  const handleAddBlogClose = () => {
-    setShowAddBlog(false);
+    navigation.navigate('AddBlog', { isEditing: false });
   };
 
   const handleReadMore = async (blogId: string) => {
@@ -69,6 +71,7 @@ const BlogPage: React.FC<BlogPageProps> = ({ navigation }) => {
       Alert.alert("Error", "Failed to load blog details");
     }
   };
+
   const getActiveTab = () => {
     switch (activeIndex) {
       case 0:
@@ -84,62 +87,56 @@ const BlogPage: React.FC<BlogPageProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {!showAddBlog && (
-        <Search
-          activeTab={getActiveTab()}
-          onTabPress={handleTabPress}
-          onAddPress={handleAddPress}
-        />
-      )}
-      {showAddBlog ? (
-        <AddBlog onClose={handleAddBlogClose} />
-      ) : (
-        <Swiper
-          loop={false}
-          showsPagination={false}
-          index={activeIndex}
-          onIndexChanged={handleIndexChange}
-          scrollEnabled={true}
+      <Search
+        activeTab={getActiveTab()}
+        onTabPress={handleTabPress}
+        onAddPress={handleAddPress}
+      />
+      <Swiper
+        loop={false}
+        showsPagination={false}
+        index={activeIndex}
+        onIndexChanged={handleIndexChange}
+        scrollEnabled={true}
+      >
+        <ScrollView 
+          style={styles.page}
+          contentContainerStyle={styles.scrollContentContainer}
         >
-          <ScrollView 
-            style={styles.page}
-            contentContainerStyle={styles.scrollContentContainer}
-          >
-            <View style={styles.blogList}>
-              {blogs && blogs.length > 0 ? (
-  blogs.map((blog) => (
-    <BlogPost
-      key={blog.id}
-      id={blog.id}  // Add this line
-      coverPhoto={blog.blog_coverPhoto}
-      title={blog.blog_title}
-      introduction={blog.blog_category}
-      hashTags={blog.blog_hashtags || []}
-      authorName="Author Name"
-      authorImage="https://example.com/default-author-image.jpg"
-      date="Date"
-      onPress={() => handleReadMore(blog.id)}
-    />
-  ))
-) : (
-  <Text style={styles.noBlogsText}>No blogs available</Text>
-)}
-            </View>
-          </ScrollView>
-          <ScrollView 
-            style={styles.page}
-            contentContainerStyle={styles.scrollContentContainer}
-          >
-            <TrendingPage />
-          </ScrollView>
-          <ScrollView 
-            style={styles.page}
-            contentContainerStyle={styles.scrollContentContainer}
-          >
-            <MyBlogPage />
-          </ScrollView>
-        </Swiper>
-      )}
+          <View style={styles.blogList}>
+            {blogs && blogs.length > 0 ? (
+              blogs.map((blog) => (
+                <BlogPost
+                  key={blog.id}
+                  id={blog.id}
+                  coverPhoto={blog.blog_coverPhoto}
+                  title={blog.blog_title}
+                  introduction={blog.blog_category}
+                  hashTags={blog.blog_hashtags || []}
+                  authorName="Author Name"
+                  authorImage="https://example.com/default-author-image.jpg"
+                  date="Date"
+                  onPress={() => handleReadMore(blog.id)}
+                />
+              ))
+            ) : (
+              <Text style={styles.noBlogsText}>No blogs available</Text>
+            )}
+          </View>
+        </ScrollView>
+        <ScrollView 
+          style={styles.page}
+          contentContainerStyle={styles.scrollContentContainer}
+        >
+          <TrendingPage />
+        </ScrollView>
+        <ScrollView 
+          style={styles.page}
+          contentContainerStyle={styles.scrollContentContainer}
+        >
+          <MyBlogPage />
+        </ScrollView>
+      </Swiper>
     </View>
   );
 };
