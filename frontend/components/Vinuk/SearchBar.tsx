@@ -11,7 +11,7 @@ export default function SearchBar() {
             console.log(data, details);
         }}
         query={{
-            key: 'AIzaSyBH7riketYEacEHYifh_GwefBIz6EsiG2o',
+            key: 'AIzaSyBBk1ph6x5-jtBGBk3JhV6wkX1lfaLYJ5Y',
             language: 'en',
         }}
         currentLocation={true}
