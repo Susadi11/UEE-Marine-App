@@ -27,9 +27,9 @@ export default function EventCard({ event }: EventCardProps) {
       {/* Event Details */}
       <View style={styles.detailsContainer}>
         <Text style={styles.title}>{event.title}</Text>
-        <Text style={styles.address}>
+        {/* <Text style={styles.address}>
           {event.location.latitude}, {event.location.longitude}
-        </Text>
+        </Text> */}
         <Text style={styles.description}>{event.description}</Text>
       </View>
     </View>
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     borderRadius: 8, // Reduced border radius for softer corners
     overflow: 'hidden',
     marginBottom: 20,
-    marginHorizontal: 5, // Equal spacing between cards horizontally
+    marginHorizontal: 2, // Equal spacing between cards horizontally
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
