@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, ActivityIndicator, ScrollView } from 'react-native';
-import MapView, { Marker } from 'react-native-maps'; // Import Marker for placing event markers
+import MapView from 'react-native-maps';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebaseConfig'; // Import your Firebase configuration
 import EventCard from '../components/Vinuk/EventCard';
@@ -27,7 +27,7 @@ const MapScreen = () => {
   const [loading, setLoading] = useState(true); // For location loading state
   const [events, setEvents] = useState<Event[]>([]); // To store events fetched from Firestore with the correct type
 
-  // Fetch user location when component mounts
+  // Fetch location when component mounts
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -88,6 +88,8 @@ const MapScreen = () => {
     fetchEvents();
   }, []);
   
+  
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -100,12 +102,11 @@ const MapScreen = () => {
   return (
     <View style={styles.container}>
 
-      <Header />
+      <Header/>
 
       <View>
-        <SearchBar />
+        <SearchBar/>
       </View>
-
       {/* Map Component */}
       <MapView
         style={styles.map}
@@ -116,21 +117,7 @@ const MapScreen = () => {
           longitudeDelta: 0.05,
         }}
         showsUserLocation={true}
-      >
-        {/* Display markers for each event */}
-        {events.map(event => (
-          <Marker
-            key={event.id}
-            coordinate={{
-              latitude: event.location.latitude,
-              longitude: event.location.longitude,
-            }}
-            title={event.title}
-            description={event.description}
-          />
-        ))}
-      </MapView>
-
+      />
       {/* Event Card List */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.EventListContainer}>
         {events.map(event => (
