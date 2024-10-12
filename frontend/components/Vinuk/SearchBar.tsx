@@ -8,15 +8,17 @@ export default function SearchBar() {
       <GooglePlacesAutocomplete
         placeholder="Search Ocean Events"
         onPress={(data, details = null) => {
-          console.log(data, details);
+            console.log(data, details);
         }}
         query={{
-          key: 'YOUR_API_KEY', // Replace this with your actual Google API key
-          language: 'en',
+            key: 'AIzaSyBH7riketYEacEHYifh_GwefBIz6EsiG2o',
+            language: 'en',
         }}
         currentLocation={true}
         currentLocationLabel="Current location"
-      />
+        onFail={(error) => console.error(error)} // Log errors
+        />
+
     </View>
   );
 }

@@ -1,16 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, Text, View, TextInput, ActivityIndicator } from 'react-native';
 import MapView, { Marker } from "react-native-maps";
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import Header from '../components/Vinuk/Header'; // Import the header component
 import SearchBar from '@/components/Vinuk/SearchBar';
+import EventList from '@/components/Vinuk/EventList';
+import GlobalAPI from '@/Util/GlobalAPI';
 
 const MapScreen = () => {
   // Specify the type of location, which will hold coordinates
   const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null); // Make errorMsg a string or null
   const [loading, setLoading] = useState(true);
+  // const [location, setLocation] = useContext{UserLocationContext};
+
+  // const GetNearByPlace=()=>{
+  //   const data ={
+  //     "includedTypes": ["restaurant"],
+  //     "maxResultCount": 10,
+  //     "locationRestriction": {
+  //       "circle": {
+  //         "center": {
+  //           "latitude": 37.7937,
+  //           "longitude": -122.3965},
+  //         "radius": 500.0
+  //       }
+  //   }
+
+  //   GlobalAPI.NewNearByPlace(data).then(resp=>{
+  //     console.log(resp.data);
+  //   })
+  // }
 
   useEffect(() => {
     (async () => {
@@ -61,6 +82,9 @@ const MapScreen = () => {
         }}
         showsUserLocation={true}
       />
+      <View style={styles.EventListContainer}>
+        <EventList />
+      </View>
 
     </View>
   );
@@ -79,6 +103,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  EventListContainer: {
+    position: 'absolute',
+    bottom: 0,
+    zIndex: 10,
+    width: '100%',
   },
 });
 
