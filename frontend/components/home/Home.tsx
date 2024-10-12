@@ -14,6 +14,7 @@ type RootStackParamList = {
   Home: undefined;
   ExploreEvents: undefined;
   Settings: undefined;
+  Profile: undefined;
   MapScreen: undefined;
   TrendingPage: undefined;
   BlogDetail: { blogData: Blog };
@@ -146,7 +147,7 @@ const Home: React.FC = () => {
       {/* Welcome Message */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
             <Ionicons name="person-circle-outline" size={28} color="#333" />
           </TouchableOpacity>
           <Text style={styles.welcomeText}>Hi</Text>

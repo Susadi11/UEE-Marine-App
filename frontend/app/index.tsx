@@ -40,6 +40,7 @@ import MusicPlayer3 from '@/screens/MusicPlayer3';
 import MusicPlayer4 from '@/screens/MusicPlayer4';
 import MusicHistory from '@/screens/MusicHistory';
 import AddBlog from '@/components/blogComponent/AddBlog';
+import Profile from '@/screens/Profile';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -220,6 +221,7 @@ const MainStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="Tabs" component={MainTabs} />
     <Stack.Screen name="Settings" component={Settings} />
+    <Stack.Screen name="Profile" component={Profile} />
     <Stack.Screen name="SeaWaveTrack" component={SeaWaveTrack} />
     <Stack.Screen name="MapScreen" component={Map} />
     <Stack.Screen name="PremiumPage" component={PremiumPage} />
