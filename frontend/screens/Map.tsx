@@ -1,52 +1,94 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { StyleSheet, Text, View, TextInput, ActivityIndicator } from 'react-native';
-import MapView, { Marker } from "react-native-maps";
-import { Ionicons } from '@expo/vector-icons';
-import * as Location from 'expo-location';
-import Header from '../components/Vinuk/Header'; // Import the header component
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, ActivityIndicator, ScrollView } from 'react-native';
+import MapView from 'react-native-maps';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../firebaseConfig'; // Import your Firebase configuration
+import EventCard from '../components/Vinuk/EventCard';
+import * as Location from 'expo-location'; // Correct the Location import
+import Header from '@/components/Vinuk/Header';
 import SearchBar from '@/components/Vinuk/SearchBar';
-import EventList from '@/components/Vinuk/EventList';
-import GlobalAPI from '@/Util/GlobalAPI';
+
+// Define Event interface here or import it from another file
+interface Event {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  location: {
+    latitude: number;
+    longitude: number;
+  };
+  date: string;
+  time: string;
+}
 
 const MapScreen = () => {
-  // Specify the type of location, which will hold coordinates
-  const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null); // Make errorMsg a string or null
-  const [loading, setLoading] = useState(true);
-  // const [location, setLocation] = useContext{UserLocationContext};
+  const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null); // Corrected the location state type
+  const [loading, setLoading] = useState(true); // For location loading state
+  const [events, setEvents] = useState<Event[]>([]); // To store events fetched from Firestore with the correct type
 
-  // const GetNearByPlace=()=>{
-  //   const data ={
-  //     "includedTypes": ["restaurant"],
-  //     "maxResultCount": 10,
-  //     "locationRestriction": {
-  //       "circle": {
-  //         "center": {
-  //           "latitude": 37.7937,
-  //           "longitude": -122.3965},
-  //         "radius": 500.0
-  //       }
-  //   }
-
-  //   GlobalAPI.NewNearByPlace(data).then(resp=>{
-  //     console.log(resp.data);
-  //   })
-  // }
-
+  // Fetch location when component mounts
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
         setLoading(false);
         return;
       }
 
       let userLocation = await Location.getCurrentPositionAsync({});
-      setLocation(userLocation.coords); // Only set the coordinates
+      setLocation(userLocation.coords);
       setLoading(false);
     })();
   }, []);
+
+  // Fetch events from Firestore
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'events'));
+        const eventList: Event[] = []; // Specify the type of eventList as Event[]
+        
+        querySnapshot.forEach(doc => {
+          const data = doc.data();
+  
+          // Ensure that the data contains all the required fields for an Event
+          if (
+            data.title && 
+            data.description && 
+            data.imageUrl && 
+            data.location?.latitude && 
+            data.location?.longitude && 
+            data.date && 
+            data.time
+          ) {
+            const event: Event = {
+              id: doc.id, // Set the document id
+              title: data.title,
+              description: data.description,
+              imageUrl: data.imageUrl,
+              location: {
+                latitude: data.location.latitude,
+                longitude: data.location.longitude
+              },
+              date: data.date,
+              time: data.time
+            };
+  
+            eventList.push(event); // Push the event into the eventList
+          }
+        });
+        
+        setEvents(eventList); // Set the events state
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      }
+    };
+  
+    fetchEvents();
+  }, []);
+  
+  
 
   if (loading) {
     return (
@@ -57,21 +99,15 @@ const MapScreen = () => {
     );
   }
 
-  if (errorMsg) {
-    return (
-      <View style={styles.container}>
-        <Text>{errorMsg}</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
-      {/* Header Component */}
-      <Header />
-      <SearchBar />
 
-      {/* Map */}
+      <Header/>
+
+      <View>
+        <SearchBar/>
+      </View>
+      {/* Map Component */}
       <MapView
         style={styles.map}
         initialRegion={{
@@ -82,10 +118,12 @@ const MapScreen = () => {
         }}
         showsUserLocation={true}
       />
-      <View style={styles.EventListContainer}>
-        <EventList />
-      </View>
-
+      {/* Event Card List */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.EventListContainer}>
+        {events.map(event => (
+          <EventCard key={event.id} event={event} /> // Pass each event to EventCard component
+        ))}
+      </ScrollView>
     </View>
   );
 };
