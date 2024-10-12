@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, ActivityIndicator, ScrollView } from 'react-native';
-import MapView from 'react-native-maps';
+import { StyleSheet, Text, View, ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native';
+import MapView, { Marker, Polyline } from 'react-native-maps';
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../firebaseConfig'; // Import your Firebase configuration
+import { db } from '../firebaseConfig';
 import EventCard from '../components/Vinuk/EventCard';
-import * as Location from 'expo-location'; // Correct the Location import
+import * as Location from 'expo-location';
 import Header from '@/components/Vinuk/Header';
 import SearchBar from '@/components/Vinuk/SearchBar';
+import axios from 'axios';
+import AntDesign from '@expo/vector-icons/AntDesign';
+import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
-// Define Event interface here or import it from another file
+const API_KEY = 'AIzaSyB-lnBLwMFZ30uDuWSgCdDYn63pa1wvWww';
+
 interface Event {
   id: string;
   title: string;
@@ -23,11 +27,19 @@ interface Event {
 }
 
 const MapScreen = () => {
-  const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null); // Corrected the location state type
-  const [loading, setLoading] = useState(true); // For location loading state
-  const [events, setEvents] = useState<Event[]>([]); // To store events fetched from Firestore with the correct type
+  const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [directionsCoordinates, setDirectionsCoordinates] = useState<{ latitude: number; longitude: number }[]>([]);
+  const [showDirections, setShowDirections] = useState(false);
+  const [selectedEventLocation, setSelectedEventLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
-  // Fetch location when component mounts
+  let [fontsLoaded] = useFonts({
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+  });
+
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -42,53 +54,103 @@ const MapScreen = () => {
     })();
   }, []);
 
-  // Fetch events from Firestore
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, 'events'));
-        const eventList: Event[] = []; // Specify the type of eventList as Event[]
-        
+        const eventList: Event[] = [];
+
         querySnapshot.forEach(doc => {
           const data = doc.data();
-  
-          // Ensure that the data contains all the required fields for an Event
+
           if (
-            data.title && 
-            data.description && 
-            data.imageUrl && 
-            data.location?.latitude && 
-            data.location?.longitude && 
-            data.date && 
+            data.title &&
+            data.description &&
+            data.imageUrl &&
+            data.location?.latitude &&
+            data.location?.longitude &&
+            data.date &&
             data.time
           ) {
             const event: Event = {
-              id: doc.id, // Set the document id
+              id: doc.id,
               title: data.title,
               description: data.description,
               imageUrl: data.imageUrl,
               location: {
                 latitude: data.location.latitude,
-                longitude: data.location.longitude
+                longitude: data.location.longitude,
               },
               date: data.date,
-              time: data.time
+              time: data.time,
             };
-  
-            eventList.push(event); // Push the event into the eventList
+
+            eventList.push(event);
           }
         });
-        
-        setEvents(eventList); // Set the events state
+
+        setEvents(eventList);
       } catch (error) {
         console.error('Error fetching events:', error);
       }
     };
-  
+
     fetchEvents();
   }, []);
-  
-  
+
+  const handleEventCardPress = async (eventLocation: { latitude: number; longitude: number }) => {
+    if (!location) return;
+
+    try {
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/directions/json?origin=${location.latitude},${location.longitude}&destination=${eventLocation.latitude},${eventLocation.longitude}&key=${API_KEY}`
+      );
+
+      const points = response.data.routes[0].overview_polyline.points;
+      const decodePolyline = (points: string) => {
+        const coordinates: { latitude: number; longitude: number }[] = [];
+        let index = 0, len = points.length;
+        let lat = 0, lng = 0;
+
+        while (index < len) {
+          let b, shift = 0, result = 0;
+          do {
+            b = points.charCodeAt(index++) - 63;
+            result |= (b & 0x1f) << shift;
+            shift += 5;
+          } while (b >= 0x20);
+          const dlat = (result & 1) ? ~(result >> 1) : (result >> 1);
+          lat += dlat;
+
+          shift = 0;
+          result = 0;
+          do {
+            b = points.charCodeAt(index++) - 63;
+            result |= (b & 0x1f) << shift;
+            shift += 5;
+          } while (b >= 0x20);
+          const dlng = (result & 1) ? ~(result >> 1) : (result >> 1);
+          lng += dlng;
+
+          coordinates.push({ latitude: lat / 1e5, longitude: lng / 1e5 });
+        }
+        return coordinates;
+      };
+
+      const routeCoordinates = decodePolyline(points);
+      setDirectionsCoordinates(routeCoordinates);
+      setSelectedEventLocation(eventLocation); // Set the destination event location
+      setShowDirections(true);
+    } catch (error) {
+      console.error('Error fetching directions:', error);
+    }
+  };
+
+  const handleBackPress = () => {
+    setDirectionsCoordinates([]);
+    setSelectedEventLocation(null); // Clear selected event location
+    setShowDirections(false);
+  };
 
   if (loading) {
     return (
@@ -99,15 +161,15 @@ const MapScreen = () => {
     );
   }
 
+  if (!fontsLoaded) {
+    return null; // or a loading indicator
+  }
+
   return (
     <View style={styles.container}>
+      <Header />
+      <SearchBar />
 
-      <Header/>
-
-      <View>
-        <SearchBar/>
-      </View>
-      {/* Map Component */}
       <MapView
         style={styles.map}
         initialRegion={{
@@ -117,18 +179,50 @@ const MapScreen = () => {
           longitudeDelta: 0.05,
         }}
         showsUserLocation={true}
-      />
-      {/* Event Card List */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.EventListContainer}>
-        {events.map(event => (
-          <EventCard key={event.id} event={event} /> // Pass each event to EventCard component
+      >
+        {showDirections && (
+          <>
+            <Polyline coordinates={directionsCoordinates} strokeWidth={4} strokeColor="blue" />
+            {selectedEventLocation && (
+              <Marker
+                coordinate={selectedEventLocation}
+                title="Destination"
+                description="You are heading here"
+              />
+            )}
+          </>
+        )}
+
+        {!showDirections && events.map(event => (
+          <Marker
+            key={event.id}
+            coordinate={{
+              latitude: event.location.latitude,
+              longitude: event.location.longitude,
+            }}
+            title={event.title}
+            description={event.description}
+          />
         ))}
-      </ScrollView>
+      </MapView>
+
+      {showDirections && (
+        <TouchableOpacity style={styles.backButtonContainer} onPress={handleBackPress}>
+          <AntDesign name="back" size={24} color="black" />
+        </TouchableOpacity>
+      )}
+
+      {!showDirections && (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.EventListContainer}>
+          {events.map(event => (
+            <EventCard key={event.id} event={event} onPress={() => handleEventCardPress(event.location)} />
+          ))}
+        </ScrollView>
+      )}
     </View>
   );
 };
 
-// Styling
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
@@ -147,6 +241,15 @@ const styles = StyleSheet.create({
     bottom: 0,
     zIndex: 10,
     width: '100%',
+  },
+  backButtonContainer: {
+    position: 'absolute',
+    top: 110,
+    left: 20,
+    padding: 10,
+    zIndex: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 8,
   },
 });
 
